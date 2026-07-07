@@ -1,0 +1,23 @@
+name: Build & Deploy to GitHub Pages
+
+on:
+  push:
+    branches:
+      - claude/silicon-spectrum-supply-chain-wxokru
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./
+          exclude_assets: '.github'
