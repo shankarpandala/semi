@@ -1,65 +1,65 @@
 {
- "updated": "2026-07-07T04:16:12+00:00",
+ "updated": "2026-07-07T05:12:33+00:00",
  "quotes": {
   "000660.KS": {
-   "price": 2127000.0,
+   "price": 2095000.0,
    "currency": "KRW",
-   "capUSD": 991.97
+   "capUSD": 974.68
   },
   "002156.SZ": {
    "price": 68.35,
    "currency": "CNY",
-   "capUSD": 15.27
+   "capUSD": 15.29
   },
   "002185.SZ": {
    "price": 21.93,
    "currency": "CNY",
-   "capUSD": 10.73
+   "capUSD": 10.75
   },
   "002371.SZ": {
    "price": 811.0,
    "currency": "CNY",
-   "capUSD": 86.64
+   "capUSD": 86.77
   },
   "002916.SZ": {
    "price": 398.44,
    "currency": "CNY",
-   "capUSD": 39.96
+   "capUSD": 40.01
   },
   "005290.KQ": {
-   "price": 45850.0,
+   "price": 45350.0,
    "currency": "KRW",
-   "capUSD": 1.54
+   "capUSD": 1.51
   },
   "005930.KS": {
-   "price": 289000.0,
+   "price": 287000.0,
    "currency": "KRW",
-   "capUSD": 1246.8
+   "capUSD": 1235.17
   },
   "009150.KS": {
-   "price": 1641000.0,
+   "price": 1612000.0,
    "currency": "KRW",
-   "capUSD": 81.45
+   "capUSD": 79.82
   },
   "033640.KQ": {
-   "price": 20400.0,
+   "price": 20300.0,
    "currency": "KRW",
    "capUSD": 0.31
   },
   "036540.KQ": {
-   "price": 5120.0,
+   "price": 5080.0,
    "currency": "KRW",
    "capUSD": 0.55
   },
   "067310.KQ": {
-   "price": 36350.0,
+   "price": 36550.0,
    "currency": "KRW",
    "capUSD": 1.59
   },
   "0981.HK": {
    "price": 73.35,
    "currency": "HKD",
-   "capUSD": 80.06
+   "capUSD": 80.07
   },
   "1347.HK": {
    "price": 179.2,
@@ -67,204 +67,204 @@
    "capUSD": 39.7
   },
   "2317.TW": {
-   "price": 238.5,
+   "price": 237.0,
    "currency": "TWD",
-   "capUSD": 104.15
+   "capUSD": 103.45
   },
   "2356.TW": {
-   "price": 66.1,
+   "price": 65.8,
    "currency": "TWD",
-   "capUSD": 7.4
+   "capUSD": 7.36
   },
   "2382.TW": {
    "price": 375.0,
    "currency": "TWD",
-   "capUSD": 45.08
+   "capUSD": 45.06
   },
   "2408.TW": {
-   "price": 409.0,
+   "price": 404.5,
    "currency": "TWD",
-   "capUSD": 39.53
+   "capUSD": 39.07
   },
   "2449.TW": {
-   "price": 322.5,
+   "price": 318.5,
    "currency": "TWD",
-   "capUSD": 12.3
+   "capUSD": 12.14
   },
   "2454.TW": {
-   "price": 3985.0,
+   "price": 3980.0,
    "currency": "TWD",
-   "capUSD": 198.38
+   "capUSD": 198.03
   },
   "2802.T": {
-   "price": 5924.0,
+   "price": 5894.0,
    "currency": "JPY",
-   "capUSD": 34.99
+   "capUSD": 34.83
   },
   "3037.TW": {
-   "price": 855.0,
+   "price": 839.0,
    "currency": "TWD",
-   "capUSD": 41.98
+   "capUSD": 41.17
   },
   "3189.TW": {
-   "price": 725.0,
+   "price": 687.0,
    "currency": "TWD",
-   "capUSD": 11.91
+   "capUSD": 11.28
   },
   "3231.TW": {
-   "price": 156.5,
+   "price": 156.0,
    "currency": "TWD",
-   "capUSD": 15.52
+   "capUSD": 15.47
   },
   "3436.T": {
-   "price": 4656.0,
+   "price": 4586.0,
    "currency": "JPY",
-   "capUSD": 10.06
+   "capUSD": 9.91
   },
   "3532.TW": {
-   "price": 386.0,
+   "price": 378.5,
    "currency": "TWD",
-   "capUSD": 4.67
+   "capUSD": 4.58
   },
   "4004.T": {
-   "price": 16025.0,
+   "price": 15805.0,
    "currency": "JPY",
-   "capUSD": 17.92
+   "capUSD": 17.68
   },
   "4043.T": {
-   "price": 4714.0,
+   "price": 4669.0,
    "currency": "JPY",
-   "capUSD": 2.1
+   "capUSD": 2.08
   },
   "4062.T": {
-   "price": 20190.0,
+   "price": 19955.0,
    "currency": "JPY",
-   "capUSD": 34.84
+   "capUSD": 34.45
   },
   "4063.T": {
-   "price": 7225.0,
+   "price": 7167.0,
    "currency": "JPY",
-   "capUSD": 83.02
+   "capUSD": 82.39
   },
   "4091.T": {
-   "price": 6205.0,
+   "price": 6176.0,
    "currency": "JPY",
-   "capUSD": 16.6
+   "capUSD": 16.53
   },
   "4109.T": {
-   "price": 6020.0,
+   "price": 5990.0,
    "currency": "JPY",
    "capUSD": 0.45
   },
   "4186.T": {
-   "price": 10120.0,
+   "price": 10040.0,
    "currency": "JPY",
-   "capUSD": 7.5
+   "capUSD": 7.44
   },
   "456040.KS": {
-   "price": 89200.0,
+   "price": 89100.0,
    "currency": "KRW",
    "capUSD": 0.52
   },
   "4901.T": {
-   "price": 3652.0,
+   "price": 3657.0,
    "currency": "JPY",
-   "capUSD": 26.98
+   "capUSD": 27.03
   },
   "4958.TW": {
-   "price": 552.0,
+   "price": 547.0,
    "currency": "TWD",
-   "capUSD": 18.58
+   "capUSD": 18.41
   },
   "5333.T": {
-   "price": 7166.0,
+   "price": 7140.0,
    "currency": "JPY",
-   "capUSD": 12.46
+   "capUSD": 12.42
   },
   "600584.SS": {
    "price": 100.73,
    "currency": "CNY",
-   "capUSD": 26.54
+   "capUSD": 26.57
   },
   "6147.TWO": {
-   "price": 199.0,
+   "price": 196.0,
    "currency": "TWD",
-   "capUSD": 4.62
+   "capUSD": 4.55
   },
   "6239.TW": {
-   "price": 323.0,
+   "price": 318.5,
    "currency": "TWD",
-   "capUSD": 7.44
+   "capUSD": 7.34
   },
   "6361.T": {
-   "price": 6012.0,
+   "price": 5920.0,
    "currency": "JPY",
-   "capUSD": 16.97
+   "capUSD": 16.72
   },
   "6488.TWO": {
    "price": 1205.0,
    "currency": "TWD",
-   "capUSD": 17.97
+   "capUSD": 17.96
   },
   "6525.T": {
-   "price": 10625.0,
+   "price": 10505.0,
    "currency": "JPY",
-   "capUSD": 15.35
+   "capUSD": 15.18
   },
   "6856.T": {
-   "price": 26500.0,
+   "price": 26230.0,
    "currency": "JPY",
-   "capUSD": 6.88
+   "capUSD": 6.81
   },
   "6857.T": {
-   "price": 29085.0,
+   "price": 28875.0,
    "currency": "JPY",
-   "capUSD": 130.27
+   "capUSD": 129.39
   },
   "688012.SS": {
    "price": 419.5,
    "currency": "CNY",
-   "capUSD": 58.84
+   "capUSD": 58.92
   },
   "6947.T": {
-   "price": 4830.0,
+   "price": 4855.0,
    "currency": "JPY",
    "capUSD": 0.63
   },
   "6971.T": {
-   "price": 3731.0,
+   "price": 3732.0,
    "currency": "JPY",
-   "capUSD": 32.04
+   "capUSD": 32.06
   },
   "7731.T": {
-   "price": 2191.0,
+   "price": 2193.0,
    "currency": "JPY",
-   "capUSD": 4.46
+   "capUSD": 4.47
   },
   "7735.T": {
-   "price": 17085.0,
+   "price": 17055.0,
    "currency": "JPY",
-   "capUSD": 19.96
+   "capUSD": 19.94
   },
   "7751.T": {
-   "price": 4299.0,
+   "price": 4310.0,
    "currency": "JPY",
-   "capUSD": 22.69
+   "capUSD": 22.76
   },
   "8035.T": {
-   "price": 69840.0,
+   "price": 69550.0,
    "currency": "JPY",
-   "capUSD": 196.3
+   "capUSD": 195.58
   },
   "8046.TW": {
-   "price": 1070.0,
+   "price": 1045.0,
    "currency": "TWD",
-   "capUSD": 21.56
+   "capUSD": 21.05
   },
   "8150.TW": {
-   "price": 109.5,
+   "price": 108.0,
    "currency": "TWD",
-   "capUSD": 2.37
+   "capUSD": 2.34
   },
   "AAPL": {
    "price": 312.66,
@@ -279,7 +279,7 @@
   "AI.PA": {
    "price": 177.6,
    "currency": "EUR",
-   "capUSD": 129.21
+   "capUSD": 129.18
   },
   "AMAT": {
    "price": 592.79,
@@ -314,7 +314,7 @@
   "ASM.AS": {
    "price": 964.4,
    "currency": "EUR",
-   "capUSD": 53.94
+   "capUSD": 53.93
   },
   "ASML": {
    "price": 1825.07,
@@ -344,7 +344,7 @@
   "BAS.DE": {
    "price": 47.33,
    "currency": "EUR",
-   "capUSD": 47.89
+   "capUSD": 47.88
   },
   "CDNS": {
    "price": 375.77,
@@ -412,14 +412,14 @@
    "capUSD": 24.86
   },
   "MOSCHIP.NS": {
-   "price": 224.7,
+   "price": 225.5,
    "currency": "INR",
    "capUSD": 0.46
   },
   "MRK.DE": {
    "price": 142.8,
    "currency": "EUR",
-   "capUSD": 71.04
+   "capUSD": 71.02
   },
   "MRVL": {
    "price": 249.27,
@@ -494,7 +494,7 @@
   "VACN.SW": {
    "price": 692.8,
    "currency": "CHF",
-   "capUSD": 25.78
+   "capUSD": 25.77
   },
   "WAF.DE": {
    "price": 91.75,

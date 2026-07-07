@@ -25,7 +25,7 @@
   /* ---------- HERO ---------- */
   .hero{
     position:relative;
-    padding:64px 32px 40px;
+    padding:64px max(32px, calc((100% - 1400px) / 2)) 40px;
     border-bottom:1px solid var(--line);
     background:
       radial-gradient(ellipse 900px 400px at 15% -10%, rgba(139,127,216,0.14), transparent 60%),
@@ -55,20 +55,12 @@
   .stat b{display:block;font-size:26px;font-weight:600;color:var(--text);}
   .stat span{font-size:11px;color:var(--text-faint);letter-spacing:.06em;text-transform:uppercase;}
 
-  /* ---------- METHOD NOTE ---------- */
-  .method-note{
-    max-width:900px; margin-top:22px; padding:13px 16px; border-radius:10px;
-    background:var(--panel-2); border:1px solid var(--line);
-    font-size:12.5px; line-height:1.6; color:var(--text-dim);
-  }
-  .method-note b{color:var(--text);}
-
   /* ---------- CONTROLS ---------- */
   .controls{
     position:sticky; top:0; z-index:40;
     background:rgba(10,12,16,0.92); backdrop-filter:blur(10px);
     border-bottom:1px solid var(--line);
-    padding:14px 32px; display:flex; gap:14px; align-items:center; flex-wrap:wrap;
+    padding:14px max(32px, calc((100% - 1400px) / 2)); display:flex; gap:14px; align-items:center; flex-wrap:wrap;
   }
   .search-wrap{position:relative; flex:1 1 260px; max-width:380px;}
   .search-wrap svg{position:absolute; left:12px; top:50%; transform:translateY(-50%); opacity:.5;}
@@ -88,7 +80,7 @@
   .chip:hover{color:var(--text); border-color:#3a4150;}
   .chip.active{color:#0A0C10; border-color:transparent;}
   .result-count{font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--text-faint); white-space:nowrap;}
-  .legend{display:flex; gap:14px; flex-wrap:wrap; padding:10px 32px 0; font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:var(--text-faint);}
+  .legend{display:flex; gap:14px; flex-wrap:wrap; padding:10px max(32px, calc((100% - 1400px) / 2)) 0; font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:var(--text-faint);}
   .legend span{display:inline-flex; align-items:center; gap:5px;}
   .legend i{width:7px;height:7px;border-radius:50%;display:inline-block;}
   .legend i.priced{background:var(--r5);}
@@ -96,27 +88,23 @@
   .legend i.unpriced{border:1px solid var(--text-faint); background:transparent;}
 
   /* ---------- MAIN LAYOUT ---------- */
-  .layout{display:flex;}
-  .rail{
-    width:56px; flex-shrink:0; position:relative;
-    display:flex; flex-direction:column; align-items:center;
-  }
-  .rail::before{
-    content:''; position:absolute; top:0; bottom:0; left:50%; width:2px; transform:translateX(-50%);
+  .rows-outer{padding:0 max(32px, calc((100% - 1400px) / 2));}
+  .rows{position:relative; min-width:0; padding:8px 0 90px 60px;}
+  .rows::before{
+    content:''; position:absolute; left:16px; top:56px; bottom:130px; width:2px;
     background:linear-gradient(180deg,var(--r0),var(--r1),var(--r2),var(--r3),var(--r4),var(--r5),var(--r6),var(--r7),var(--r8),var(--r9));
     opacity:.35;
   }
-  .rail-node{
-    width:34px;height:34px;border-radius:9px; margin-top:58px; flex-shrink:0;
+  .tier-num{
+    position:absolute; left:-60px; top:32px;
+    width:34px;height:34px;border-radius:9px;
     display:flex; align-items:center; justify-content:center;
     font-family:'IBM Plex Mono',monospace; font-weight:600; font-size:13px;
-    background:var(--panel); border:1.5px solid var(--line); position:relative; z-index:2;
+    background:var(--panel); border:1.5px solid var(--line); z-index:2;
   }
-  .rail-node:first-child{margin-top:44px;}
-
-  .rows{flex:1; min-width:0; padding:8px 32px 100px 8px;}
 
   .row{
+    position:relative;
     padding:34px 0; border-bottom:1px solid var(--line);
     opacity:0; transform:translateY(14px); transition:opacity .5s ease, transform .5s ease;
   }
@@ -137,14 +125,11 @@
   .row-desc{color:var(--text-dim); font-size:13px; max-width:680px; margin:0 0 18px; line-height:1.55;}
 
   .strip{
-    display:flex; gap:10px; overflow-x:auto; padding:4px 4px 14px 0; scrollbar-width:thin;
+    display:grid; grid-template-columns:repeat(auto-fill, minmax(190px, 1fr));
+    gap:10px; padding:4px 0 6px;
   }
-  .strip::-webkit-scrollbar{height:6px;}
-  .strip::-webkit-scrollbar-thumb{background:var(--line); border-radius:4px;}
-  .strip::-webkit-scrollbar-track{background:transparent;}
 
   .card{
-    flex:0 0 auto; width:186px;
     background:var(--panel); border:1px solid var(--line); border-radius:10px;
     padding:12px 13px 11px; cursor:pointer; text-align:left;
     transition:border-color .15s, transform .15s, background .15s;
@@ -205,18 +190,20 @@
 
   /* ---------- FOOTER ---------- */
   footer{
-    padding:26px 32px 48px; border-top:1px solid var(--line);
+    padding:26px max(32px, calc((100% - 1400px) / 2)) 48px; border-top:1px solid var(--line);
     font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--text-faint); line-height:1.85;
   }
   footer b{color:var(--text-dim);}
 
   @media (max-width:720px){
-    .rail{display:none;}
-    .rows{padding:8px 16px 80px;}
+    .rows-outer{padding:0 16px;}
+    .rows{padding:8px 0 80px;}
+    .rows::before{display:none;}
+    .tier-num{display:none;}
     .hero{padding:44px 18px 30px;}
     .controls{padding:12px 16px;}
     .legend{padding:10px 16px 0;}
-    .card{width:168px;}
+    .strip{grid-template-columns:repeat(auto-fill, minmax(150px, 1fr));}
   }
 </style>
 </head>
@@ -234,9 +221,6 @@
     <div class="stat"><b id="statPricedCount">—</b><span>Priced / Total</span></div>
     <div class="stat"><b id="statUpdated">—</b><span>Prices as of</span></div>
   </div>
-  <div class="method-note">
-    <b>How to read the numbers.</b> Share prices and market caps are fetched live from Yahoo Finance by a scheduled GitHub Action (refreshed every ~6 hours and on each deploy); non-USD market caps are converted to USD at the same moment's FX rate. Prices are shown in each listing's native currency. If a live quote is unavailable, the page falls back to a static July 2026 snapshot (no share price shown) — so treat figures as directional, not exact-to-the-dollar. <b>"Share of tier"</b> is a company's cap as a % of that tier's <i>combined priced</i> total — a valuation-weight measure, not a product or revenue market-share figure. <b>Private</b> marks companies confirmed not to be independently publicly traded (family-, foundation-, PE-owned, or a wholly-owned subsidiary of a listed parent).
-  </div>
 </div>
 
 <div class="controls">
@@ -253,8 +237,7 @@
   <span><i class="unpriced"></i> No quote available</span>
 </div>
 
-<div class="layout">
-  <div class="rail" id="rail"></div>
+<div class="rows-outer">
   <div class="rows" id="rows"></div>
 </div>
 
@@ -536,23 +519,12 @@ if(LIVE.updated){
   document.getElementById('statUpdated').title = 'Live quotes unavailable — showing static snapshot.';
 }
 
-const railEl = document.getElementById('rail');
 const rowsEl = document.getElementById('rows');
 const chipsEl = document.getElementById('tierChips');
 const resultCountEl = document.getElementById('resultCount');
 const searchEl = document.getElementById('search');
 
 let activeTierFilter = null;
-
-TIERS.forEach(t=>{
-  const n = document.createElement('div');
-  n.className='rail-node';
-  n.style.color = t.color;
-  n.style.borderColor = t.hex+'55';
-  n.textContent = t.id;
-  n.title = t.label;
-  railEl.appendChild(n);
-});
 
 TIERS.forEach(t=>{
   const c = document.createElement('div');
@@ -570,6 +542,14 @@ TIERS.forEach(t=>{
   const row = document.createElement('div');
   row.className='row';
   row.dataset.tier = t.id;
+
+  const num = document.createElement('div');
+  num.className='tier-num';
+  num.style.color = t.color;
+  num.style.borderColor = t.hex+'55';
+  num.textContent = t.id;
+  num.title = t.label;
+  row.appendChild(num);
 
   const head = document.createElement('div');
   head.className='row-head';
