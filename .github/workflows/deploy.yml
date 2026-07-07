@@ -5,6 +5,9 @@ on:
     branches:
       - claude/silicon-spectrum-supply-chain-wxokru
       - main
+  schedule:
+    - cron: '0 */6 * * *'
+  workflow_dispatch:
 
 jobs:
   deploy:
@@ -15,9 +18,18 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Fetch live market data from Yahoo Finance
+        run: |
+          pip install yfinance
+          python scripts/fetch_market_data.py
+
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./
-          exclude_assets: '.github'
+          exclude_assets: '.github,scripts'

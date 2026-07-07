@@ -158,6 +158,7 @@
   .card .hq{font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:var(--text-faint); letter-spacing:.02em; margin-top:-3px;}
   .card .cap-value{font-family:'IBM Plex Mono',monospace; font-weight:600; font-size:14.5px; color:var(--tier-color,#ccc);}
   .card .cap-value.muted{color:var(--text-faint); font-weight:500; font-size:12.5px; font-style:italic;}
+  .card .price-line{font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--text-dim); letter-spacing:.02em;}
   .card .cap-sub{font-family:'IBM Plex Mono',monospace; font-size:9.5px; color:var(--text-faint); letter-spacing:.02em;}
   .card .bar-track{height:3px; border-radius:2px; background:var(--line); overflow:hidden; margin-top:1px;}
   .card .bar-fill{height:100%; background:var(--tier-color,#888); border-radius:2px;}
@@ -194,6 +195,7 @@
     background:var(--panel-2); border:1px solid var(--line); border-radius:10px; padding:14px 16px; margin-bottom:20px;
   }
   .drawer .cap-block .big{font-family:'IBM Plex Mono',monospace; font-size:24px; font-weight:600;}
+  .drawer .cap-block .price{font-family:'IBM Plex Mono',monospace; font-size:13px; color:var(--text); margin-top:6px;}
   .drawer .cap-block .sub{font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--text-faint); margin-top:4px;}
   .drawer .cap-block .bar-track{height:5px; border-radius:3px; background:var(--line); overflow:hidden; margin-top:10px;}
   .drawer .cap-block .bar-fill{height:100%; border-radius:3px;}
@@ -222,24 +224,25 @@
 
 <div class="hero">
   <div class="hero-spectrum"></div>
-  <p class="eyebrow"><span class="dot"></span>SAND → SILICON → SYSTEM · 119 COMPANIES · 10 TIERS · MARKET CAP BY TIER</p>
+  <p class="eyebrow"><span class="dot"></span>SAND → SILICON → SYSTEM · 119 COMPANIES · 10 TIERS · LIVE MARKET DATA</p>
   <h1>The <span>silicon spectrum</span>: every layer of the chip supply chain, sized by the market.</h1>
-  <p>From eleven-nines polysilicon to the hyperscale racks it ends up powering, each row is one tier of the stack, colored like a wavelength scan. Every company now carries its public market capitalization, and each tier totals up what its priced members are worth. Tap any card for the full breakdown, including its share of the tier.</p>
+  <p>From eleven-nines polysilicon to the hyperscale racks it ends up powering, each row is one tier of the stack, colored like a wavelength scan. Every listed company carries a live share price and market capitalization from Yahoo Finance, and each tier totals up what its priced members are worth. Tap any card for the full breakdown, including its share of the tier.</p>
   <div class="hero-stats">
     <div class="stat"><b>10</b><span>Tiers</span></div>
     <div class="stat"><b>119</b><span>Companies</span></div>
     <div class="stat"><b id="statTotalCap">—</b><span>Combined cap (priced)</span></div>
     <div class="stat"><b id="statPricedCount">—</b><span>Priced / Total</span></div>
+    <div class="stat"><b id="statUpdated">—</b><span>Prices as of</span></div>
   </div>
   <div class="method-note">
-    <b>How to read the numbers.</b> Market caps are public-market values in USD, pulled from live financial data sources in the first week of July 2026 — they drift daily and cross-listed/ADR figures can vary ~5–20% by source and moment, so treat these as directional, not exact-to-the-dollar. <b>"Share of tier"</b> is a company's cap as a % of that tier's <i>combined priced</i> total — a valuation-weight measure, not a product or revenue market-share figure. <b>Private</b> marks companies confirmed not to be independently publicly traded (family-, foundation-, PE-owned, or a wholly-owned subsidiary of a listed parent). <b>Not yet priced</b> marks smaller or regional suppliers not independently verified in this pass — ask and I'll look one up.
+    <b>How to read the numbers.</b> Share prices and market caps are fetched live from Yahoo Finance by a scheduled GitHub Action (refreshed every ~6 hours and on each deploy); non-USD market caps are converted to USD at the same moment's FX rate. Prices are shown in each listing's native currency. If a live quote is unavailable, the page falls back to a static July 2026 snapshot (no share price shown) — so treat figures as directional, not exact-to-the-dollar. <b>"Share of tier"</b> is a company's cap as a % of that tier's <i>combined priced</i> total — a valuation-weight measure, not a product or revenue market-share figure. <b>Private</b> marks companies confirmed not to be independently publicly traded (family-, foundation-, PE-owned, or a wholly-owned subsidiary of a listed parent).
   </div>
 </div>
 
 <div class="controls">
   <div class="search-wrap">
     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-    <input id="search" type="text" placeholder="Search company, HQ, or domain…" autocomplete="off">
+    <input id="search" type="text" placeholder="Search company, HQ, ticker, or domain…" autocomplete="off">
   </div>
   <div class="tier-chips" id="tierChips"></div>
   <div class="result-count" id="resultCount"></div>
@@ -247,7 +250,7 @@
 <div class="legend">
   <span><i class="priced"></i> Priced (color = tier)</span>
   <span><i class="private"></i> Private / subsidiary</span>
-  <span><i class="unpriced"></i> Not yet priced</span>
+  <span><i class="unpriced"></i> No quote available</span>
 </div>
 
 <div class="layout">
@@ -257,7 +260,7 @@
 
 <footer>
   DATA SCOPE — 119 companies across the full sand-to-system chain. Two multi-company source rows were split for accurate pricing: "Amazon / Google / Microsoft" → 3 rows; "Wistron / Inventec" → 2 rows.<br>
-  MARKET CAP SOURCES — companiesmarketcap.com, stockanalysis.com, MacroTrends, Investing.com, PitchBook, Yahoo Finance, TradingEconomics; gathered July 2026. Figures are approximate and will have moved since.<br>
+  MARKET DATA — live share prices &amp; market caps from Yahoo Finance, refreshed by GitHub Actions on a ~6-hour schedule; non-USD caps converted at live FX rates. Static July 2026 snapshot used as fallback when a quote is unavailable.<br>
   SUPPLY-CHAIN SOURCES — Semiconductor Engineering · imec · 24 Market Reports · CSIMarket · Fortune Business Insights · TRUMPF newsroom.
 </footer>
 
@@ -270,6 +273,7 @@
 
   <div class="cap-block" id="drawerCapBlock">
     <div class="big" id="drawerCapBig"></div>
+    <div class="price" id="drawerPrice"></div>
     <div class="sub" id="drawerCapSub"></div>
     <div class="bar-track"><div class="bar-fill" id="drawerCapBar"></div></div>
   </div>
@@ -280,21 +284,23 @@
 </div>
 
 <script>
-// cap figures in USD billions; null = not priced in this pass. status: 'private' overrides cap.
-// crossParent: for entities whose value is carried by a same-parent listing elsewhere, to avoid double count.
+// cap figures in USD billions = static fallback snapshot (July 2026), overridden by
+// live Yahoo Finance data from market-data.json when available. null = no fallback figure.
+// ticker = Yahoo Finance symbol for the company's primary listing (ADR where the ADR
+// reflects the full company). status: 'private' = confirmed not independently listed.
 const TIERS = [
   {
     id:0, color:'var(--r0)', hex:'#8B7FD8', label:'Tier 0–1 · Raw Materials & Wafers',
     icon:'<path d="M12 2 L20 7 L20 17 L12 22 L4 17 L4 7 Z" stroke="currentColor" stroke-width="1.6" fill="none"/><path d="M12 2 V22 M4 7 L20 17 M20 7 L4 17" stroke="currentColor" stroke-width="1" opacity=".5"/>',
     desc:'Metallurgical silicon purified to eleven-nines polysilicon, then pulled into monocrystalline ingots via the Czochralski process and sliced into bare wafers.',
     companies:[
-      {name:'Wacker Chemie', hq:'Germany', domain:'Electronic-grade polysilicon feedstock', cap:5.2},
-      {name:'Tokuyama Corporation', hq:'Japan', domain:'High-purity polysilicon', cap:2.2},
-      {name:'SUMCO Corporation', hq:'Japan', domain:'Electronic-grade silicon wafers, high-purity substrates', cap:9.2},
-      {name:'GlobalWafers', hq:'Taiwan', domain:'Bare silicon wafers, compound semiconductors', cap:16.8},
-      {name:'Siltronic AG', hq:'Germany', domain:'Hyper-pure silicon wafers', cap:3.3},
-      {name:'Formosa SUMCO Technology', hq:'Taiwan', domain:'Silicon wafers (joint venture)', cap:4.8},
-      {name:'OCI Company', hq:'South Korea', domain:'Polysilicon manufacturing', cap:null},
+      {name:'Wacker Chemie', hq:'Germany', ticker:'WCH.DE', domain:'Electronic-grade polysilicon feedstock', cap:5.2},
+      {name:'Tokuyama Corporation', hq:'Japan', ticker:'4043.T', domain:'High-purity polysilicon', cap:2.2},
+      {name:'SUMCO Corporation', hq:'Japan', ticker:'3436.T', domain:'Electronic-grade silicon wafers, high-purity substrates', cap:9.2},
+      {name:'GlobalWafers', hq:'Taiwan', ticker:'6488.TWO', domain:'Bare silicon wafers, compound semiconductors', cap:16.8},
+      {name:'Siltronic AG', hq:'Germany', ticker:'WAF.DE', domain:'Hyper-pure silicon wafers', cap:3.3},
+      {name:'Formosa SUMCO Technology', hq:'Taiwan', ticker:'3532.TW', domain:'Silicon wafers (joint venture)', cap:4.8},
+      {name:'OCI Company', hq:'South Korea', ticker:'456040.KS', domain:'Polysilicon manufacturing', cap:null},
       {name:'Hemlock Semiconductor', hq:'United States', domain:'Ultra-pure polycrystalline silicon', cap:null, status:'private', note:'Private joint venture (Shin-Etsu Handotai / Mitsubishi Materials); not publicly traded.'},
       {name:'Shin-Etsu Handotai', hq:'Japan', domain:'Global leader in silicon wafers, advanced substrates', cap:null, status:'crossref', note:'Wholly-owned subsidiary of Shin-Etsu Chemical (see Tier 2) — value carried there, not double-counted here.'},
     ]
@@ -304,22 +310,22 @@ const TIERS = [
     icon:'<path d="M9 3h6 M10 3v5l-5 9a2 2 0 0 0 2 3h10a2 2 0 0 0 2-3l-5-9V3" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/>',
     desc:'Ultra-high-purity wet chemicals, EUV/DUV photoresists, and specialty process gases feeding cleaning, lithography, etch, and deposition steps.',
     companies:[
-      {name:'Linde plc', hq:'United Kingdom', domain:'UHP gases, electronic specialty gases', cap:238.4},
-      {name:'Air Liquide', hq:'France', domain:'Bulk and electronic specialty gases (ESG)', cap:123.4},
-      {name:'Shin-Etsu Chemical', hq:'Japan', domain:'Photoresists, adhesion promoters (HMDS); parent of Shin-Etsu Handotai (Tier 0)', cap:77.6},
-      {name:'Merck KGaA (Versum Materials)', hq:'Germany', domain:'Electronic materials, specialty gases, spin-on dielectrics', cap:68.9},
-      {name:'Air Products and Chemicals', hq:'United States', domain:'Industrial and electronic specialty gases', cap:63.0},
-      {name:'BASF SE', hq:'Germany', domain:'High-purity sulfuric acid, cleaning chemicals', cap:49.1},
-      {name:'Entegris (incl. KMG Chemicals)', hq:'United States', domain:'Advanced filtration, specialty chemicals, CMP slurries', cap:27.2},
-      {name:'Taiyo Nippon Sanso', hq:'Japan', domain:'Specialty gases, gas delivery systems', cap:14.2},
-      {name:'Avantor Performance Materials', hq:'United States', domain:'High-purity solvents, etchants', cap:6.8},
-      {name:'Solvay S.A.', hq:'Belgium', domain:'Specialty polymers, electronic wet chemicals', cap:3.2, note:'Solvay demerged its specialty-chemicals arm into Syensqo in Dec 2023; figure shown is Solvay SA post-split.'},
-      {name:'Stella Chemifa', hq:'Japan', domain:'UHP hydrofluoric acid, wet chemicals', cap:null},
-      {name:'Kanto Chemical', hq:'Japan', domain:'Wet etchants, cleaning chemicals, sulfuric acid', cap:null},
-      {name:'Tokyo Ohka Kogyo (TOK)', hq:'Japan', domain:'Photoresists (EUV, ArF, KrF), developers', cap:null},
-      {name:'Fujifilm Holdings', hq:'Japan', domain:'Photoresists, CMP slurries, advanced polymers', cap:null},
-      {name:'Dongjin Semichem', hq:'South Korea', domain:'KrF/ArF photoresists, wet chemicals', cap:null},
-      {name:'Resonac Holdings', hq:'Japan', domain:'High-purity etching gases, CMP slurries', cap:null},
+      {name:'Linde plc', hq:'United Kingdom', ticker:'LIN', domain:'UHP gases, electronic specialty gases', cap:238.4},
+      {name:'Air Liquide', hq:'France', ticker:'AI.PA', domain:'Bulk and electronic specialty gases (ESG)', cap:123.4},
+      {name:'Shin-Etsu Chemical', hq:'Japan', ticker:'4063.T', domain:'Photoresists, adhesion promoters (HMDS); parent of Shin-Etsu Handotai (Tier 0)', cap:77.6},
+      {name:'Merck KGaA (Versum Materials)', hq:'Germany', ticker:'MRK.DE', domain:'Electronic materials, specialty gases, spin-on dielectrics', cap:68.9},
+      {name:'Air Products and Chemicals', hq:'United States', ticker:'APD', domain:'Industrial and electronic specialty gases', cap:63.0},
+      {name:'BASF SE', hq:'Germany', ticker:'BAS.DE', domain:'High-purity sulfuric acid, cleaning chemicals', cap:49.1},
+      {name:'Entegris (incl. KMG Chemicals)', hq:'United States', ticker:'ENTG', domain:'Advanced filtration, specialty chemicals, CMP slurries', cap:27.2},
+      {name:'Taiyo Nippon Sanso', hq:'Japan', ticker:'4091.T', domain:'Specialty gases, gas delivery systems (Nippon Sanso Holdings)', cap:14.2},
+      {name:'Avantor Performance Materials', hq:'United States', ticker:'AVTR', domain:'High-purity solvents, etchants', cap:6.8},
+      {name:'Solvay S.A.', hq:'Belgium', ticker:'SOLB.BR', domain:'Specialty polymers, electronic wet chemicals', cap:3.2, note:'Solvay demerged its specialty-chemicals arm into Syensqo in Dec 2023; figure shown is Solvay SA post-split.'},
+      {name:'Stella Chemifa', hq:'Japan', ticker:'4109.T', domain:'UHP hydrofluoric acid, wet chemicals', cap:null},
+      {name:'Kanto Chemical', hq:'Japan', domain:'Wet etchants, cleaning chemicals, sulfuric acid', cap:null, status:'private', note:'Privately held; not publicly traded.'},
+      {name:'Tokyo Ohka Kogyo (TOK)', hq:'Japan', ticker:'4186.T', domain:'Photoresists (EUV, ArF, KrF), developers', cap:null},
+      {name:'Fujifilm Holdings', hq:'Japan', ticker:'4901.T', domain:'Photoresists, CMP slurries, advanced polymers', cap:null},
+      {name:'Dongjin Semichem', hq:'South Korea', ticker:'005290.KQ', domain:'KrF/ArF photoresists, wet chemicals', cap:null},
+      {name:'Resonac Holdings', hq:'Japan', ticker:'4004.T', domain:'High-purity etching gases, CMP slurries', cap:null},
       {name:'JSR Corporation', hq:'Japan', domain:'Advanced photoresists, anti-reflective coatings', cap:null, status:'private', note:'Taken private in 2024 via a Japan Investment Corporation-led buyout; delisted from Tokyo Stock Exchange.'},
       {name:'SK Specialty', hq:'South Korea', domain:'CVD and deposition specialty gases', cap:null, status:'private', note:'Wholly-owned subsidiary within the SK Group; not separately listed.'},
     ]
@@ -329,15 +335,15 @@ const TIERS = [
     icon:'<circle cx="12" cy="12" r="3.2" stroke="currentColor" stroke-width="1.6" fill="none"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1" stroke="currentColor" stroke-width="1.4"/>',
     desc:'The mechanical, optical, and electrical building blocks — vacuum pumps, RF generators, mirrors, lasers — that equipment makers integrate into finished tools.',
     companies:[
-      {name:'MKS Instruments', hq:'United States', domain:'RF power subsystems, vacuum gauges, MFCs (now MKS Inc.)', cap:21.4},
-      {name:'VAT Group', hq:'Switzerland', domain:'High-vacuum valves for process chambers', cap:20.6},
-      {name:'Advanced Energy Industries', hq:'United States', domain:'Precision power delivery, RF matching networks', cap:14.4},
-      {name:'Ultra Clean Technology', hq:'United States', domain:'Fluid delivery systems, gas panels', cap:5.4},
-      {name:'Ichor Systems', hq:'United States', domain:'Gas delivery and chemical delivery subsystems', cap:3.4},
-      {name:'Comet Group', hq:'Switzerland', domain:'RF impedance matching networks, vacuum capacitors', cap:null},
-      {name:'Horiba', hq:'Japan', domain:'Mass flow controllers, fluid measurement', cap:null},
-      {name:'Ebara Corporation', hq:'Japan', domain:'Dry vacuum pumps, CMP subsystems', cap:null},
-      {name:'NGK Insulators', hq:'Japan', domain:'Ceramic components for process chambers', cap:null},
+      {name:'MKS Instruments', hq:'United States', ticker:'MKSI', domain:'RF power subsystems, vacuum gauges, MFCs (now MKS Inc.)', cap:21.4},
+      {name:'VAT Group', hq:'Switzerland', ticker:'VACN.SW', domain:'High-vacuum valves for process chambers', cap:20.6},
+      {name:'Advanced Energy Industries', hq:'United States', ticker:'AEIS', domain:'Precision power delivery, RF matching networks', cap:14.4},
+      {name:'Ultra Clean Technology', hq:'United States', ticker:'UCTT', domain:'Fluid delivery systems, gas panels', cap:5.4},
+      {name:'Ichor Systems', hq:'United States', ticker:'ICHR', domain:'Gas delivery and chemical delivery subsystems', cap:3.4},
+      {name:'Comet Group', hq:'Switzerland', ticker:'COTN.SW', domain:'RF impedance matching networks, vacuum capacitors', cap:null},
+      {name:'Horiba', hq:'Japan', ticker:'6856.T', domain:'Mass flow controllers, fluid measurement', cap:null},
+      {name:'Ebara Corporation', hq:'Japan', ticker:'6361.T', domain:'Dry vacuum pumps, CMP subsystems', cap:null},
+      {name:'NGK Insulators', hq:'Japan', ticker:'5333.T', domain:'Ceramic components for process chambers', cap:null},
       {name:'Carl Zeiss SMT', hq:'Germany', domain:'High-NA and EUV optical systems, mirrors', cap:null, status:'private', note:'Part of Zeiss Group, owned by the Carl Zeiss Foundation; not publicly traded.'},
       {name:'TRUMPF', hq:'Germany', domain:'High-power drive lasers for EUV generation', cap:null, status:'private', note:'Family-owned (Leibinger family); not publicly traded.'},
       {name:'Edwards (Atlas Copco)', hq:'United Kingdom', domain:'Vacuum pumps, abatement subsystems', cap:null, status:'private', note:'Wholly-owned subsidiary of Atlas Copco AB (public in Sweden); not broken out separately.'},
@@ -348,18 +354,18 @@ const TIERS = [
     icon:'<rect x="4" y="7" width="16" height="12" rx="1.5" stroke="currentColor" stroke-width="1.6" fill="none"/><path d="M9 7V4h6v3" stroke="currentColor" stroke-width="1.6" fill="none"/><circle cx="9" cy="13" r="1.4" stroke="currentColor" stroke-width="1.4" fill="none"/><circle cx="15" cy="13" r="1.4" stroke="currentColor" stroke-width="1.4" fill="none"/>',
     desc:'The capital equipment oligopoly: lithography, deposition, etch, ion implantation, CMP, and metrology tools installed inside the fab cleanroom.',
     companies:[
-      {name:'ASML', hq:'Netherlands', domain:'Absolute monopoly in EUV and High-NA EUV lithography', cap:743.7},
-      {name:'Applied Materials', hq:'United States', domain:'Market leader in deposition, materials engineering, CMP, etch', cap:490.0},
-      {name:'Lam Research', hq:'United States', domain:'Dominant in advanced etch and dielectric deposition', cap:486.5},
-      {name:'KLA Corporation', hq:'United States', domain:'Yield management, defect inspection, metrology', cap:339.1},
-      {name:'Tokyo Electron (TEL)', hq:'Japan', domain:'Coater/developers (track systems), etch, deposition', cap:212.5},
-      {name:'NAURA Technology Group', hq:'China', domain:'Etch, deposition, and cleaning equipment', cap:77.2},
-      {name:'ASM International', hq:'Netherlands', domain:'Atomic Layer Deposition (ALD), epitaxy', cap:59.8},
-      {name:'Advanced Micro-Fabrication Equipment (AMEC)', hq:'China', domain:'Plasma etching and MOCVD equipment', cap:49.8},
-      {name:'Canon', hq:'Japan', domain:'i-line, KrF, and nanoimprint lithography', cap:22.2},
-      {name:'Screen Semiconductor Solutions', hq:'Japan', domain:'Wafer cleaning equipment, coater/developers (SCREEN Holdings)', cap:19.6},
-      {name:'Kokusai Electric', hq:'Japan', domain:'Batch deposition systems, thermal processing', cap:14.7},
-      {name:'Nikon', hq:'Japan', domain:'ArF immersion and DUV lithography', cap:null},
+      {name:'ASML', hq:'Netherlands', ticker:'ASML', domain:'Absolute monopoly in EUV and High-NA EUV lithography', cap:743.7},
+      {name:'Applied Materials', hq:'United States', ticker:'AMAT', domain:'Market leader in deposition, materials engineering, CMP, etch', cap:490.0},
+      {name:'Lam Research', hq:'United States', ticker:'LRCX', domain:'Dominant in advanced etch and dielectric deposition', cap:486.5},
+      {name:'KLA Corporation', hq:'United States', ticker:'KLAC', domain:'Yield management, defect inspection, metrology', cap:339.1},
+      {name:'Tokyo Electron (TEL)', hq:'Japan', ticker:'8035.T', domain:'Coater/developers (track systems), etch, deposition', cap:212.5},
+      {name:'NAURA Technology Group', hq:'China', ticker:'002371.SZ', domain:'Etch, deposition, and cleaning equipment', cap:77.2},
+      {name:'ASM International', hq:'Netherlands', ticker:'ASM.AS', domain:'Atomic Layer Deposition (ALD), epitaxy', cap:59.8},
+      {name:'Advanced Micro-Fabrication Equipment (AMEC)', hq:'China', ticker:'688012.SS', domain:'Plasma etching and MOCVD equipment', cap:49.8},
+      {name:'Canon', hq:'Japan', ticker:'7751.T', domain:'i-line, KrF, and nanoimprint lithography', cap:22.2},
+      {name:'Screen Semiconductor Solutions', hq:'Japan', ticker:'7735.T', domain:'Wafer cleaning equipment, coater/developers (SCREEN Holdings)', cap:19.6},
+      {name:'Kokusai Electric', hq:'Japan', ticker:'6525.T', domain:'Batch deposition systems, thermal processing', cap:14.7},
+      {name:'Nikon', hq:'Japan', ticker:'7731.T', domain:'ArF immersion and DUV lithography', cap:null},
       {name:'Hitachi High-Tech', hq:'Japan', domain:'Etch systems, electron microscopes, metrology', cap:null, status:'private', note:'Wholly-owned subsidiary of Hitachi Ltd since 2020; delisted.'},
       {name:'Plasma-Therm', hq:'United States', domain:'Specialty plasma etch and deposition', cap:null, status:'private', note:'Privately held (equipment specialist); not publicly traded.'},
     ]
@@ -369,15 +375,15 @@ const TIERS = [
     icon:'<rect x="3" y="4" width="18" height="13" rx="1.5" stroke="currentColor" stroke-width="1.6" fill="none"/><path d="M8 21h8M12 17v4" stroke="currentColor" stroke-width="1.6"/><path d="M7 9l3 2-3 2M13 13h4" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linecap="round"/>',
     desc:'The software that compiles billions of transistors into a physical floorplan, and the licensable IP blocks — CPU cores, interfaces — that speed up design.',
     companies:[
-      {name:'Arm Holdings', hq:'United Kingdom', domain:'CPU architectures (Cortex, Neoverse), mobile/embedded IP', cap:469.4},
-      {name:'Cadence Design Systems', hq:'United States', domain:'EDA software, physical design, system simulation', cap:112.0},
-      {name:'Synopsys', hq:'United States', domain:'EDA software, logic verification, extensive interface IP', cap:87.2},
-      {name:'Keysight Technologies', hq:'United States', domain:'Electronic design and test software', cap:60.2},
-      {name:'Rambus', hq:'United States', domain:'Memory interface IP, security silicon IP', cap:13.0},
-      {name:'CEVA', hq:'United States', domain:'Wireless connectivity and smart sensing IP', cap:1.4},
+      {name:'Arm Holdings', hq:'United Kingdom', ticker:'ARM', domain:'CPU architectures (Cortex, Neoverse), mobile/embedded IP', cap:469.4},
+      {name:'Cadence Design Systems', hq:'United States', ticker:'CDNS', domain:'EDA software, physical design, system simulation', cap:112.0},
+      {name:'Synopsys', hq:'United States', ticker:'SNPS', domain:'EDA software, logic verification, extensive interface IP', cap:87.2},
+      {name:'Keysight Technologies', hq:'United States', ticker:'KEYS', domain:'Electronic design and test software', cap:60.2},
+      {name:'Rambus', hq:'United States', ticker:'RMBS', domain:'Memory interface IP, security silicon IP', cap:13.0},
+      {name:'CEVA', hq:'United States', ticker:'CEVA', domain:'Wireless connectivity and smart sensing IP', cap:1.4},
       {name:'Siemens EDA (formerly Mentor)', hq:'United States', domain:'EDA software, IC verification, digital twins', cap:null, note:'Business unit of Siemens AG (a large diversified conglomerate); not separately listed, so no standalone market cap.'},
-      {name:'Alphawave Semi', hq:'United Kingdom', domain:'High-speed connectivity IP, chiplet interconnects', cap:null},
-      {name:'Zuken', hq:'Japan', domain:'PCB and electrical wiring design', cap:null},
+      {name:'Alphawave Semi', hq:'United Kingdom', ticker:'AWE.L', domain:'High-speed connectivity IP, chiplet interconnects', cap:null},
+      {name:'Zuken', hq:'Japan', ticker:'6947.T', domain:'PCB and electrical wiring design', cap:null},
       {name:'Imagination Technologies', hq:'United Kingdom', domain:'GPU and AI accelerator IP', cap:null, status:'private', note:'Owned by Canyon Bridge Capital Partners since 2017; not publicly traded.'},
       {name:'Altium', hq:'Australia', domain:'PCB design software', cap:null, status:'private', note:'Acquired by Renesas in 2024 and taken private; delisted from the ASX.'},
     ]
@@ -387,17 +393,17 @@ const TIERS = [
     icon:'<path d="M3 20V9l4 3V9l4 3V9l4 3V9l4 3v8Z" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/><path d="M3 20h18" stroke="currentColor" stroke-width="1.6"/>',
     desc:'Where wafers, chemicals, gases, tools, and designs converge — the physical fabs running hundreds of sequential steps to turn a blank wafer into finished dies.',
     companies:[
-      {name:'TSMC', hq:'Taiwan', domain:'Global leader in pure-play foundry, advanced sub-3nm nodes', cap:2396.0},
-      {name:'Samsung Electronics', hq:'South Korea', domain:'Leading IDM (memory) and advanced logic foundry', cap:1516.0},
-      {name:'SK Hynix', hq:'South Korea', domain:'IDM dominating High-Bandwidth Memory (HBM) and DRAM', cap:1280.0},
-      {name:'Micron Technology', hq:'United States', domain:'IDM focusing on advanced DRAM, NAND flash, HBM3e', cap:1278.0},
-      {name:'Intel Corporation', hq:'United States', domain:'IDM pivoting to foundry services, advanced logic', cap:673.4},
-      {name:'SMIC', hq:'China', domain:'Leading Chinese pure-play foundry', cap:78.2},
-      {name:'UMC (United Microelectronics)', hq:'Taiwan', domain:'Pure-play foundry focusing on mature and specialty nodes', cap:60.4},
-      {name:'Nanya Technology', hq:'Taiwan', domain:'DRAM manufacturing', cap:45.0},
-      {name:'GlobalFoundries', hq:'United States', domain:'Specialty pure-play foundry, RF, photonics, automotive', cap:47.1},
-      {name:'Hua Hong Semiconductor', hq:'China', domain:'Mature node and specialty pure-play foundry', cap:37.3},
-      {name:'Tower Semiconductor', hq:'Israel', domain:'Specialty analog foundry', cap:34.1},
+      {name:'TSMC', hq:'Taiwan', ticker:'TSM', domain:'Global leader in pure-play foundry, advanced sub-3nm nodes', cap:2396.0},
+      {name:'Samsung Electronics', hq:'South Korea', ticker:'005930.KS', domain:'Leading IDM (memory) and advanced logic foundry', cap:1516.0},
+      {name:'SK Hynix', hq:'South Korea', ticker:'000660.KS', domain:'IDM dominating High-Bandwidth Memory (HBM) and DRAM', cap:1280.0},
+      {name:'Micron Technology', hq:'United States', ticker:'MU', domain:'IDM focusing on advanced DRAM, NAND flash, HBM3e', cap:1278.0},
+      {name:'Intel Corporation', hq:'United States', ticker:'INTC', domain:'IDM pivoting to foundry services, advanced logic', cap:673.4},
+      {name:'SMIC', hq:'China', ticker:'0981.HK', domain:'Leading Chinese pure-play foundry', cap:78.2},
+      {name:'UMC (United Microelectronics)', hq:'Taiwan', ticker:'UMC', domain:'Pure-play foundry focusing on mature and specialty nodes', cap:60.4},
+      {name:'Nanya Technology', hq:'Taiwan', ticker:'2408.TW', domain:'DRAM manufacturing', cap:45.0},
+      {name:'GlobalFoundries', hq:'United States', ticker:'GFS', domain:'Specialty pure-play foundry, RF, photonics, automotive', cap:47.1},
+      {name:'Hua Hong Semiconductor', hq:'China', ticker:'1347.HK', domain:'Mature node and specialty pure-play foundry', cap:37.3},
+      {name:'Tower Semiconductor', hq:'Israel', ticker:'TSEM', domain:'Specialty analog foundry', cap:34.1},
       {name:'Tata Electronics', hq:'India', domain:'Emerging regional foundry and assembly operations', cap:null, status:'private', note:'Wholly-owned subsidiary of Tata Sons; not independently listed.'},
     ]
   },
@@ -406,17 +412,17 @@ const TIERS = [
     icon:'<rect x="4" y="4" width="16" height="16" rx="2" stroke="currentColor" stroke-width="1.6" fill="none"/><rect x="8" y="8" width="8" height="8" rx="1" stroke="currentColor" stroke-width="1.4" fill="none"/><path d="M4 9h-2M4 15h-2M20 9h2M20 15h2M9 4v-2M15 4v-2M9 20v2M15 20v2" stroke="currentColor" stroke-width="1.2"/>',
     desc:'Ajinomoto Build-up Film and the high-density substrates it enables — the chokepoint material behind every advanced HPC package.',
     companies:[
-      {name:'Samsung Electro-Mechanics (Semco)', hq:'South Korea', domain:'ABF substrates for memory and display applications', cap:107.0, note:'Cap surged in H1 2026 on an AI-server MLCC and substrate demand rally.'},
-      {name:'Unimicron Technology', hq:'Taiwan', domain:'Global leader in ABF substrate conversion and manufacturing', cap:48.8},
-      {name:'Kyocera Corporation', hq:'Japan', domain:'High-layer count substrates, aerospace/military packaging', cap:21.0},
-      {name:'Nan Ya PCB', hq:'Taiwan', domain:'ABF substrates, high-end printed circuit boards', cap:23.1},
-      {name:'AT&S', hq:'Austria', domain:'HDI printed circuit boards and IC substrates', cap:10.1},
-      {name:'Ibiden Co., Ltd.', hq:'Japan', domain:'Advanced IC package substrates, ABF conversion', cap:10.0},
-      {name:'Ajinomoto Co., Inc.', hq:'Japan', domain:'ABF raw material formulation and monopoly', cap:null, note:'Total corporate market cap spans a large global food business plus ABF; not verified in this pass.'},
-      {name:'Shinko Electric Industries', hq:'Japan', domain:'Advanced packaging substrates, thermal solutions', cap:null},
-      {name:'Kinsus Interconnect Tech.', hq:'Taiwan', domain:'ABF substrates for complex processors', cap:null},
-      {name:'Shennan Circuits', hq:'China', domain:'Expanding ABF substrate capacity', cap:null},
-      {name:'Zhen Ding Technology', hq:'Taiwan', domain:'PCB and IC substrate manufacturing', cap:null},
+      {name:'Samsung Electro-Mechanics (Semco)', hq:'South Korea', ticker:'009150.KS', domain:'ABF substrates for memory and display applications', cap:107.0, note:'Cap surged in H1 2026 on an AI-server MLCC and substrate demand rally.'},
+      {name:'Unimicron Technology', hq:'Taiwan', ticker:'3037.TW', domain:'Global leader in ABF substrate conversion and manufacturing', cap:48.8},
+      {name:'Kyocera Corporation', hq:'Japan', ticker:'6971.T', domain:'High-layer count substrates, aerospace/military packaging', cap:21.0},
+      {name:'Nan Ya PCB', hq:'Taiwan', ticker:'8046.TW', domain:'ABF substrates, high-end printed circuit boards', cap:23.1},
+      {name:'AT&S', hq:'Austria', ticker:'ATS.VI', domain:'HDI printed circuit boards and IC substrates', cap:10.1},
+      {name:'Ibiden Co., Ltd.', hq:'Japan', ticker:'4062.T', domain:'Advanced IC package substrates, ABF conversion', cap:10.0},
+      {name:'Ajinomoto Co., Inc.', hq:'Japan', ticker:'2802.T', domain:'ABF raw material formulation and monopoly', cap:null, note:'Total corporate market cap spans a large global food business plus ABF — cap reflects the whole group, not ABF alone.'},
+      {name:'Shinko Electric Industries', hq:'Japan', domain:'Advanced packaging substrates, thermal solutions', cap:null, status:'private', note:'Taken private in 2025 by a JIC-led consortium; delisted from the Tokyo Stock Exchange.'},
+      {name:'Kinsus Interconnect Tech.', hq:'Taiwan', ticker:'3189.TW', domain:'ABF substrates for complex processors', cap:null},
+      {name:'Shennan Circuits', hq:'China', ticker:'002916.SZ', domain:'Expanding ABF substrate capacity', cap:null},
+      {name:'Zhen Ding Technology', hq:'Taiwan', ticker:'4958.TW', domain:'PCB and IC substrate manufacturing', cap:null},
     ]
   },
   {
@@ -424,20 +430,20 @@ const TIERS = [
     icon:'<path d="M12 2 3 7l9 5 9-5-9-5Z" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/><path d="M3 12l9 5 9-5M3 17l9 5 9-5" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/>',
     desc:'Dicing, packaging, and electrically sorting finished dies — now hyper-critical thanks to CoWoS-style heterogeneous integration of HBM with logic.',
     companies:[
-      {name:'Advantest', hq:'Japan', domain:'Memory, SoC, and RF automatic test systems', cap:135.0},
-      {name:'ASE Technology (incl. SPIL)', hq:'Taiwan', domain:'Global #1 OSAT, flip-chip, SiP, advanced packaging', cap:88.0},
-      {name:'Teradyne', hq:'United States', domain:'Automatic Test Equipment (ATE) for final sorting', cap:57.0},
-      {name:'JCET Group', hq:'China', domain:'Global #3 OSAT, high-density heterogeneous integration', cap:23.0},
-      {name:'Amkor Technology', hq:'United States', domain:'Global #2 OSAT, automotive, 2.5D packaging', cap:21.0},
-      {name:'Tongfu Microelectronics (TFME)', hq:'China', domain:'Advanced chiplet packaging, strategic AMD partner', cap:15.5},
-      {name:'ChipMOS Technologies', hq:'Taiwan', domain:'Specialized in display driver ICs and memory packaging', cap:2.3},
-      {name:'Powertech Technology (PTI)', hq:'Taiwan', domain:'Dominant in memory packaging (DRAM/NAND)', cap:null},
-      {name:'King Yuan Electronics (KYEC)', hq:'Taiwan', domain:'Specialized pure-play testing (wafer sort, final test)', cap:null},
-      {name:'Huatian Technology', hq:'China', domain:'Broad spectrum OSAT, growing advanced packaging', cap:null},
-      {name:'Chipbond Technology', hq:'Taiwan', domain:'Display driver packaging, gold bumping', cap:null},
-      {name:'Hana Micron', hq:'South Korea', domain:'Memory packaging for Samsung and SK hynix', cap:null},
-      {name:'SFA Semicon', hq:'South Korea', domain:'Memory packaging (DRAM and NAND-focused)', cap:null},
-      {name:'Nepes Corporation', hq:'South Korea', domain:'Fan-out wafer-level packaging (FOWLP) specialist', cap:null},
+      {name:'Advantest', hq:'Japan', ticker:'6857.T', domain:'Memory, SoC, and RF automatic test systems', cap:135.0},
+      {name:'ASE Technology (incl. SPIL)', hq:'Taiwan', ticker:'ASX', domain:'Global #1 OSAT, flip-chip, SiP, advanced packaging', cap:88.0},
+      {name:'Teradyne', hq:'United States', ticker:'TER', domain:'Automatic Test Equipment (ATE) for final sorting', cap:57.0},
+      {name:'JCET Group', hq:'China', ticker:'600584.SS', domain:'Global #3 OSAT, high-density heterogeneous integration', cap:23.0},
+      {name:'Amkor Technology', hq:'United States', ticker:'AMKR', domain:'Global #2 OSAT, automotive, 2.5D packaging', cap:21.0},
+      {name:'Tongfu Microelectronics (TFME)', hq:'China', ticker:'002156.SZ', domain:'Advanced chiplet packaging, strategic AMD partner', cap:15.5},
+      {name:'ChipMOS Technologies', hq:'Taiwan', ticker:'8150.TW', domain:'Specialized in display driver ICs and memory packaging', cap:2.3},
+      {name:'Powertech Technology (PTI)', hq:'Taiwan', ticker:'6239.TW', domain:'Dominant in memory packaging (DRAM/NAND)', cap:null},
+      {name:'King Yuan Electronics (KYEC)', hq:'Taiwan', ticker:'2449.TW', domain:'Specialized pure-play testing (wafer sort, final test)', cap:null},
+      {name:'Huatian Technology', hq:'China', ticker:'002185.SZ', domain:'Broad spectrum OSAT, growing advanced packaging', cap:null},
+      {name:'Chipbond Technology', hq:'Taiwan', ticker:'6147.TWO', domain:'Display driver packaging, gold bumping', cap:null},
+      {name:'Hana Micron', hq:'South Korea', ticker:'067310.KQ', domain:'Memory packaging for Samsung and SK hynix', cap:null},
+      {name:'SFA Semicon', hq:'South Korea', ticker:'036540.KQ', domain:'Memory packaging (DRAM and NAND-focused)', cap:null},
+      {name:'Nepes Corporation', hq:'South Korea', ticker:'033640.KQ', domain:'Fan-out wafer-level packaging (FOWLP) specialist', cap:null},
       {name:'UTAC Group', hq:'Singapore', domain:'Automotive, industrial, and consumer packaging', cap:null, status:'private', note:'Owned by Affinity Equity Partners; not publicly traded.'},
     ]
   },
@@ -446,13 +452,13 @@ const TIERS = [
     icon:'<rect x="6" y="6" width="12" height="12" rx="1.5" stroke="currentColor" stroke-width="1.6" fill="none"/><path d="M9 3v3M15 3v3M9 18v3M15 18v3M3 9h3M3 15h3M18 9h3M18 15h3" stroke="currentColor" stroke-width="1.6"/>',
     desc:'The architects — no fabs, all R&D — designing the CPUs, GPUs, and SoCs that run on EDA tools and foundry capacity from the tiers above.',
     companies:[
-      {name:'NVIDIA', hq:'United States', domain:'Undisputed leader in AI data center GPUs and accelerators', cap:5150.0},
-      {name:'Broadcom', hq:'United States', domain:'Networking ASICs, data center switches, embedded processors', cap:1957.0},
-      {name:'AMD', hq:'United States', domain:'High-performance CPUs, GPUs, and adaptive SoCs', cap:877.0},
-      {name:'Marvell Technology', hq:'United States', domain:'Data infrastructure, networking, and storage silicon', cap:272.0},
-      {name:'Qualcomm', hq:'United States', domain:'Mobile SoCs, 5G basebands, automotive telematics', cap:250.0},
-      {name:'MediaTek', hq:'Taiwan', domain:'Mobile processors, smart home silicon', cap:226.0},
-      {name:'MosChip', hq:'India', domain:'Semiconductor and product engineering services, custom ASICs', cap:null},
+      {name:'NVIDIA', hq:'United States', ticker:'NVDA', domain:'Undisputed leader in AI data center GPUs and accelerators', cap:5150.0},
+      {name:'Broadcom', hq:'United States', ticker:'AVGO', domain:'Networking ASICs, data center switches, embedded processors', cap:1957.0},
+      {name:'AMD', hq:'United States', ticker:'AMD', domain:'High-performance CPUs, GPUs, and adaptive SoCs', cap:877.0},
+      {name:'Marvell Technology', hq:'United States', ticker:'MRVL', domain:'Data infrastructure, networking, and storage silicon', cap:272.0},
+      {name:'Qualcomm', hq:'United States', ticker:'QCOM', domain:'Mobile SoCs, 5G basebands, automotive telematics', cap:250.0},
+      {name:'MediaTek', hq:'Taiwan', ticker:'2454.TW', domain:'Mobile processors, smart home silicon', cap:226.0},
+      {name:'MosChip', hq:'India', ticker:'MOSCHIP.NS', domain:'Semiconductor and product engineering services, custom ASICs', cap:null},
       {name:'Saankhya Labs', hq:'India', domain:'Software-defined radio (SDR) chipsets, wireless communication', cap:null, status:'private', note:'Privately held Indian deep-tech startup; not publicly traded.'},
     ]
   },
@@ -461,15 +467,15 @@ const TIERS = [
     icon:'<rect x="3" y="4" width="18" height="12" rx="1.5" stroke="currentColor" stroke-width="1.6" fill="none"/><path d="M8 20h8M12 16v4" stroke="currentColor" stroke-width="1.6"/>',
     desc:'OEMs, ODMs, and hyperscalers assembling packaged silicon into the servers, laptops, and phones that drive the modern digital economy.',
     companies:[
-      {name:'Apple', hq:'United States', domain:'Consumer electronics integration, hyperscale consumer', cap:4543.0},
-      {name:'Alphabet (Google)', hq:'United States', domain:'Hyperscale cloud provider consuming massive volumes of AI silicon', cap:4310.0},
-      {name:'Microsoft', hq:'United States', domain:'Hyperscale cloud provider consuming massive volumes of AI silicon', cap:3174.0},
-      {name:'Amazon', hq:'United States', domain:'Hyperscale cloud provider consuming massive volumes of AI silicon', cap:2676.0},
-      {name:'Foxconn (Hon Hai)', hq:'Taiwan', domain:'Massive global contract manufacturing, server and phone assembly', cap:137.8},
-      {name:'Quanta Computer', hq:'Taiwan', domain:'ODM for laptops and data center servers', cap:48.0},
-      {name:'Supermicro', hq:'United States', domain:'High-performance enterprise servers, liquid cooling racks', cap:17.9},
-      {name:'Wistron', hq:'Taiwan', domain:'Server boards, computing hardware assembly', cap:null},
-      {name:'Inventec', hq:'Taiwan', domain:'Server boards, computing hardware assembly', cap:null},
+      {name:'Apple', hq:'United States', ticker:'AAPL', domain:'Consumer electronics integration, hyperscale consumer', cap:4543.0},
+      {name:'Alphabet (Google)', hq:'United States', ticker:'GOOGL', domain:'Hyperscale cloud provider consuming massive volumes of AI silicon', cap:4310.0},
+      {name:'Microsoft', hq:'United States', ticker:'MSFT', domain:'Hyperscale cloud provider consuming massive volumes of AI silicon', cap:3174.0},
+      {name:'Amazon', hq:'United States', ticker:'AMZN', domain:'Hyperscale cloud provider consuming massive volumes of AI silicon', cap:2676.0},
+      {name:'Foxconn (Hon Hai)', hq:'Taiwan', ticker:'2317.TW', domain:'Massive global contract manufacturing, server and phone assembly', cap:137.8},
+      {name:'Quanta Computer', hq:'Taiwan', ticker:'2382.TW', domain:'ODM for laptops and data center servers', cap:48.0},
+      {name:'Supermicro', hq:'United States', ticker:'SMCI', domain:'High-performance enterprise servers, liquid cooling racks', cap:17.9},
+      {name:'Wistron', hq:'Taiwan', ticker:'3231.TW', domain:'Server boards, computing hardware assembly', cap:null},
+      {name:'Inventec', hq:'Taiwan', ticker:'2356.TW', domain:'Server boards, computing hardware assembly', cap:null},
     ]
   },
 ];
@@ -479,6 +485,29 @@ function fmtCap(v){
   if(v>=1) return '$'+v.toFixed(1)+'B';
   return '$'+Math.round(v*1000)+'M';
 }
+function fmtPrice(co){
+  return co.livePrice.toLocaleString('en-US',{maximumFractionDigits:2})+' '+co.liveCurrency;
+}
+
+const LIVE = {quotes:{}, updated:null};
+
+fetch('market-data.json', {cache:'no-store'})
+  .then(r => r.ok ? r.json() : Promise.reject(new Error('no market-data.json')))
+  .then(d => { LIVE.quotes = d.quotes || {}; LIVE.updated = d.updated || null; })
+  .catch(()=>{ /* fall back to baked-in snapshot figures */ })
+  .finally(buildPage);
+
+function buildPage(){
+
+// overlay live Yahoo data onto the static snapshot
+TIERS.forEach(t=>{
+  t.companies.forEach(co=>{
+    const q = co.ticker ? LIVE.quotes[co.ticker] : null;
+    if(!q) return;
+    if(q.price!=null){ co.livePrice = q.price; co.liveCurrency = q.currency; }
+    if(q.capUSD!=null){ co.cap = q.capUSD; co.live = true; }
+  });
+});
 
 // sort within each tier: priced (desc) -> private -> unpriced, alpha within group
 TIERS.forEach(t=>{
@@ -498,6 +527,14 @@ const GRAND_PRICED = TIERS.reduce((s,t)=>s+t.pricedCount,0);
 const GRAND_ALL = TIERS.reduce((s,t)=>s+t.companies.length,0);
 document.getElementById('statTotalCap').textContent = fmtCap(GRAND_TOTAL);
 document.getElementById('statPricedCount').textContent = GRAND_PRICED+' / '+GRAND_ALL;
+if(LIVE.updated){
+  const d = new Date(LIVE.updated);
+  document.getElementById('statUpdated').textContent =
+    d.toLocaleString('en-US',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit',hour12:false,timeZone:'UTC'})+' UTC';
+} else {
+  document.getElementById('statUpdated').textContent = 'Jul 2026*';
+  document.getElementById('statUpdated').title = 'Live quotes unavailable — showing static snapshot.';
+}
 
 const railEl = document.getElementById('rail');
 const rowsEl = document.getElementById('rows');
@@ -560,16 +597,17 @@ TIERS.forEach(t=>{
     card.style.setProperty('--tier-color', t.hex);
     card.dataset.name = co.name.toLowerCase();
     card.dataset.hq = co.hq.toLowerCase();
-    card.dataset.domain = co.domain.toLowerCase();
+    card.dataset.domain = (co.domain + ' ' + (co.ticker||'')).toLowerCase();
 
     let capHtml;
     if(co.status==='private'){
       capHtml = `<div class="cap-value muted">Private</div><div class="cap-sub">not publicly traded</div>`;
     } else if(co.cap==null){
-      capHtml = `<div class="cap-value muted">— </div><div class="cap-sub">not yet priced</div>`;
+      capHtml = `<div class="cap-value muted">— </div><div class="cap-sub">${co.ticker ? 'no live quote ('+co.ticker+')' : 'not priced'}</div>`;
     } else {
       const share = t.pricedSum>0 ? (co.cap/t.pricedSum*100) : 0;
-      capHtml = `<div class="cap-value">${fmtCap(co.cap)}</div>
+      const priceLine = co.livePrice!=null ? `<div class="price-line">${fmtPrice(co)} · ${co.ticker}</div>` : '';
+      capHtml = `<div class="cap-value">${fmtCap(co.cap)}</div>${priceLine}
         <div class="cap-sub">${share.toFixed(share<1?1:0)}% of tier · <div class="bar-track" style="display:inline-block;width:34px;vertical-align:middle;margin-left:2px;"><div class="bar-fill" style="width:${Math.min(100,share)}%"></div></div></div>`;
     }
 
@@ -593,23 +631,25 @@ function openDrawer(tier, co){
   document.querySelectorAll('.card.active').forEach(c=>c.classList.remove('active'));
   document.getElementById('drawerTierBadge').innerHTML = `<span class="sw" style="background:${tier.color}"></span>${tier.label}`;
   document.getElementById('drawerName').textContent = co.name;
-  document.getElementById('drawerHq').textContent = 'Headquarters — ' + co.hq;
+  document.getElementById('drawerHq').textContent = 'Headquarters — ' + co.hq + (co.ticker ? ' · ' + co.ticker : '');
 
   const big = document.getElementById('drawerCapBig');
+  const price = document.getElementById('drawerPrice');
   const sub = document.getElementById('drawerCapSub');
   const bar = document.getElementById('drawerCapBar');
+  price.textContent = co.livePrice!=null ? 'Share price: '+fmtPrice(co)+' (live, Yahoo Finance)' : '';
   if(co.status==='private'){
     big.textContent = 'Private'; big.style.color = 'var(--text-faint)';
     sub.textContent = co.note || 'Confirmed not independently publicly traded.';
     bar.style.width='0%';
   } else if(co.cap==null){
-    big.textContent = '— Not yet priced'; big.style.color = 'var(--text-faint)';
-    sub.textContent = co.note || 'Not independently verified in this pass — ask and I can look this one up.';
+    big.textContent = '— No quote'; big.style.color = 'var(--text-faint)';
+    sub.textContent = co.note || (co.ticker ? 'Live quote for '+co.ticker+' unavailable in the latest refresh.' : 'No listing identified for this company.');
     bar.style.width='0%';
   } else {
     const share = tier.pricedSum>0 ? (co.cap/tier.pricedSum*100) : 0;
     big.textContent = fmtCap(co.cap); big.style.color = tier.hex;
-    sub.textContent = share.toFixed(1)+'% of '+tier.label.split('·')[1].trim()+"'s priced total ("+fmtCap(tier.pricedSum)+' across '+tier.pricedCount+' of '+tier.companies.length+' companies)' + (co.note ? ' — '+co.note : '');
+    sub.textContent = share.toFixed(1)+'% of '+tier.label.split('·')[1].trim()+"'s priced total ("+fmtCap(tier.pricedSum)+' across '+tier.pricedCount+' of '+tier.companies.length+' companies)' + (co.live ? '' : ' — static July 2026 snapshot, live quote unavailable') + (co.note ? ' — '+co.note : '');
     bar.style.width = Math.min(100,share)+'%';
     bar.style.background = tier.hex;
   }
@@ -659,6 +699,8 @@ function renderFilters(){
 
 searchEl.addEventListener('input', renderFilters);
 renderFilters();
+
+} // end buildPage
 </script>
 </body>
 </html>
