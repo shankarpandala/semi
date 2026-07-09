@@ -27,17 +27,24 @@ for sym in tickers:
         price = fi.last_price
         cur = fi.currency
         cap = fi.market_cap
+        prev = fi.previous_close
         if price is None or cur is None:
             raise ValueError("no price/currency in response")
         # LSE quotes come back in pence
         if cur == "GBp":
             price = price / 100.0
             cap = cap / 100.0 if cap is not None else None
+            prev = prev / 100.0 if prev is not None else None
             cur = "GBP"
+        # daily move vs previous close, in percent
+        change_pct = None
+        if prev not in (None, 0):
+            change_pct = round((float(price) - float(prev)) / float(prev) * 100, 2)
         quotes[sym] = {
             "price": round(float(price), 2),
             "currency": cur,
             "cap": float(cap) if cap is not None else None,
+            "changePct": change_pct,
         }
         currencies.add(cur)
     except Exception as e:  # noqa: BLE001 - tolerate any per-ticker failure
@@ -64,6 +71,7 @@ for sym, q in quotes.items():
         "price": q["price"],
         "currency": q["currency"],
         "capUSD": cap_usd,
+        "changePct": q["changePct"],
     }
 
 out = ROOT / "market-data.json"
