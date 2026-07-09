@@ -149,6 +149,18 @@
   .card .bar-fill{height:100%; background:var(--tier-color,#888); border-radius:2px;}
   .card mark{background:none; color:var(--r5); font-weight:700;}
 
+  /* daily change */
+  .chg{font-weight:600;}
+  .chg.up{color:#4FBF7A;}
+  .chg.down{color:#DD5B5B;}
+  .chg.flat{color:var(--text-faint);}
+
+  /* tier weight bar (share of grand total) */
+  .tier-weight{display:inline-flex; align-items:center; gap:7px; margin-left:6px;}
+  .tier-weight .wt-track{width:110px; max-width:24vw; height:6px; border-radius:3px; background:var(--line); overflow:hidden;}
+  .tier-weight .wt-fill{height:100%; border-radius:3px;}
+  .tier-weight .wt-pct{font-size:11px; color:var(--text-faint);}
+
   /* ---------- DRAWER ---------- */
   .drawer-backdrop{
     position:fixed; inset:0; background:rgba(6,7,10,.55); backdrop-filter:blur(2px);
@@ -471,6 +483,19 @@ function fmtCap(v){
 function fmtPrice(co){
   return co.livePrice.toLocaleString('en-US',{maximumFractionDigits:2})+' '+co.liveCurrency;
 }
+function fmtChange(v){
+  if(v==null) return '';
+  const cls = v>0?'up':(v<0?'down':'flat');
+  const arrow = v>0?'▲':(v<0?'▼':'·');
+  return `<span class="chg ${cls}">${arrow} ${Math.abs(v).toFixed(2)}%</span>`;
+}
+function escHtml(s){ return s.replace(/[&<>]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
+function highlight(text, q){
+  if(!q) return escHtml(text);
+  const i = text.toLowerCase().indexOf(q);
+  if(i<0) return escHtml(text);
+  return escHtml(text.slice(0,i))+'<mark>'+escHtml(text.slice(i,i+q.length))+'</mark>'+escHtml(text.slice(i+q.length));
+}
 
 const LIVE = {quotes:{}, updated:null};
 
@@ -489,6 +514,7 @@ TIERS.forEach(t=>{
     if(!q) return;
     if(q.price!=null){ co.livePrice = q.price; co.liveCurrency = q.currency; }
     if(q.capUSD!=null){ co.cap = q.capUSD; co.live = true; }
+    if(q.changePct!=null){ co.change = q.changePct; }
   });
 });
 
@@ -525,6 +551,14 @@ const resultCountEl = document.getElementById('resultCount');
 const searchEl = document.getElementById('search');
 
 let activeTierFilter = null;
+let currentCo = null;
+
+function updateHash(){
+  const parts = [];
+  if(activeTierFilter!==null) parts.push('tier='+activeTierFilter);
+  if(currentCo) parts.push('co='+encodeURIComponent(currentCo.name));
+  history.replaceState(null, '', parts.length ? '#'+parts.join('&') : location.pathname+location.search);
+}
 
 TIERS.forEach(t=>{
   const c = document.createElement('div');
@@ -534,6 +568,7 @@ TIERS.forEach(t=>{
   c.addEventListener('click', ()=>{
     activeTierFilter = (activeTierFilter === t.id) ? null : t.id;
     renderFilters();
+    updateHash();
   });
   chipsEl.appendChild(c);
 });
@@ -560,7 +595,11 @@ TIERS.forEach(t=>{
 
   const capLine = document.createElement('div');
   capLine.className='row-cap-line';
-  capLine.innerHTML = `<b style="color:${t.color}">${fmtCap(t.pricedSum)}</b> combined <span class="priced-of">· ${t.pricedCount} of ${t.companies.length} priced</span>`;
+  const weight = GRAND_TOTAL>0 ? (t.pricedSum/GRAND_TOTAL*100) : 0;
+  capLine.innerHTML = `<b style="color:${t.color}">${fmtCap(t.pricedSum)}</b> combined <span class="priced-of">· ${t.pricedCount} of ${t.companies.length} priced</span>`
+    + `<span class="tier-weight" title="This tier's combined cap as a share of all ${TIERS.length} tiers (${fmtCap(GRAND_TOTAL)})">`
+    + `<span class="wt-track"><span class="wt-fill" style="width:${weight}%;background:${t.hex}"></span></span>`
+    + `<span class="wt-pct">${weight.toFixed(1)}% of stack</span></span>`;
   row.appendChild(capLine);
 
   const desc = document.createElement('p');
@@ -586,12 +625,13 @@ TIERS.forEach(t=>{
       capHtml = `<div class="cap-value muted">— </div><div class="cap-sub">${co.ticker ? 'no live quote ('+co.ticker+')' : 'not priced'}</div>`;
     } else {
       const share = t.pricedSum>0 ? (co.cap/t.pricedSum*100) : 0;
-      const priceLine = co.livePrice!=null ? `<div class="price-line">${fmtPrice(co)} · ${co.ticker}</div>` : '';
+      const priceLine = co.livePrice!=null ? `<div class="price-line">${fmtPrice(co)} ${fmtChange(co.change)}</div>` : '';
       capHtml = `<div class="cap-value">${fmtCap(co.cap)}</div>${priceLine}
         <div class="cap-sub">${share.toFixed(share<1?1:0)}% of tier · <div class="bar-track" style="display:inline-block;width:34px;vertical-align:middle;margin-left:2px;"><div class="bar-fill" style="width:${Math.min(100,share)}%"></div></div></div>`;
     }
 
-    card.innerHTML = `<div class="name">${co.name}</div><div class="hq">${co.hq}</div>${capHtml}`;
+    card.innerHTML = `<div class="name">${escHtml(co.name)}</div><div class="hq">${escHtml(co.hq)}</div>${capHtml}`;
+    card._co = co;
     card.addEventListener('click', ()=> openDrawer(t, co));
     strip.appendChild(card);
   });
@@ -609,6 +649,7 @@ const drawer = document.getElementById('drawer');
 const backdrop = document.getElementById('backdrop');
 function openDrawer(tier, co){
   document.querySelectorAll('.card.active').forEach(c=>c.classList.remove('active'));
+  currentCo = co;
   document.getElementById('drawerTierBadge').innerHTML = `<span class="sw" style="background:${tier.color}"></span>${tier.label}`;
   document.getElementById('drawerName').textContent = co.name;
   document.getElementById('drawerHq').textContent = 'Headquarters — ' + co.hq + (co.ticker ? ' · ' + co.ticker : '');
@@ -617,7 +658,7 @@ function openDrawer(tier, co){
   const price = document.getElementById('drawerPrice');
   const sub = document.getElementById('drawerCapSub');
   const bar = document.getElementById('drawerCapBar');
-  price.textContent = co.livePrice!=null ? 'Share price: '+fmtPrice(co)+' (live, Yahoo Finance)' : '';
+  price.innerHTML = co.livePrice!=null ? 'Share price: '+fmtPrice(co)+' '+fmtChange(co.change)+' <span style="color:var(--text-faint)">(live, Yahoo Finance)</span>' : '';
   if(co.status==='private'){
     big.textContent = 'Private'; big.style.color = 'var(--text-faint)';
     sub.textContent = co.note || 'Confirmed not independently publicly traded.';
@@ -638,10 +679,13 @@ function openDrawer(tier, co){
   document.getElementById('drawerTierDesc').textContent = tier.desc;
   drawer.classList.add('open');
   backdrop.classList.add('open');
+  updateHash();
 }
 function closeDrawer(){
   drawer.classList.remove('open');
   backdrop.classList.remove('open');
+  currentCo = null;
+  updateHash();
 }
 document.getElementById('drawerClose').addEventListener('click', closeDrawer);
 backdrop.addEventListener('click', closeDrawer);
@@ -668,7 +712,12 @@ function renderFilters(){
     row.querySelectorAll('.card').forEach(card=>{
       const textMatch = !q || card.dataset.name.includes(q) || card.dataset.hq.includes(q) || card.dataset.domain.includes(q);
       card.classList.toggle('hidden', !textMatch);
-      if(textMatch){ rowHasVisible = true; visibleCount++; }
+      if(textMatch){
+        rowHasVisible = true; visibleCount++;
+        const co = card._co;
+        card.querySelector('.name').innerHTML = highlight(co.name, q);
+        card.querySelector('.hq').innerHTML = highlight(co.hq, q);
+      }
     });
 
     if(q && !rowHasVisible){ row.style.display='none'; } else { row.style.display=''; }
@@ -678,7 +727,22 @@ function renderFilters(){
 }
 
 searchEl.addEventListener('input', renderFilters);
-renderFilters();
+
+// deep-link: apply #tier=<id>&co=<name> from the URL on load
+(function applyHash(){
+  const h = new URLSearchParams(location.hash.replace(/^#/, ''));
+  const t = h.get('tier');
+  if(t!==null && t!=='' && TIERS[+t]) activeTierFilter = +t;
+  renderFilters();
+  const coName = h.get('co');
+  if(coName){
+    const target = decodeURIComponent(coName);
+    for(const tier of TIERS){
+      const co = tier.companies.find(c=>c.name===target);
+      if(co){ openDrawer(tier, co); break; }
+    }
+  }
+})();
 
 } // end buildPage
 </script>
