@@ -22,38 +22,28 @@
   html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;}
   ::selection{background:#3a3f4c;}
 
-  /* ---------- HERO ---------- */
-  .hero{
+  /* ---------- TOP BAR ---------- */
+  .topbar{
     position:relative;
-    padding:64px max(32px, calc((100% - 1400px) / 2)) 40px;
+    padding:14px max(32px, calc((100% - 1400px) / 2)) 13px;
     border-bottom:1px solid var(--line);
-    background:
-      radial-gradient(ellipse 900px 400px at 15% -10%, rgba(139,127,216,0.14), transparent 60%),
-      radial-gradient(ellipse 900px 400px at 85% 110%, rgba(201,83,139,0.12), transparent 60%);
-    overflow:hidden;
   }
   .hero-spectrum{
-    position:absolute; left:0; right:0; top:0; height:4px;
+    position:absolute; left:0; right:0; top:0; height:3px;
     background:linear-gradient(90deg,var(--r0),var(--r1),var(--r2),var(--r3),var(--r4),var(--r5),var(--r6),var(--r7),var(--r8),var(--r9));
   }
-  .eyebrow{
-    font-family:'IBM Plex Mono',monospace; font-size:11.5px; letter-spacing:.14em; text-transform:uppercase;
-    color:var(--text-dim); margin:0 0 18px; display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+  .topbar-row{display:flex; align-items:center; gap:14px 28px; flex-wrap:wrap; justify-content:space-between;}
+  .brand{
+    font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:17px; letter-spacing:-.01em; white-space:nowrap;
   }
-  .eyebrow .dot{width:6px;height:6px;border-radius:50%;background:var(--r5);box-shadow:0 0 10px var(--r5);}
-  h1{
-    font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:clamp(30px,5vw,52px);
-    line-height:1.05; margin:0 0 16px; letter-spacing:-0.01em; max-width:860px;
-  }
-  h1 span{
+  .brand span{
     background:linear-gradient(90deg,var(--r0),var(--r5),var(--r9));
     -webkit-background-clip:text; background-clip:text; color:transparent;
   }
-  .hero p{max-width:660px;color:var(--text-dim);font-size:15.5px;line-height:1.6;margin:0 0 28px;}
-  .hero-stats{display:flex;gap:28px;flex-wrap:wrap;margin-bottom:8px;}
-  .stat{font-family:'IBM Plex Mono',monospace;}
-  .stat b{display:block;font-size:26px;font-weight:600;color:var(--text);}
-  .stat span{font-size:11px;color:var(--text-faint);letter-spacing:.06em;text-transform:uppercase;}
+  .hero-stats{display:flex; gap:22px; flex-wrap:wrap;}
+  .stat{font-family:'IBM Plex Mono',monospace; display:flex; align-items:baseline; gap:6px;}
+  .stat b{font-size:15px; font-weight:600; color:var(--text);}
+  .stat span{font-size:10px; color:var(--text-faint); letter-spacing:.05em; text-transform:uppercase;}
 
   /* ---------- CONTROLS ---------- */
   .controls{
@@ -212,7 +202,7 @@
     .rows{padding:8px 0 80px;}
     .rows::before{display:none;}
     .tier-num{display:none;}
-    .hero{padding:44px 18px 30px;}
+    .topbar{padding:12px 16px 11px;}
     .controls{padding:12px 16px;}
     .legend{padding:10px 16px 0;}
     .strip{grid-template-columns:repeat(auto-fill, minmax(150px, 1fr));}
@@ -221,19 +211,19 @@
 </head>
 <body>
 
-<div class="hero">
+<header class="topbar">
   <div class="hero-spectrum"></div>
-  <p class="eyebrow"><span class="dot"></span>SAND → SILICON → SYSTEM · 119 COMPANIES · 10 TIERS · LIVE MARKET DATA</p>
-  <h1>The <span>silicon spectrum</span>: every layer of the chip supply chain, sized by the market.</h1>
-  <p>From eleven-nines polysilicon to the hyperscale racks it ends up powering, each row is one tier of the stack, colored like a wavelength scan. Every listed company carries a live share price and market capitalization from Yahoo Finance, and each tier totals up what its priced members are worth. Tap any card for the full breakdown, including its share of the tier.</p>
-  <div class="hero-stats">
-    <div class="stat"><b>10</b><span>Tiers</span></div>
-    <div class="stat"><b>119</b><span>Companies</span></div>
-    <div class="stat"><b id="statTotalCap">—</b><span>Combined cap (priced)</span></div>
-    <div class="stat"><b id="statPricedCount">—</b><span>Priced / Total</span></div>
-    <div class="stat"><b id="statUpdated">—</b><span>Prices as of</span></div>
+  <div class="topbar-row">
+    <div class="brand">The <span>Silicon Spectrum</span></div>
+    <div class="hero-stats">
+      <div class="stat"><b>10</b><span>Tiers</span></div>
+      <div class="stat"><b>119</b><span>Companies</span></div>
+      <div class="stat"><b id="statTotalCap">—</b><span>Combined cap</span></div>
+      <div class="stat"><b id="statPricedCount">—</b><span>Priced / total</span></div>
+      <div class="stat"><b id="statUpdated">—</b><span>Prices as of</span></div>
+    </div>
   </div>
-</div>
+</header>
 
 <div class="controls">
   <div class="search-wrap">
