@@ -1,10 +1,10 @@
 {
- "updated": "2026-07-09T14:17:56+00:00",
+ "updated": "2026-07-09T15:07:39+00:00",
  "quotes": {
   "000660.KS": {
    "price": 2186000.0,
    "currency": "KRW",
-   "capUSD": 1028.41,
+   "capUSD": 1027.91,
    "changePct": 5.3
   },
   "002156.SZ": {
@@ -22,13 +22,13 @@
   "002371.SZ": {
    "price": 878.43,
    "currency": "CNY",
-   "capUSD": 93.98,
+   "capUSD": 94.0,
    "changePct": 10.63
   },
   "002916.SZ": {
    "price": 442.56,
    "currency": "CNY",
-   "capUSD": 44.44,
+   "capUSD": 44.45,
    "changePct": 9.95
   },
   "005290.KQ": {
@@ -40,13 +40,13 @@
   "005930.KS": {
    "price": 278000.0,
    "currency": "KRW",
-   "capUSD": 1209.84,
+   "capUSD": 1209.26,
    "changePct": 0.18
   },
   "009150.KS": {
    "price": 1493000.0,
    "currency": "KRW",
-   "capUSD": 74.75,
+   "capUSD": 74.72,
    "changePct": 0.95
   },
   "033640.KQ": {
@@ -82,7 +82,7 @@
   "2317.TW": {
    "price": 237.5,
    "currency": "TWD",
-   "capUSD": 103.36,
+   "capUSD": 103.38,
    "changePct": 0.42
   },
   "2356.TW": {
@@ -94,25 +94,25 @@
   "2382.TW": {
    "price": 373.5,
    "currency": "TWD",
-   "capUSD": 44.74,
+   "capUSD": 44.76,
    "changePct": -1.06
   },
   "2408.TW": {
    "price": 435.5,
    "currency": "TWD",
-   "capUSD": 41.94,
+   "capUSD": 41.95,
    "changePct": 10.81
   },
   "2449.TW": {
    "price": 308.5,
    "currency": "TWD",
-   "capUSD": 11.72,
+   "capUSD": 11.73,
    "changePct": 0.98
   },
   "2454.TW": {
    "price": 3925.0,
    "currency": "TWD",
-   "capUSD": 194.71,
+   "capUSD": 194.76,
    "changePct": -1.75
   },
   "2802.T": {
@@ -124,7 +124,7 @@
   "3037.TW": {
    "price": 875.0,
    "currency": "TWD",
-   "capUSD": 42.81,
+   "capUSD": 42.82,
    "changePct": 1.51
   },
   "3189.TW": {
@@ -136,7 +136,7 @@
   "3231.TW": {
    "price": 144.5,
    "currency": "TWD",
-   "capUSD": 14.28,
+   "capUSD": 14.29,
    "changePct": -1.37
   },
   "3436.T": {
@@ -244,7 +244,7 @@
   "6488.TWO": {
    "price": 1350.0,
    "currency": "TWD",
-   "capUSD": 20.06,
+   "capUSD": 20.07,
    "changePct": 9.76
   },
   "6525.T": {
@@ -262,13 +262,13 @@
   "6857.T": {
    "price": 29160.0,
    "currency": "JPY",
-   "capUSD": 130.17,
+   "capUSD": 130.16,
    "changePct": 4.95
   },
   "688012.SS": {
    "price": 471.59,
    "currency": "CNY",
-   "capUSD": 66.59,
+   "capUSD": 66.61,
    "changePct": 11.04
   },
   "6947.T": {
@@ -304,13 +304,13 @@
   "8035.T": {
    "price": 71060.0,
    "currency": "JPY",
-   "capUSD": 199.06,
+   "capUSD": 199.05,
    "changePct": 4.96
   },
   "8046.TW": {
    "price": 1215.0,
    "currency": "TWD",
-   "capUSD": 24.4,
+   "capUSD": 24.41,
    "changePct": 9.46
   },
   "8150.TW": {
@@ -320,178 +320,178 @@
    "changePct": 9.86
   },
   "AAPL": {
-   "price": 310.68,
+   "price": 311.97,
    "currency": "USD",
-   "capUSD": 4563.07,
-   "changePct": -0.79
+   "capUSD": 4582.01,
+   "changePct": -0.38
   },
   "AEIS": {
-   "price": 311.09,
+   "price": 316.37,
    "currency": "USD",
-   "capUSD": 12.45,
-   "changePct": 5.76
+   "capUSD": 12.66,
+   "changePct": 7.55
   },
   "AI.PA": {
-   "price": 172.64,
+   "price": 173.26,
    "currency": "EUR",
-   "capUSD": 125.62,
-   "changePct": -0.61
+   "capUSD": 126.01,
+   "changePct": -0.25
   },
   "AMAT": {
-   "price": 618.41,
+   "price": 610.28,
    "currency": "USD",
-   "capUSD": 490.99,
-   "changePct": 7.18
+   "capUSD": 484.54,
+   "changePct": 5.77
   },
   "AMD": {
-   "price": 554.84,
+   "price": 555.77,
    "currency": "USD",
-   "capUSD": 904.73,
-   "changePct": 7.36
+   "capUSD": 906.24,
+   "changePct": 7.54
   },
   "AMKR": {
-   "price": 72.21,
+   "price": 72.77,
    "currency": "USD",
-   "capUSD": 17.9,
-   "changePct": 7.21
+   "capUSD": 18.04,
+   "changePct": 8.05
   },
   "AMZN": {
-   "price": 240.01,
+   "price": 241.55,
    "currency": "USD",
-   "capUSD": 2581.81,
-   "changePct": -1.26
+   "capUSD": 2598.38,
+   "changePct": -0.63
   },
   "APD": {
-   "price": 296.46,
+   "price": 296.6,
    "currency": "USD",
-   "capUSD": 66.02,
-   "changePct": 0.82
+   "capUSD": 66.05,
+   "changePct": 0.87
   },
   "ARM": {
-   "price": 332.67,
+   "price": 334.6,
    "currency": "USD",
-   "capUSD": 353.97,
-   "changePct": 10.7
+   "capUSD": 356.03,
+   "changePct": 11.35
   },
   "ASM.AS": {
-   "price": 935.2,
+   "price": 926.0,
    "currency": "EUR",
-   "capUSD": 52.32,
-   "changePct": 5.79
+   "capUSD": 51.78,
+   "changePct": 4.75
   },
   "ASML": {
-   "price": 1836.09,
+   "price": 1830.86,
    "currency": "USD",
-   "capUSD": 707.66,
-   "changePct": 3.5
+   "capUSD": 705.65,
+   "changePct": 3.2
   },
   "ASX": {
-   "price": 43.87,
+   "price": 44.24,
    "currency": "USD",
-   "capUSD": 96.25,
-   "changePct": 8.97
+   "capUSD": 97.06,
+   "changePct": 9.89
   },
   "ATS.VI": {
-   "price": 192.4,
+   "price": 192.6,
    "currency": "EUR",
-   "capUSD": 8.55,
-   "changePct": 7.13
+   "capUSD": 8.56,
+   "changePct": 7.24
   },
   "AVGO": {
-   "price": 390.43,
+   "price": 394.83,
    "currency": "USD",
-   "capUSD": 1857.5,
-   "changePct": 0.14
+   "capUSD": 1878.41,
+   "changePct": 1.26
   },
   "AVTR": {
-   "price": 10.19,
+   "price": 10.49,
    "currency": "USD",
-   "capUSD": 6.96,
-   "changePct": 3.82
+   "capUSD": 7.17,
+   "changePct": 6.87
   },
   "BAS.DE": {
-   "price": 47.2,
+   "price": 47.35,
    "currency": "EUR",
-   "capUSD": 47.76,
-   "changePct": -0.91
+   "capUSD": 47.9,
+   "changePct": -0.59
   },
   "CDNS": {
-   "price": 377.62,
+   "price": 380.53,
    "currency": "USD",
-   "capUSD": 104.15,
-   "changePct": 1.24
+   "capUSD": 104.96,
+   "changePct": 2.02
   },
   "CEVA": {
-   "price": 47.53,
+   "price": 48.17,
    "currency": "USD",
-   "capUSD": 1.32,
-   "changePct": 6.64
+   "capUSD": 1.34,
+   "changePct": 8.09
   },
   "COTN.SW": {
-   "price": 396.0,
+   "price": 392.6,
    "currency": "CHF",
-   "capUSD": 3.81,
-   "changePct": 12.82
+   "capUSD": 3.78,
+   "changePct": 11.85
   },
   "ENTG": {
-   "price": 150.16,
+   "price": 150.9,
    "currency": "USD",
-   "capUSD": 22.87,
-   "changePct": 6.48
+   "capUSD": 22.98,
+   "changePct": 7.01
   },
   "GFS": {
-   "price": 71.03,
+   "price": 71.5,
    "currency": "USD",
-   "capUSD": 38.97,
-   "changePct": 4.46
+   "capUSD": 39.23,
+   "changePct": 5.15
   },
   "GOOGL": {
-   "price": 352.33,
+   "price": 353.02,
    "currency": "USD",
-   "capUSD": 4299.39,
-   "changePct": -2.64
+   "capUSD": 4307.81,
+   "changePct": -2.45
   },
   "ICHR": {
-   "price": 97.56,
+   "price": 98.71,
    "currency": "USD",
-   "capUSD": 3.4,
-   "changePct": 6.04
+   "capUSD": 3.44,
+   "changePct": 7.3
   },
   "INTC": {
-   "price": 114.5,
+   "price": 113.17,
    "currency": "USD",
-   "capUSD": 575.45,
-   "changePct": 3.81
+   "capUSD": 568.79,
+   "changePct": 2.61
   },
   "KEYS": {
-   "price": 326.73,
+   "price": 326.97,
    "currency": "USD",
-   "capUSD": 55.84,
-   "changePct": 2.21
+   "capUSD": 55.88,
+   "changePct": 2.28
   },
   "KLAC": {
-   "price": 240.44,
+   "price": 236.78,
    "currency": "USD",
-   "capUSD": 314.08,
-   "changePct": 8.11
+   "capUSD": 309.3,
+   "changePct": 6.47
   },
   "LIN": {
-   "price": 520.82,
+   "price": 520.05,
    "currency": "USD",
-   "capUSD": 240.8,
-   "changePct": -1.17
+   "capUSD": 240.45,
+   "changePct": -1.32
   },
   "LRCX": {
-   "price": 359.11,
+   "price": 355.0,
    "currency": "USD",
-   "capUSD": 449.09,
-   "changePct": 7.52
+   "capUSD": 443.94,
+   "changePct": 6.28
   },
   "MKSI": {
-   "price": 369.75,
+   "price": 375.8,
    "currency": "USD",
-   "capUSD": 24.97,
-   "changePct": 5.01
+   "capUSD": 25.38,
+   "changePct": 6.73
   },
   "MOSCHIP.NS": {
    "price": 238.62,
@@ -500,112 +500,112 @@
    "changePct": 3.11
   },
   "MRK.DE": {
-   "price": 139.2,
+   "price": 139.5,
    "currency": "EUR",
-   "capUSD": 69.25,
-   "changePct": -0.32
+   "capUSD": 69.37,
+   "changePct": -0.11
   },
   "MRVL": {
-   "price": 245.65,
+   "price": 247.51,
    "currency": "USD",
-   "capUSD": 215.08,
-   "changePct": 4.72
+   "capUSD": 216.52,
+   "changePct": 5.52
   },
   "MSFT": {
-   "price": 375.52,
+   "price": 379.37,
    "currency": "USD",
-   "capUSD": 2789.53,
-   "changePct": -2.18
+   "capUSD": 2818.13,
+   "changePct": -1.18
   },
   "MU": {
-   "price": 1017.5,
+   "price": 1022.59,
    "currency": "USD",
-   "capUSD": 1149.16,
-   "changePct": 6.24
+   "capUSD": 1154.91,
+   "changePct": 6.78
   },
   "NVDA": {
-   "price": 199.9,
+   "price": 201.49,
    "currency": "USD",
-   "capUSD": 4841.78,
-   "changePct": -1.83
+   "capUSD": 4880.17,
+   "changePct": -1.05
   },
   "QCOM": {
-   "price": 190.01,
+   "price": 193.62,
    "currency": "USD",
-   "capUSD": 200.27,
-   "changePct": 1.23
+   "capUSD": 204.08,
+   "changePct": 3.15
   },
   "RMBS": {
-   "price": 117.73,
+   "price": 117.95,
    "currency": "USD",
-   "capUSD": 12.73,
-   "changePct": 6.18
+   "capUSD": 12.75,
+   "changePct": 6.38
   },
   "SMCI": {
-   "price": 28.43,
+   "price": 28.92,
    "currency": "USD",
-   "capUSD": 18.39,
-   "changePct": 1.53
+   "capUSD": 18.7,
+   "changePct": 3.27
   },
   "SNPS": {
-   "price": 433.17,
+   "price": 437.15,
    "currency": "USD",
-   "capUSD": 82.94,
-   "changePct": -0.91
+   "capUSD": 83.71,
+   "changePct": 0.0
   },
   "SOLB.BR": {
-   "price": 25.96,
+   "price": 26.08,
    "currency": "EUR",
-   "capUSD": 3.1,
-   "changePct": 0.23
+   "capUSD": 3.12,
+   "changePct": 0.69
   },
   "TER": {
-   "price": 371.55,
+   "price": 374.04,
    "currency": "USD",
-   "capUSD": 58.16,
-   "changePct": 5.54
+   "capUSD": 58.55,
+   "changePct": 6.25
   },
   "TSEM": {
-   "price": 225.9,
+   "price": 231.41,
    "currency": "USD",
-   "capUSD": 26.79,
-   "changePct": 5.93
+   "capUSD": 27.44,
+   "changePct": 8.52
   },
   "TSM": {
-   "price": 440.67,
+   "price": 442.89,
    "currency": "USD",
-   "capUSD": 2285.55,
-   "changePct": 0.51
+   "capUSD": 2297.04,
+   "changePct": 1.01
   },
   "UCTT": {
-   "price": 107.53,
+   "price": 108.86,
    "currency": "USD",
-   "capUSD": 4.82,
-   "changePct": 4.37
+   "capUSD": 4.88,
+   "changePct": 5.66
   },
   "UMC": {
-   "price": 24.88,
+   "price": 25.25,
    "currency": "USD",
-   "capUSD": 62.43,
-   "changePct": -0.19
+   "capUSD": 63.35,
+   "changePct": 1.26
   },
   "VACN.SW": {
-   "price": 684.6,
+   "price": 680.4,
    "currency": "CHF",
-   "capUSD": 25.43,
-   "changePct": 5.49
+   "capUSD": 25.28,
+   "changePct": 4.84
   },
   "WAF.DE": {
-   "price": 92.15,
+   "price": 92.0,
    "currency": "EUR",
    "capUSD": 3.16,
-   "changePct": 15.48
+   "changePct": 15.29
   },
   "WCH.DE": {
-   "price": 91.5,
+   "price": 91.45,
    "currency": "EUR",
    "capUSD": 5.2,
-   "changePct": 4.45
+   "changePct": 4.39
   }
  }
 }

@@ -20,6 +20,7 @@
   }
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;}
+  html{scroll-behavior:smooth;}
   ::selection{background:#3a3f4c;}
 
   /* ---------- TOP BAR ---------- */
@@ -33,6 +34,14 @@
     background:linear-gradient(90deg,var(--r0),var(--r1),var(--r2),var(--r3),var(--r4),var(--r5),var(--r6),var(--r7),var(--r8),var(--r9));
   }
   .topbar-row{display:flex; align-items:center; gap:14px 28px; flex-wrap:wrap; justify-content:space-between;}
+  .brand-group{display:flex; align-items:center; gap:11px; min-width:0;}
+  .pandala{
+    font-family:'IBM Plex Mono',monospace; font-size:13px; color:var(--text-dim);
+    text-decoration:none; white-space:nowrap; transition:opacity .15s;
+  }
+  .pandala:hover{opacity:.8;}
+  .pandala span{color:#5ce0d8;}
+  .brand-sep{color:var(--text-faint); user-select:none;}
   .brand{
     font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:17px; letter-spacing:-.01em; white-space:nowrap;
   }
@@ -66,9 +75,9 @@
     font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.02em;
     padding:6px 10px; border-radius:6px; border:1px solid var(--line); background:var(--panel-2);
     color:var(--text-dim); cursor:pointer; user-select:none; transition:all .15s; white-space:nowrap;
+    text-decoration:none; display:inline-block;
   }
   .chip:hover{color:var(--text); border-color:#3a4150;}
-  .chip.active{color:#0A0C10; border-color:transparent;}
   .result-count{font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--text-faint); white-space:nowrap;}
   .legend{display:flex; gap:14px; flex-wrap:wrap; padding:10px max(32px, calc((100% - 1400px) / 2)) 0; font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:var(--text-faint);}
   .legend span{display:inline-flex; align-items:center; gap:5px;}
@@ -97,7 +106,10 @@
     position:relative;
     padding:34px 0; border-bottom:1px solid var(--line);
     opacity:0; transform:translateY(14px); transition:opacity .5s ease, transform .5s ease;
+    scroll-margin-top:64px;
   }
+  @keyframes tierflash{from{background:rgba(232,184,75,0.10);}to{background:transparent;}}
+  .row:target{animation:tierflash 1.3s ease-out;}
   .row.visible{opacity:1; transform:translateY(0);}
   .row:last-child{border-bottom:none;}
   .row.dimmed{opacity:.28;}
@@ -214,7 +226,11 @@
 <header class="topbar">
   <div class="hero-spectrum"></div>
   <div class="topbar-row">
-    <div class="brand">The <span>Silicon Spectrum</span></div>
+    <div class="brand-group">
+      <a class="pandala" href="https://www.pandala.in">~/<span>pandala.in</span></a>
+      <span class="brand-sep" aria-hidden="true">|</span>
+      <div class="brand">The <span>Silicon Spectrum</span></div>
+    </div>
     <div class="hero-stats">
       <div class="stat"><b>10</b><span>Tiers</span></div>
       <div class="stat"><b>119</b><span>Companies</span></div>
@@ -540,32 +556,26 @@ const chipsEl = document.getElementById('tierChips');
 const resultCountEl = document.getElementById('resultCount');
 const searchEl = document.getElementById('search');
 
-let activeTierFilter = null;
 let currentCo = null;
 
 function updateHash(){
-  const parts = [];
-  if(activeTierFilter!==null) parts.push('tier='+activeTierFilter);
-  if(currentCo) parts.push('co='+encodeURIComponent(currentCo.name));
-  history.replaceState(null, '', parts.length ? '#'+parts.join('&') : location.pathname+location.search);
+  history.replaceState(null, '', currentCo ? '#co='+encodeURIComponent(currentCo.name) : location.pathname+location.search);
 }
 
+// tier chips act as hyperlinks that jump to their tier row
 TIERS.forEach(t=>{
-  const c = document.createElement('div');
+  const c = document.createElement('a');
   c.className='chip';
   c.textContent = 'T'+t.id;
-  c.dataset.tier = t.id;
-  c.addEventListener('click', ()=>{
-    activeTierFilter = (activeTierFilter === t.id) ? null : t.id;
-    renderFilters();
-    updateHash();
-  });
+  c.href = '#tier-'+t.id;
+  c.title = 'Jump to ' + t.label;
   chipsEl.appendChild(c);
 });
 
 TIERS.forEach(t=>{
   const row = document.createElement('div');
   row.className='row';
+  row.id = 'tier-'+t.id;
   row.dataset.tier = t.id;
 
   const num = document.createElement('div');
@@ -685,19 +695,7 @@ function renderFilters(){
   const q = searchEl.value.trim().toLowerCase();
   let visibleCount = 0;
 
-  document.querySelectorAll('.chip').forEach(c=>{
-    const tierId = parseInt(c.dataset.tier);
-    const isActive = activeTierFilter === tierId;
-    c.classList.toggle('active', isActive);
-    c.style.background = isActive ? TIERS[tierId].color : '';
-    c.style.color = isActive ? '#0A0C10' : '';
-  });
-
   document.querySelectorAll('.row').forEach(row=>{
-    const tierId = parseInt(row.dataset.tier);
-    const tierMatch = (activeTierFilter === null) || (activeTierFilter === tierId);
-    row.classList.toggle('dimmed', !tierMatch && activeTierFilter !== null);
-
     let rowHasVisible = false;
     row.querySelectorAll('.card').forEach(card=>{
       const textMatch = !q || card.dataset.name.includes(q) || card.dataset.hq.includes(q) || card.dataset.domain.includes(q);
@@ -709,22 +707,24 @@ function renderFilters(){
         card.querySelector('.hq').innerHTML = highlight(co.hq, q);
       }
     });
-
-    if(q && !rowHasVisible){ row.style.display='none'; } else { row.style.display=''; }
+    row.style.display = (q && !rowHasVisible) ? 'none' : '';
   });
 
-  resultCountEl.textContent = (q || activeTierFilter!==null) ? `${visibleCount} match${visibleCount===1?'':'es'}` : `${GRAND_ALL} companies`;
+  resultCountEl.textContent = q ? `${visibleCount} match${visibleCount===1?'':'es'}` : `${GRAND_ALL} companies`;
 }
 
 searchEl.addEventListener('input', renderFilters);
 
-// deep-link: apply #tier=<id>&co=<name> from the URL on load
+// deep-link on load: #tier-<id> jumps to a tier row; #co=<name> opens a company
 (function applyHash(){
-  const h = new URLSearchParams(location.hash.replace(/^#/, ''));
-  const t = h.get('tier');
-  if(t!==null && t!=='' && TIERS[+t]) activeTierFilter = +t;
   renderFilters();
-  const coName = h.get('co');
+  const h = location.hash.replace(/^#/, '');
+  if(/^tier-\d+$/.test(h)){
+    const row = document.getElementById(h);
+    if(row){ row.classList.add('visible'); requestAnimationFrame(()=>row.scrollIntoView()); }
+    return;
+  }
+  const coName = new URLSearchParams(h).get('co');
   if(coName){
     const target = decodeURIComponent(coName);
     for(const tier of TIERS){
