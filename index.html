@@ -296,7 +296,7 @@ const TIERS = [
       {name:'Siltronic AG', hq:'Germany', ticker:'WAF.DE', domain:'Hyper-pure silicon wafers', cap:3.3},
       {name:'Formosa SUMCO Technology', hq:'Taiwan', ticker:'3532.TW', domain:'Silicon wafers (joint venture)', cap:4.8},
       {name:'OCI Company', hq:'South Korea', ticker:'456040.KS', domain:'Polysilicon manufacturing', cap:null},
-      {name:'Hemlock Semiconductor', hq:'United States', domain:'Ultra-pure polycrystalline silicon', cap:null, status:'private', note:'Private joint venture (Shin-Etsu Handotai / Mitsubishi Materials); not publicly traded.'},
+      {name:'Hemlock Semiconductor', hq:'United States', domain:'Ultra-pure polycrystalline silicon', cap:null, status:'private', note:'Privately held — majority-owned by Corning Inc. (~80%) with Shin-Etsu Chemical (~20%); not publicly traded.'},
       {name:'Shin-Etsu Handotai', hq:'Japan', domain:'Global leader in silicon wafers, advanced substrates', cap:null, status:'crossref', note:'Wholly-owned subsidiary of Shin-Etsu Chemical (see Tier 2) — value carried there, not double-counted here.'},
     ]
   },
@@ -313,7 +313,7 @@ const TIERS = [
       {name:'BASF SE', hq:'Germany', ticker:'BAS.DE', domain:'High-purity sulfuric acid, cleaning chemicals', cap:49.1},
       {name:'Entegris (incl. KMG Chemicals)', hq:'United States', ticker:'ENTG', domain:'Advanced filtration, specialty chemicals, CMP slurries', cap:27.2},
       {name:'Taiyo Nippon Sanso', hq:'Japan', ticker:'4091.T', domain:'Specialty gases, gas delivery systems (Nippon Sanso Holdings)', cap:14.2},
-      {name:'Avantor Performance Materials', hq:'United States', ticker:'AVTR', domain:'High-purity solvents, etchants', cap:6.8},
+      {name:'Avantor, Inc.', hq:'United States', ticker:'AVTR', domain:'High-purity solvents, etchants', cap:6.8},
       {name:'Solvay S.A.', hq:'Belgium', ticker:'SOLB.BR', domain:'Specialty polymers, electronic wet chemicals', cap:3.2, note:'Solvay demerged its specialty-chemicals arm into Syensqo in Dec 2023; figure shown is Solvay SA post-split.'},
       {name:'Stella Chemifa', hq:'Japan', ticker:'4109.T', domain:'UHP hydrofluoric acid, wet chemicals', cap:null},
       {name:'Kanto Chemical', hq:'Japan', domain:'Wet etchants, cleaning chemicals, sulfuric acid', cap:null, status:'private', note:'Privately held; not publicly traded.'},
@@ -322,7 +322,7 @@ const TIERS = [
       {name:'Dongjin Semichem', hq:'South Korea', ticker:'005290.KQ', domain:'KrF/ArF photoresists, wet chemicals', cap:null},
       {name:'Resonac Holdings', hq:'Japan', ticker:'4004.T', domain:'High-purity etching gases, CMP slurries', cap:null},
       {name:'JSR Corporation', hq:'Japan', domain:'Advanced photoresists, anti-reflective coatings', cap:null, status:'private', note:'Taken private in 2024 via a Japan Investment Corporation-led buyout; delisted from Tokyo Stock Exchange.'},
-      {name:'SK Specialty', hq:'South Korea', domain:'CVD and deposition specialty gases', cap:null, status:'private', note:'Wholly-owned subsidiary within the SK Group; not separately listed.'},
+      {name:'SK Specialty', hq:'South Korea', domain:'CVD and deposition specialty gases', cap:null, status:'private', note:'Hahn & Co. acquired an 85% stake (completed March 2025); SK Inc. retains ~15%. Not publicly listed.'},
     ]
   },
   {
@@ -358,7 +358,7 @@ const TIERS = [
       {name:'ASM International', hq:'Netherlands', ticker:'ASM.AS', domain:'Atomic Layer Deposition (ALD), epitaxy', cap:59.8},
       {name:'Advanced Micro-Fabrication Equipment (AMEC)', hq:'China', ticker:'688012.SS', domain:'Plasma etching and MOCVD equipment', cap:49.8},
       {name:'Canon', hq:'Japan', ticker:'7751.T', domain:'i-line, KrF, and nanoimprint lithography', cap:22.2},
-      {name:'Screen Semiconductor Solutions', hq:'Japan', ticker:'7735.T', domain:'Wafer cleaning equipment, coater/developers (SCREEN Holdings)', cap:19.6},
+      {name:'SCREEN Holdings', hq:'Japan', ticker:'7735.T', domain:'Wafer cleaning equipment, coater/developers', cap:19.6},
       {name:'Kokusai Electric', hq:'Japan', ticker:'6525.T', domain:'Batch deposition systems, thermal processing', cap:14.7},
       {name:'Nikon', hq:'Japan', ticker:'7731.T', domain:'ArF immersion and DUV lithography', cap:null},
       {name:'Hitachi High-Tech', hq:'Japan', domain:'Etch systems, electron microscopes, metrology', cap:null, status:'private', note:'Wholly-owned subsidiary of Hitachi Ltd since 2020; delisted.'},
@@ -377,7 +377,7 @@ const TIERS = [
       {name:'Rambus', hq:'United States', ticker:'RMBS', domain:'Memory interface IP, security silicon IP', cap:13.0},
       {name:'CEVA', hq:'United States', ticker:'CEVA', domain:'Wireless connectivity and smart sensing IP', cap:1.4},
       {name:'Siemens EDA (formerly Mentor)', hq:'United States', domain:'EDA software, IC verification, digital twins', cap:null, note:'Business unit of Siemens AG (a large diversified conglomerate); not separately listed, so no standalone market cap.'},
-      {name:'Alphawave Semi', hq:'United Kingdom', domain:'High-speed connectivity IP, chiplet interconnects', cap:null, status:'private', note:'Acquired by Qualcomm (deal closed 2026); delisted from the London Stock Exchange.'},
+      {name:'Alphawave Semi', hq:'United Kingdom', domain:'High-speed connectivity IP, chiplet interconnects', cap:null, status:'private', note:'Acquired by Qualcomm (deal closed December 2025); delisted from the London Stock Exchange.'},
       {name:'Zuken', hq:'Japan', ticker:'6947.T', domain:'PCB and electrical wiring design', cap:null},
       {name:'Imagination Technologies', hq:'United Kingdom', domain:'GPU and AI accelerator IP', cap:null, status:'private', note:'Owned by Canyon Bridge Capital Partners since 2017; not publicly traded.'},
       {name:'Altium', hq:'Australia', domain:'PCB design software', cap:null, status:'private', note:'Acquired by Renesas in 2024 and taken private; delisted from the ASX.'},
@@ -439,7 +439,7 @@ const TIERS = [
       {name:'Hana Micron', hq:'South Korea', ticker:'067310.KQ', domain:'Memory packaging for Samsung and SK hynix', cap:null},
       {name:'SFA Semicon', hq:'South Korea', ticker:'036540.KQ', domain:'Memory packaging (DRAM and NAND-focused)', cap:null},
       {name:'Nepes Corporation', hq:'South Korea', ticker:'033640.KQ', domain:'Fan-out wafer-level packaging (FOWLP) specialist', cap:null},
-      {name:'UTAC Group', hq:'Singapore', domain:'Automotive, industrial, and consumer packaging', cap:null, status:'private', note:'Owned by Affinity Equity Partners; not publicly traded.'},
+      {name:'UTAC Group', hq:'Singapore', domain:'Automotive, industrial, and consumer packaging', cap:null, status:'private', note:'Owned by Wise Road Capital (acquired 2020); not publicly traded.'},
     ]
   },
   {
@@ -454,7 +454,7 @@ const TIERS = [
       {name:'Qualcomm', hq:'United States', ticker:'QCOM', domain:'Mobile SoCs, 5G basebands, automotive telematics', cap:250.0},
       {name:'MediaTek', hq:'Taiwan', ticker:'2454.TW', domain:'Mobile processors, smart home silicon', cap:226.0},
       {name:'MosChip', hq:'India', ticker:'MOSCHIP.NS', domain:'Semiconductor and product engineering services, custom ASICs', cap:null},
-      {name:'Saankhya Labs', hq:'India', domain:'Software-defined radio (SDR) chipsets, wireless communication', cap:null, status:'private', note:'Privately held Indian deep-tech startup; not publicly traded.'},
+      {name:'Saankhya Labs', hq:'India', domain:'Software-defined radio (SDR) chipsets, wireless communication', cap:null, status:'private', note:'Wholly-owned subsidiary of Tejas Networks (Tata Group) since a 2024 merger; not independently listed.'},
     ]
   },
   {
