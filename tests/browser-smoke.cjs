@@ -1,6 +1,8 @@
 // Synthetic HTTP responses exercise the real browser loader and calculations.
 // These tests do not establish the provider's availability or quote accuracy.
 const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const path = require('node:path');
 const {chromium} = require('playwright');
 
 const baseURL = process.env.SEMI_BASE_URL || 'http://127.0.0.1:8000';
@@ -358,6 +360,46 @@ async function run(){
       assert.ok(sizes.body[0] <= sizes.body[1], JSON.stringify(sizes));
       assert.ok(sizes.drawer[0] <= sizes.drawer[1], JSON.stringify(sizes));
       assert.deepEqual(errors, []);
+    });
+    await check('Market data still loads in browsers without Object.hasOwn', async () => {
+      const compatiblePage = await context.newPage();
+      const compatibilityErrors = [];
+      compatiblePage.on('pageerror', error => compatibilityErrors.push(error.message));
+      await compatiblePage.addInitScript(() => { delete Object.hasOwn; });
+      await compatiblePage.goto(baseURL, {waitUntil:'domcontentloaded'});
+      await compatiblePage.waitForFunction(() => !document.getElementById('marketRefresh').disabled);
+      assert.equal(await compatiblePage.evaluate(() => typeof Object.hasOwn), 'undefined');
+      assert.equal(await compatiblePage.locator('#statTotalCap').textContent(), '$20.0B');
+      assert.equal(await compatiblePage.locator('#statPricedCount').textContent(), '1 / 101');
+      assert.notEqual(await compatiblePage.locator('#statUpdated').textContent(), '—');
+      assert.deepEqual(compatibilityErrors, []);
+      await compatiblePage.close();
+    });
+
+    await check('An HTML-only copy explains missing supporting files and links to the live portal', async () => {
+      // Managed Chromium blocks file:// navigation. Model the same missing-file
+      // condition with an HTTP copy that has no sibling assets directory.
+      const copiedPage = await context.newPage();
+      const copyURL = baseURL+'/downloaded-copy/index.html';
+      const copyErrors = [];
+      const copyRequests = [];
+      copiedPage.on('pageerror', error => copyErrors.push(error.message));
+      copiedPage.on('request', request => copyRequests.push(request.url()));
+      await copiedPage.route(copyURL, route => route.fulfill({
+        contentType:'text/html', body:fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8'),
+      }));
+      await copiedPage.route(baseURL+'/downloaded-copy/assets/**', route => route.fulfill({status:404, body:'File not found'}));
+      await copiedPage.goto(copyURL, {waitUntil:'domcontentloaded'});
+      await copiedPage.waitForFunction(() => !document.getElementById('marketRefresh').disabled);
+      assert.match(await copiedPage.locator('#marketDataStatus').textContent(), /missing its market-data files/i);
+      assert.equal(await copiedPage.locator('#marketPortalLink').isVisible(), true);
+      assert.equal(await copiedPage.locator('#marketPortalLink').getAttribute('href'), 'https://www.pandala.in/semi/');
+      assert.equal(await copiedPage.locator('#statTotalCap').textContent(), 'Unavailable');
+      assert.equal(await copiedPage.locator('#statUpdated').textContent(), '—');
+      assert.equal(await copiedPage.locator('.card').count(), 119);
+      assert.ok(!copyRequests.some(url => url.startsWith(scannerURL+'/')));
+      assert.deepEqual(copyErrors, []);
+      await copiedPage.close();
     });
     console.log(`${checks} browser checks passed (synthetic provider fixtures).`);
   } finally {

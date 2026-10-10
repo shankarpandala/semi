@@ -43,7 +43,7 @@
   }
 
   async function fetchQuotes(tickers, options = {}) {
-    const {signal, timeoutMs = 15000, fetchImpl = globalThis.fetch} = options;
+    const {signal, timeoutMs = 15000, fetchImpl = globalThis.fetch.bind(globalThis)} = options;
     const requested = [...new Set(tickers)];
     const providerToTicker = new Map();
     for (const ticker of requested) {
@@ -104,7 +104,7 @@
           providerTime: null,
         };
       }
-      const missing = requested.filter(ticker => !Object.hasOwn(quotes, ticker));
+      const missing = requested.filter(ticker => !Object.prototype.hasOwnProperty.call(quotes, ticker));
       return {quotes, fetchedAt: Object.keys(quotes).length ? new Date().toISOString() : null, missing};
     } finally {
       clearTimeout(timer);

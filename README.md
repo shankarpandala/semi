@@ -2,6 +2,10 @@
 
 A browser-based dashboard of 119 companies across the semiconductor supply chain.
 
+Open the live portal at **https://www.pandala.in/semi/**. A downloaded copy of
+`index.html` alone is incomplete: the files in `assets/` are also required to
+load market data. Use the deployed portal, or serve the complete repository.
+
 ## Run locally
 
 Serve the repository with Python's standard library:

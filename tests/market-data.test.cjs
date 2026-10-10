@@ -1,5 +1,8 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const path = require('node:path');
+const vm = require('node:vm');
 const {fetchQuotes, toUSD} = require('../assets/market-data.js');
 
 const response = rows => ({ok: true, json: async () => ({data: rows})});
@@ -261,4 +264,25 @@ test('an already cancelled caller signal cannot return a successful result', {ti
     signal: controller.signal,
     fetchImpl: abortableFetch(),
   }), error => error === reason);
+});
+
+test('works without Object.hasOwn and calls the browser fetch with its required receiver', async () => {
+  const context = vm.createContext({
+    AbortController, setTimeout, clearTimeout,
+    MarketPrices: {tradingViewSymbol: ticker => ticker === 'AAPL' ? 'NASDAQ:AAPL' : null},
+  });
+  vm.runInContext(`
+    Object.hasOwn = undefined;
+    globalThis.fetch = async function () {
+      if (this !== globalThis) throw new TypeError('Illegal invocation');
+      return {ok: true, json: async () => ({data: [
+        {s: 'NASDAQ:AAPL', d: [200, 3e12, 0, 'delayed_streaming_900', 'USD', 'USD']}
+      ]})};
+    };
+  `, context);
+  vm.runInContext(fs.readFileSync(path.join(__dirname, '..', 'assets', 'market-data.js'), 'utf8'), context);
+  const result = await vm.runInContext("MarketData.fetchQuotes(['AAPL', 'UNKNOWN'])", context);
+  assert.equal(result.quotes.AAPL.priceUSD, 200);
+  assert.equal(result.quotes.AAPL.capUSD, 3000);
+  assert.deepEqual(Array.from(result.missing), ['UNKNOWN']);
 });
