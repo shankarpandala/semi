@@ -135,6 +135,21 @@
   .chart-empty{padding:60px 18px; text-align:center; color:var(--text-dim); font-size:13.5px;}
   .scroll-hint{display:none; padding:6px 18px 0; font-size:11px; color:var(--text-faint);}
 
+  .chart-legend{display:flex; flex-wrap:wrap; gap:6px 16px; list-style:none; margin:0; padding:0 18px 10px; font-size:11px; color:var(--text-dim);}
+  .chart-legend li{display:inline-flex; align-items:center; gap:6px;}
+  .chart-legend i{width:12px; height:8px; border-radius:2px; display:inline-block;}
+  #chart .stub{transition:opacity .12s;}
+  #chart.has-focus .stub{opacity:.25;}
+  #chart.has-focus .stub.on{opacity:1;}
+  .cap{color:var(--text-faint); font-family:'IBM Plex Mono',monospace; font-size:11px; white-space:nowrap;}
+  .cap:empty{display:none;}
+  .co-cell .cap, h1 .cap{margin-left:8px;}
+  .account-basis{padding:4px 18px 8px; font-size:12px; color:var(--text-dim); line-height:1.55;}
+  .account-basis:empty{display:none;}
+  .account-basis ul{margin:4px 0 0; padding-left:16px;}
+  #accountsTable td.label{color:var(--text);}
+  #accountsTable tr.total td{border-top:1px solid #3a4150; color:var(--text); font-weight:500;}
+  #accountsTable td .sw{width:8px; height:8px; border-radius:2px; display:inline-block; margin-right:7px;}
   .tooltip{
     position:fixed; z-index:60; pointer-events:none; max-width:320px;
     background:#1b2029; border:1px solid #333a46; border-radius:8px; padding:10px 12px;
@@ -215,7 +230,8 @@
       </nav>
     </div>
     <div class="hero-stats">
-      <div class="stat"><b id="statTotal">—</b><span>Tracked flows · USD</span></div>
+      <div class="stat"><b id="statRevenue">—</b><span>Revenue accounted</span></div>
+      <div class="stat"><b id="statTotal">—</b><span>Between tracked companies</span></div>
       <div class="stat"><b id="statCount">—</b><span>Company links</span></div>
       <div class="stat"><b id="statCompanies">—</b><span>Companies linked</span></div>
       <div class="stat"><b id="statPeriod">2025</b><span>Period</span></div>
@@ -248,6 +264,7 @@
 
   <section class="card chart-card" aria-labelledby="viewTitle">
     <div class="chart-hint" aria-hidden="true"><span id="hintLeft">Customers pay</span><span>money flows left → right</span><span id="hintRight">Suppliers get paid</span></div>
+    <ul class="chart-legend" id="chartLegend" aria-label="Legend"></ul>
     <div class="chart-scroll" id="chartScroll">
       <svg id="chart" role="group" aria-describedby="viewSub"></svg>
     </div>
@@ -256,9 +273,20 @@
 
   <section class="card notes-card" id="notes" hidden></section>
 
+  <section class="card table-card" id="accountsCard" aria-labelledby="accountsTitle">
+    <div class="table-head">
+      <h2 id="accountsTitle">Revenue &amp; costs</h2>
+      <p id="accountsNote"></p>
+    </div>
+    <div class="table-scroll">
+      <table id="accountsTable"><thead></thead><tbody></tbody></table>
+    </div>
+    <div class="account-basis" id="accountBasis"></div>
+  </section>
+
   <section class="card table-card" aria-labelledby="tableTitle">
     <div class="table-head">
-      <h2 id="tableTitle">Flows in this view</h2>
+      <h2 id="tableTitle">Flows between tracked companies</h2>
       <p id="tableNote"></p>
     </div>
     <div class="table-scroll">
@@ -274,22 +302,26 @@
     <h2 id="methodTitle">How to read this</h2>
     <dl>
       <dt>Direction</dt><dd>Each band runs from the customer who pays to the supplier who is paid. Bands are gross payments: a dollar Microsoft pays Foxconn for an AI rack reappears in Foxconn's payment to NVIDIA, and again in NVIDIA's payment to TSMC. Column totals therefore overlap and should not be added together.</dd>
-      <dt>Scope</dt><dd>Only flows between the 119 companies on the dashboard: purchases of chips, memory, wafers, tools, subsystems, materials, gases, IP, packaging, test and assembly. Revenue from untracked customers (Meta, Dell, CXMT and many others) is not shown, so a company's bands can add up to far less than its revenue.</dd>
+      <dt>Scope</dt><dd>Every company's bands add up to its 2025 revenue. Coloured bands are payments between the 119 companies on the dashboard: chips, memory, wafers, tools, subsystems, materials, gases, IP, packaging, test and assembly. Grey shows money from customers outside the 119 (consumers, enterprises, Meta, Dell, Chinese fabs and many others) and where the rest of each company's revenue goes: other suppliers and production costs, people and R&amp;D, and operating profit. An operating loss appears as money drawn from reserves.</dd>
+      <dt>Tier 10</dt><dd>Most of Amazon's, Alphabet's and Microsoft's revenue (retail, ads, software) and Apple's services revenue have little to do with chips. For these four, only the hardware part is counted: Apple's device sales, and the hyperscalers' purchases of servers, networking and chips. Their full revenue is given in the company view.</dd>
+      <dt>Market cap</dt><dd>Market value is fetched live when the page opens, as on the companies page, and shown in tooltips and tables. It is a valuation of future profits, not money that moves in a year, so it is never drawn as a band.</dd>
       <dt>Period</dt><dd id="methodPeriod"></dd>
       <dt>Confidence</dt><dd><span class="conf-cell"><i class="conf-key disclosed"></i>Disclosed</span> — the payer or supplier reports the amount or share for this counterparty (named, or identified with near certainty). <span class="conf-cell"><i class="conf-key derived"></i>Derived</span> — calculated from reported figures plus a stated assumption. <span class="conf-cell"><i class="conf-key estimated"></i>Estimated</span> — analyst estimates or modelling from market shares; treat as an order of magnitude.</dd>
       <dt>Layout</dt><dd>Tiers follow the dashboard. Tiers 10, 8, 7 and 0–1 are split by role (brands vs. ODMs, OSATs vs. test equipment, substrates vs. ABF film, wafers vs. polysilicon) because each contains a customer–supplier step of its own. Flows within a group, between groups drawn in the same column, or running against the chain (such as Samsung's phone business buying Snapdragon chips) are listed below the chart instead of being drawn.</dd>
     </dl>
-    <p>Every flow lists its basis and sources in the table. These are static research figures, not live market data; corrections are welcome.</p>
+    <p>Every flow and every company account lists its basis and sources. These are static research figures; only market caps are live. Corrections are welcome.</p>
   </section>
 </main>
 
 <footer>
-  MONEY FLOWS — static estimates compiled from company filings, annual reports, earnings calls and industry research. Bands show payments between tracked companies only. Market values on the companies page are fetched live; these flows are not.<br>
+  MONEY FLOWS — static estimates compiled from company filings, annual reports, earnings calls and industry research. Market caps are fetched live from TradingView by your browser; the flows and accounts are not.<br>
   <a href="./">← Back to the companies dashboard</a>
 </footer>
 
 <div class="tooltip" id="tooltip" role="tooltip" hidden></div>
 
+<script src="assets/market-prices.js"></script>
+<script src="assets/market-data.js?v=2"></script>
 <script src="assets/sankey-layout.js"></script>
 <script src="assets/flow-views.js"></script>
 <script src="assets/flows-data.js"></script>
@@ -298,8 +330,25 @@
   'use strict';
   const data = window.FlowsData;
   const model = window.FlowViews.createModel(data);
+  const OUTSIDE = window.FlowViews.OUTSIDE;
   const SVGNS = 'http://www.w3.org/2000/svg';
   const OTHER_HEX = '#565E6C';
+  // Neutral greys for money that is not a payment between two tracked companies.
+  const OUTSIDE_HEX = {
+    customers:'#77808E', reserves:'#8A7A73', internal:'#454C58', hidden:'#454C58', notDrawn:'#454C58',
+    other:'#4E5562', people:'#959DAA', profit:'#D3D7DE',
+  };
+  const OUTSIDE_NOTE = {
+    customers:'Revenue from customers that are not among the 119 companies.',
+    reserves:'Spending beyond revenue: an operating loss covered from reserves or borrowing.',
+    internal:'Payments between companies inside this group.',
+    hidden:'Tracked flows hidden by the confidence filter.',
+    notDrawn:'Tracked flows that stay inside a tier group, run between groups in one column, or run against the chain. They are listed below the chart.',
+    other:'Cost of revenue not paid to a tracked company: other suppliers, factory staff, depreciation, energy.',
+    people:'Research and development, sales, general and administrative costs.',
+    profit:'Operating profit: revenue minus all operating costs.',
+  };
+  const LEGEND = [['customers', 'From customers outside the 119'], ['other', 'Other suppliers & production'], ['people', 'People, R&D & overhead'], ['profit', 'Operating profit']];
   const CONF_LABEL = {disclosed:'Disclosed', derived:'Derived', estimated:'Estimated'};
   const TABLE_PAGE = 30;
 
@@ -308,11 +357,15 @@
   const chartScroll = $('chartScroll');
   const tooltip = $('tooltip');
   const state = {conf:new Set(window.FlowViews.CONFIDENCE), showAll:false, view:{kind:'overview'}};
-  const companyNames = [...model.groupOf.keys()].filter(name => model.flows.some(f => f.from === name || f.to === name)).sort();
+  const caps = new Map();
+  const trackedNames = new Set(model.flows.flatMap(f => [f.from, f.to]));
+  const accounts = data.accounts || {};
+  const companyNames = [...model.groupOf.keys()].filter(name => trackedNames.has(name) || accounts[name]).sort();
 
   const shortName = name => data.short[name] || name;
   const groupLabel = group => group.tierLabel + ' · ' + group.role;
-  const colorOf = node => node.kind === 'other' ? OTHER_HEX : node.group.hex;
+  const colorOf = node => node.kind === 'outside' ? OUTSIDE_HEX[node.role] : node.kind === 'other' ? OTHER_HEX : node.group.hex;
+  const linkColor = link => link.outside ? OUTSIDE_HEX[link.outside] : colorOf(link.source);
   // Compact form for chart labels; one decimal elsewhere.
   function fmtUSD(v, compact = false){
     if(!(v > 0)) return '$0';
@@ -339,6 +392,35 @@
     return node;
   };
   const swatch = hex => { const s = el('i', {class:'sw'}); s.style.background = hex; return s; };
+
+  // ---------- accounts ----------
+  const ACCOUNT_KEYS = ['revenue', 'trackedIn', 'outsideTotal', 'reserves', 'trackedOut', 'other', 'people', 'profit', 'inTotal', 'outTotal'];
+  function sumAccounts(names){
+    const total = Object.fromEntries(ACCOUNT_KEYS.map(key => [key, 0]));
+    for(const name of names){
+      const item = model.account(name);
+      for(const key of ACCOUNT_KEYS) total[key] += item[key];
+    }
+    return total;
+  }
+  const allAccounts = sumAccounts(model.groupOf.keys());
+  const capFor = names => {
+    const listed = names.filter(name => data.tickers && data.tickers[name]);
+    const known = listed.filter(name => caps.has(name));
+    return {usd:known.reduce((total, name) => total + caps.get(name), 0), known:known.length, listed:listed.length};
+  };
+  const capSpan = name => el('span', {class:'cap', 'data-cap':name});
+  const groupCapSpan = group => el('span', {class:'cap', 'data-cap-group':group.id});
+  function paintCaps(){
+    document.querySelectorAll('[data-cap]').forEach(span => {
+      span.textContent = caps.has(span.dataset.cap) ? 'cap ' + fmtUSD(caps.get(span.dataset.cap)) : '';
+    });
+    document.querySelectorAll('[data-cap-group]').forEach(span => {
+      const group = model.groupById.get(span.dataset.capGroup);
+      const cap = capFor(group.companies);
+      span.textContent = cap.known ? fmtUSD(cap.usd) + (cap.known < cap.listed ? ` (${cap.known} of ${cap.listed})` : '') : '';
+    });
+  }
 
   // ---------- routing ----------
   function parseHash(){
@@ -400,19 +482,43 @@
     $('searchMsg').textContent = '';
     const built = buildView();
     renderHead(built);
-    renderMix(built.graph.flows);
+    renderMix(built);
+    renderLegend(built);
     drawChart(built);
     renderNotes(built);
+    renderAccounts(built);
     renderTable(built);
+    paintCaps();
     if(focusTitle){ focusTitle = false; $('viewTitle').focus({preventScroll:true}); }
   }
 
-  const isTracked = name => model.flows.some(f => f.from === name || f.to === name);
+  const hasAccount = name => !!accounts[name];
   function emptyMessage(view){
-    if(view.kind === 'company' && !isTracked(view.name)) return 'No flows involving this company are tracked yet.';
+    if(view.kind === 'company' && !trackedNames.has(view.name) && !hasAccount(view.name)) return 'No flows or revenue figures for this company yet.';
+    if(view.kind === 'company' && !trackedNames.has(view.name)) return 'No flows with other tracked companies; all of its revenue comes from outside the 119.';
     return 'No tracked flows match this view and filter.';
   }
   const capitalize = text => text.charAt(0).toUpperCase() + text.slice(1);
+  const listJoin = items => items.length < 2 ? items.join('') : items.slice(0, -1).join(', ') + ' and ' + items[items.length - 1];
+
+  // One sentence each for money in and money out, from an account or a sum of accounts.
+  function accountSentences(a, {subject = 'It', buyer = false} = {}){
+    if(buyer){
+      return `${subject} spent ${fmtUSD(a.inTotal)} on hardware: ${fmtUSD(a.trackedOut)} with tracked companies and ${fmtUSD(a.other)} with other hardware suppliers.`;
+    }
+    const sources = [];
+    if(a.trackedIn > 0) sources.push(`${fmtUSD(a.trackedIn)} (${pct(a.trackedIn, a.revenue)}%) from tracked companies`);
+    if(a.outsideTotal > 0) sources.push(`${fmtUSD(a.outsideTotal)} from customers outside the 119`);
+    const uses = [];
+    if(a.trackedOut > 0) uses.push(`${fmtUSD(a.trackedOut)} to tracked suppliers`);
+    if(a.other > 0) uses.push(`${fmtUSD(a.other)} to other suppliers and production`);
+    if(a.people > 0) uses.push(`${fmtUSD(a.people)} to people, R&D and overhead`);
+    let text = `${subject} took in ${fmtUSD(a.revenue)} in 2025${sources.length ? ': ' + listJoin(sources) : ''}.`;
+    if(uses.length) text += ` It paid ${listJoin(uses)}`;
+    text += a.profit > 0 ? `${uses.length ? ', and' : ' It'} kept ${fmtUSD(a.profit)} as operating profit.` : uses.length ? '.' : '';
+    if(a.reserves > 0) text += ` Costs exceeded revenue by ${fmtUSD(a.reserves)} (an operating loss), funded from reserves.`;
+    return text;
+  }
 
   function renderHead({view, graph, group}){
     const crumbs = $('crumbs');
@@ -431,8 +537,10 @@
     if(view.kind === 'overview'){
       crumb('All tiers');
       title.append('Who pays whom in the chip supply chain');
-      const total = graph.links.reduce((s, l) => s + l.value, 0);
-      sub.append(`${fmtUSD(total)} a year moves between tier groups in the bands below (${data.meta.period.toLowerCase()}). Select a tier to see its companies, or a band to see the company-to-company payments behind it.`);
+      const tracked = sum(model.flows);
+      sub.append(`The 119 companies took in ${fmtUSD(allAccounts.revenue)} in 2025 (for Tier 10, the hardware part only). `
+        + `Coloured bands are the ${fmtUSD(tracked)} one tracked company paid another. Grey stubs show money arriving from customers outside the 119, and money leaving as other suppliers, people and profit. `
+        + 'Select a tier or a band to see the companies behind it.');
     } else if(view.kind === 'pair'){
       const from = model.groupById.get(view.from), to = model.groupById.get(view.to);
       crumb('All tiers', {kind:'overview'});
@@ -448,12 +556,8 @@
       crumb('All tiers', {kind:'overview'});
       crumb(groupLabel(group));
       title.append(swatch(group.hex), groupLabel(group));
-      const t = graph.totals;
-      const parts = [];
-      if(t.in > 0) parts.push(`receives ${fmtUSD(t.in)} a year from tracked customers`);
-      if(t.out > 0) parts.push(`pays ${fmtUSD(t.out)}${t.in > 0 ? '' : ' a year'} to tracked suppliers`);
-      let text = parts.length ? capitalize(parts.join(' and ')) + '.' : emptyMessage(view);
-      if(t.internal > 0) text += ` Another ${fmtUSD(t.internal)} changes hands within the group (listed below the chart).`;
+      let text = accountSentences(graph.account, {subject:'The group'});
+      if(graph.totals.internal > 0) text += ` ${fmtUSD(graph.totals.internal)} of that changes hands within the group.`;
       sub.append(text + ' Select a company to follow its money.');
       hintLeft.textContent = 'Paid by';
       hintRight.textContent = 'Pays';
@@ -461,47 +565,50 @@
       crumb('All tiers', {kind:'overview'});
       crumb(groupLabel(group), {kind:'group', id:group.id});
       crumb(view.name);
-      title.append(swatch(group.hex), view.name);
-      const t = graph.totals;
-      if(!graph.flows.length){
-        sub.append(isTracked(view.name) ? 'No tracked flows for this company match the current filter. ' : 'No flows involving this company are tracked yet. ');
-        sub.append(el('a', {href:'./#co='+encodeURIComponent(view.name), text:'Open company card ↗'}));
-        hintLeft.textContent = 'Paid by';
-        hintRight.textContent = 'Pays';
-        return;
-      }
-      const payers = new Set(graph.flows.filter(f => f.to === view.name).map(f => f.from)).size;
-      const payees = new Set(graph.flows.filter(f => f.from === view.name).map(f => f.to)).size;
-      const parts = [];
-      if(t.in > 0) parts.push(`receives ${fmtUSD(t.in)} a year from ${payers} tracked ${plural(payers, 'customer')}`);
-      if(t.out > 0) parts.push(`pays ${fmtUSD(t.out)}${t.in > 0 ? '' : ' a year'} to ${payees} tracked ${plural(payees, 'supplier')}`);
-      let text = capitalize(parts.join(' and ')) + '.';
-      const revenue = data.revenue[view.name];
-      if(revenue && t.in > 0) text += ` Tracked inflows equal about ${pct(t.in, revenue.usd)}% of its ${fmtUSD(revenue.usd)} revenue — ${revenue.basis.replace(/\.$/, '')}.`;
-      sub.append(text + ' ');
+      title.append(swatch(group.hex), view.name, capSpan(view.name));
+      const a = model.account(view.name);
+      const source = accounts[view.name];
+      if(!a.inTotal && !a.outTotal) sub.append(emptyMessage(view) + ' ');
+      else sub.append(accountSentences(a, {buyer:!!(source && source.buyer)}) + ' ');
       sub.append(el('a', {href:'./#co='+encodeURIComponent(view.name), text:'Open company card ↗'}));
       hintLeft.textContent = 'Paid by';
       hintRight.textContent = 'Pays';
     }
   }
 
-  function renderMix(flows){
+  function renderMix({view, graph}){
     const mix = $('mix');
     mix.replaceChildren();
-    const summary = model.summarize(flows);
-    if(!summary.count) return;
-    const bar = el('span', {class:'mix-bar', 'aria-hidden':'true'});
-    for(const conf of window.FlowViews.CONFIDENCE){
-      if(!summary.byConf[conf]) continue;
-      const seg = el('span', {class:conf});
-      seg.style.flex = String(summary.byConf[conf]);
-      bar.append(seg);
+    const summary = model.summarize(graph.flows);
+    if(summary.count){
+      const bar = el('span', {class:'mix-bar', 'aria-hidden':'true'});
+      for(const conf of window.FlowViews.CONFIDENCE){
+        if(!summary.byConf[conf]) continue;
+        const seg = el('span', {class:conf});
+        seg.style.flex = String(summary.byConf[conf]);
+        bar.append(seg);
+      }
+      mix.append(bar);
+      for(const conf of window.FlowViews.CONFIDENCE){
+        mix.append(el('span', {class:'mix-item'}, el('i', {class:'conf-key '+conf}), el('b', {text:pct(summary.byConf[conf], summary.total)+'%'}), CONF_LABEL[conf].toLowerCase()));
+      }
+      mix.append(el('span', {class:'mix-item', text:'of '+fmtUSD(summary.total)+' in tracked flows'}));
     }
-    mix.append(bar);
-    for(const conf of window.FlowViews.CONFIDENCE){
-      mix.append(el('span', {class:'mix-item'}, el('i', {class:'conf-key '+conf}), el('b', {text:pct(summary.byConf[conf], summary.total)+'%'}), CONF_LABEL[conf].toLowerCase()));
+    const a = view.kind === 'overview' ? allAccounts : graph.account;
+    if(a && a.revenue > 0){
+      mix.append(el('span', {class:'mix-item'}, el('b', {text:pct(a.trackedIn, a.revenue)+'%'}), 'of revenue comes from tracked companies'));
     }
-    mix.append(el('span', {class:'mix-item', text:'of '+fmtUSD(summary.total)+' by value'}));
+  }
+
+  function renderLegend({view}){
+    const legend = $('chartLegend');
+    legend.replaceChildren();
+    if(view.kind === 'pair') return;
+    legend.append(el('li', {}, el('i', {style:'background:linear-gradient(90deg,var(--r9),var(--r5),var(--r0))'}), 'Payments between tracked companies (colour = payer’s tier)'));
+    for(const [role, label] of LEGEND){
+      const key = el('i'); key.style.background = OUTSIDE_HEX[role];
+      legend.append(el('li', {}, key, label));
+    }
   }
 
   // ---------- chart ----------
@@ -510,7 +617,7 @@
     chart.classList.remove('has-focus');
     const scroll = chartScroll;
     scroll.querySelector('.chart-empty')?.remove();
-    if(!graph.links.length){
+    if(!graph.links.length && !graph.nodes.some(n => n.extraIn || n.extraOut)){
       chart.style.display = 'none';
       scroll.append(el('p', {class:'chart-empty', text:emptyMessage(view)}));
       return;
@@ -518,39 +625,47 @@
     chart.style.display = '';
     const overview = view.kind === 'overview';
     const available = Math.max(320, scroll.clientWidth - 36);
-    const width = Math.max(available, overview ? 940 : 660);
+    const width = Math.max(available, overview ? 980 : 680);
     const columnCount = Math.max(...graph.nodes.map(n => n.column)) + 1;
     const perColumn = Array.from({length:columnCount}, (_, c) => graph.nodes.filter(n => n.column === c).length);
     const top = 6, bottom = 10;
-    const marginLeft = overview ? 155 : 170;
-    const marginRight = overview ? 130 : 170;
-    const innerHeight = overview ? (available < 700 ? 560 : 620) : Math.min(1500, Math.max(380, Math.max(...perColumn) * 30));
+    // The overview keeps its left margin for outside-money stubs and puts every label right of its node.
+    const marginLeft = overview ? 56 : 180;
+    const marginRight = overview ? 150 : 200;
+    const nodeWidth = overview ? 14 : 12;
+    const innerWidth = width - marginLeft - marginRight;
+    const innerHeight = overview ? (available < 700 ? 580 : 660) : Math.min(1500, Math.max(400, Math.max(...perColumn) * 30));
     const height = innerHeight + top + bottom;
-    const nodePadding = overview ? 22 : Math.max(6, Math.min(14, innerHeight / Math.max(...perColumn) * .3));
+    const nodePadding = overview ? 20 : Math.max(6, Math.min(14, innerHeight / Math.max(...perColumn) * .3));
     const result = window.SankeyLayout.layout({
-      nodes:graph.nodes, links:graph.links, width:width - marginLeft - marginRight, height:innerHeight,
-      nodeWidth: overview ? 14 : 12, nodePadding, minNodeHeight:2, order:graph.order,
+      nodes:graph.nodes, links:graph.links, width:innerWidth, height:innerHeight,
+      nodeWidth, nodePadding, minNodeHeight:2, order:graph.order,
     });
+    const step = columnCount > 1 ? (innerWidth - nodeWidth) / (columnCount - 1) : innerWidth;
+    const stubLength = Math.min(40, Math.max(14, (step - nodeWidth) * .26));
     chart.setAttribute('viewBox', `0 0 ${width} ${height}`);
     chart.setAttribute('width', width);
     chart.setAttribute('height', height);
-    chart.setAttribute('aria-label', $('viewTitle').textContent + '. ' + graph.links.length + ' bands. The table below lists every flow.');
+    chart.setAttribute('aria-label', $('viewTitle').textContent + '. ' + graph.links.length + ' bands. The tables below list every amount.');
+    const defs = svgEl('defs');
     const root = svgEl('g', {transform:`translate(${marginLeft},${top})`});
     const linkLayer = svgEl('g');
+    const stubLayer = svgEl('g');
     // A band's own fill always wins the pointer; the padded outlines underneath
     // only widen the target where no other band is drawn.
     const padLayer = svgEl('g', {'aria-hidden':'true'});
     const hitLayer = svgEl('g');
     const nodeLayer = svgEl('g');
     const labelLayer = svgEl('g', {'aria-hidden':'true'});
-    root.append(linkLayer, padLayer, hitLayer, nodeLayer, labelLayer);
-    chart.append(root);
+    root.append(linkLayer, stubLayer, padLayer, hitLayer, nodeLayer, labelLayer);
+    chart.append(defs, root);
 
     const linkEls = new Map();
     const nodeEls = new Map();
+    const stubEls = new Map();
     result.links.forEach(link => {
       const d = window.SankeyLayout.linkPath(link, 1);
-      const visible = svgEl('path', {d, class:'link', fill:colorOf(link.source)});
+      const visible = svgEl('path', {d, class:'link', fill:linkColor(link)});
       linkLayer.append(visible);
       const action = linkAction(view, link);
       const hit = svgEl('path', {d, class:'hit'+(action ? ' go' : ''), 'pointer-events':'fill'});
@@ -565,6 +680,35 @@
       }
       if(action){ bindActivate(hit, action); pad.addEventListener('click', () => navigate(action)); }
     });
+
+    // Stubs: outside money entering a node on the left and leaving it on the right, fading with distance.
+    const gradient = (role, side) => {
+      const id = `fade-${side}-${role}`;
+      if(!defs.querySelector('#'+id)){
+        const g = svgEl('linearGradient', {id, x1:0, x2:1, y1:0, y2:0});
+        const [a, b] = side === 'in' ? [0, .7] : [.7, 0];
+        g.append(svgEl('stop', {offset:0, 'stop-color':OUTSIDE_HEX[role], 'stop-opacity':a}), svgEl('stop', {offset:1, 'stop-color':OUTSIDE_HEX[role], 'stop-opacity':b}));
+        defs.append(g);
+      }
+      return `url(#${id})`;
+    };
+    for(const node of result.nodes){
+      const items = [];
+      for(const [side, list, span, x] of [['in', node.stubIn, node.inStub, node.x0 - stubLength], ['out', node.stubOut, node.outStub, node.x1]]){
+        if(!list) continue;
+        let y = span.y0;
+        for(const item of list){
+          const h = item.usd * result.ky;
+          const rect = svgEl('rect', {class:'stub', x, y, width:stubLength, height:Math.max(.5, h), fill:gradient(item.key, side)});
+          stubLayer.append(rect);
+          items.push(rect);
+          bindHover(rect, () => [node], () => [], () => stubTooltip(node, item, side), false);
+          y += h;
+        }
+      }
+      stubEls.set(node, items);
+    }
+
     for(const node of result.nodes){
       const g = svgEl('g', {class:'node'});
       const rect = svgEl('rect', {x:node.x0, y:node.y0, width:node.x1 - node.x0, height:Math.max(1, node.y1 - node.y0), fill:colorOf(node)});
@@ -578,12 +722,15 @@
         () => [...node.sourceLinks, ...node.targetLinks], () => nodeTooltip(view, node, action), !!action);
       if(action) bindActivate(g, action);
     }
-    drawLabels(result, labelLayer, marginLeft, marginRight);
+    drawLabels(result, labelLayer, {labelsLeft:!overview, marginLeft, marginRight});
 
     function bindHover(target, nodesOf, linksOf, content, focusable){
       const on = event => {
         chart.classList.add('has-focus');
-        for(const n of nodesOf()) nodeEls.get(n)?.classList.add('on');
+        for(const n of nodesOf()){
+          nodeEls.get(n)?.classList.add('on');
+          for(const stub of stubEls.get(n) || []) stub.classList.add('on');
+        }
         for(const l of linksOf()) linkEls.get(l)?.classList.add('on');
         showTooltip(content(), event);
       };
@@ -621,16 +768,19 @@
     return null;
   }
   const isGroup = node => node.kind === 'group' || node.kind === 'groupSide';
-  const nodeTitle = node => isGroup(node) ? groupLabel(node.group) : node.kind === 'other' ? node.label : node.name;
-  const linkSummary = link => `${nodeTitle(link.source)} pays ${nodeTitle(link.target)} ${fmtUSD(link.value)} a year`;
+  const nodeTitle = node => isGroup(node) ? groupLabel(node.group) : node.kind === 'other' || node.kind === 'outside' ? node.label : node.name;
+  const linkSummary = link => link.outside
+    ? `${nodeTitle(link.source)} → ${nodeTitle(link.target)}: ${fmtUSD(link.value)} a year`
+    : `${nodeTitle(link.source)} pays ${nodeTitle(link.target)} ${fmtUSD(link.value)} a year`;
   const nodeSummary = node => {
     const parts = [nodeTitle(node)];
-    if(node.valueIn) parts.push('receives '+fmtUSD(node.valueIn));
-    if(node.valueOut) parts.push('pays '+fmtUSD(node.valueOut));
+    if(node.kind === 'group') parts.push('revenue '+fmtUSD(node.revenue));
+    if(node.valueIn) parts.push('receives '+fmtUSD(node.valueIn)+' from tracked companies');
+    if(node.valueOut) parts.push('pays '+fmtUSD(node.valueOut)+' to tracked companies');
     return parts.join(', ');
   };
 
-  function drawLabels(result, layer, marginLeft, marginRight){
+  function drawLabels(result, layer, {labelsLeft, marginLeft, marginRight}){
     const lineH = 13;
     const columnX = result.columns.map(column => column[0]?.x0);
     const measurer = svgEl('text', {x:0, y:-1000});
@@ -667,7 +817,7 @@
         const blockH = keep.length * lineH;
         let y = (node.y0 + node.y1) / 2 - blockH / 2;
         y = Math.max(lo, Math.min(y, hi - blockH));
-        const left = node.column === 0;
+        const left = labelsLeft && node.column === 0;
         const x = left ? node.x0 - 8 : node.x1 + 8;
         const nextX = columnX[node.column + 1];
         const maxWidth = left ? marginLeft - 12 : nextX != null ? nextX - x - 6 : marginRight - 12;
@@ -686,12 +836,16 @@
   }
 
   function labelLines(node){
-    const parts = [node.valueIn ? 'in '+fmtUSD(node.valueIn, true) : '', node.valueOut ? 'out '+fmtUSD(node.valueOut, true) : ''].filter(Boolean);
-    if(isGroup(node)){
+    if(node.kind === 'group'){
+      const value = fmtUSD(node.revenue, true);
       return [{cls:'lbl-tier', text:node.group.tierLabel.toUpperCase()}, {cls:'lbl-name', text:node.group.role},
-        {cls:'lbl-value', text:parts.join(' · '), alts:parts.length > 1 ? [parts[0]] : []}];
+        {cls:'lbl-value', text:value + ' revenue', alts:[value]}];
     }
-    const name = node.kind === 'other' ? node.label : shortName(node.name);
+    if(node.kind === 'groupSide'){
+      const value = fmtUSD(node.value, true);
+      return [{cls:'lbl-tier', text:node.group.tierLabel.toUpperCase()}, {cls:'lbl-name', text:node.group.role}, {cls:'lbl-value', text:value}];
+    }
+    const name = node.kind === 'other' || node.kind === 'outside' ? node.label : shortName(node.name);
     return [{cls:'lbl-name', text:name}, {cls:'lbl-value', text:fmtUSD(node.value, true)}];
   }
 
@@ -729,12 +883,13 @@
   }
   function hideTooltip(){ tooltip.hidden = true; }
 
+  const ttRow = (hex, label, value) => {
+    const key = el('i'); key.style.background = hex;
+    return el('div', {class:'tt-row'}, key, el('span', {text:label}), el('span', {class:'amt', text:fmtUSD(value)}));
+  };
   function flowRows(flows, limit, label){
     const rows = [...flows].sort((a, b) => b.usd - a.usd);
-    const out = rows.slice(0, limit).map(f => {
-      const key = el('i'); key.style.background = f.fromGroup.hex;
-      return el('div', {class:'tt-row'}, key, el('span', {text:label(f)}), el('span', {class:'amt', text:fmtUSD(f.usd)}));
-    });
+    const out = rows.slice(0, limit).map(f => ttRow(f.fromGroup.hex, label(f), f.usd));
     if(rows.length > limit) out.push(el('div', {class:'tt-hint', text:`+ ${rows.length - limit} more in the table`}));
     return out;
   }
@@ -742,9 +897,16 @@
     const s = model.summarize(flows);
     return window.FlowViews.CONFIDENCE.filter(c => s.byConf[c] > 0).map(c => pct(s.byConf[c], s.total)+'% '+c).join(' · ');
   }
+  function capLine(names){
+    const cap = capFor(names);
+    if(!cap.known) return null;
+    return el('div', {class:'tt-hint', text:`Market cap ${fmtUSD(cap.usd)}` + (cap.known < cap.listed ? ` (${cap.known} of ${cap.listed} listed)` : '') + ' · live'});
+  }
   function linkTooltip(link, action){
     const content = [el('div', {class:'tt-value', text:fmtUSD(link.value)+' / yr'}), el('div', {class:'tt-title', text:nodeTitle(link.source)+' → '+nodeTitle(link.target)})];
-    if(link.flows.length === 1){
+    if(link.outside){
+      content.push(el('div', {class:'tt-hint', text:OUTSIDE_NOTE[link.outside]}));
+    } else if(link.flows.length === 1){
       const f = link.flows[0];
       content.push(el('div', {text:f.what}), el('div', {class:'tt-row'}, el('i', {class:'conf-key '+f.conf}), CONF_LABEL[f.conf]));
     } else {
@@ -754,23 +916,49 @@
     if(action) content.push(el('div', {class:'tt-hint', text:'Select to see the company flows'}));
     return content;
   }
+  function topOutsideCustomers(names, limit){
+    const byLabel = new Map();
+    for(const name of names) for(const item of model.account(name).outside) byLabel.set(item.label, (byLabel.get(item.label) || 0) + item.usd);
+    return [...byLabel].sort((a, b) => b[1] - a[1]).slice(0, limit);
+  }
+  function stubTooltip(node, item, side){
+    const content = [el('div', {class:'tt-value', text:fmtUSD(item.usd)+' / yr'}), el('div', {class:'tt-title', text:item.label}),
+      el('div', {class:'tt-hint', text:OUTSIDE_NOTE[item.key]})];
+    if(side === 'in' && item.key === 'customers'){
+      for(const [label, usd] of topOutsideCustomers(node.group.companies, 5)) content.push(ttRow(OUTSIDE_HEX.customers, label, usd));
+    }
+    content.push(el('div', {class:'tt-hint', text:groupLabel(node.group)}));
+    return content;
+  }
   function nodeTooltip(view, node, action){
     const content = [el('div', {class:'tt-title', text:nodeTitle(node)})];
-    if(node.valueIn) content.push(el('div', {class:'tt-row'}, 'Receives', el('span', {class:'amt', text:fmtUSD(node.valueIn)})));
-    if(node.valueOut) content.push(el('div', {class:'tt-row'}, 'Pays', el('span', {class:'amt', text:fmtUSD(node.valueOut)})));
+    if(node.kind === 'group'){
+      content.push(ttRow(node.group.hex, 'Revenue', node.revenue));
+      if(node.valueIn) content.push(ttRow(node.group.hex, 'Drawn bands in', node.valueIn));
+      for(const item of node.stubIn) content.push(ttRow(OUTSIDE_HEX[item.key], item.label, item.usd));
+      if(node.valueOut) content.push(ttRow(node.group.hex, 'Drawn bands out', node.valueOut));
+      for(const item of node.stubOut) content.push(ttRow(OUTSIDE_HEX[item.key], item.label, item.usd));
+      content.push(capLine(node.group.companies));
+    } else if(node.kind === 'outside'){
+      content.push(el('div', {class:'tt-value', text:fmtUSD(node.value)+' / yr'}), el('div', {class:'tt-hint', text:OUTSIDE_NOTE[node.role]}));
+    } else {
+      if(node.valueIn) content.push(el('div', {class:'tt-row'}, 'Receives', el('span', {class:'amt', text:fmtUSD(node.valueIn)})));
+      if(node.valueOut) content.push(el('div', {class:'tt-row'}, 'Pays', el('span', {class:'amt', text:fmtUSD(node.valueOut)})));
+    }
     if(node.kind === 'other'){
       const names = node.names.slice(0, 8).map(shortName).join(', ') + (node.names.length > 8 ? '…' : '');
       content.push(el('div', {class:'tt-hint', text:names}));
     } else if(node.kind === 'company'){
-      const revenue = data.revenue[node.name];
-      if(revenue && node.valueIn && view.kind === 'company' && node.name === view.name){
-        content.push(el('div', {class:'tt-hint', text:`≈ ${pct(node.valueIn, revenue.usd)}% of ${fmtUSD(revenue.usd)} revenue`}));
-      }
+      const a = model.account(node.name);
+      if(a.revenue > 0) content.push(el('div', {class:'tt-hint', text:`Revenue ${fmtUSD(a.revenue)}` + (a.trackedIn > 0 ? ` · ${pct(a.trackedIn, a.revenue)}% from tracked companies` : '')}));
+      content.push(capLine([node.name]));
       content.push(el('div', {class:'tt-hint', text:groupLabel(node.group)}));
+    } else if(node.kind === 'groupSide'){
+      content.push(capLine(node.group.companies));
     }
     const hint = node.kind === 'group' ? 'Select to see its companies' : node.kind === 'groupSide' ? 'Select to see the company-to-company flows' : 'Select to follow this company';
     if(action) content.push(el('div', {class:'tt-hint', text:hint}));
-    return content;
+    return content.filter(Boolean);
   }
 
   // ---------- notes (flows not drawn) ----------
@@ -789,10 +977,10 @@
     notes.hidden = false;
     const total = items.reduce((s, i) => s + i.value, 0);
     notes.append(
-      el('h2', {text:'Not drawn in this view · '+fmtUSD(total)}),
+      el('h2', {text:(view.kind === 'overview' ? 'Tracked flows not drawn as bands · ' : 'Payments inside this group · ')+fmtUSD(total)}),
       el('p', {class:'lead', text:view.kind === 'overview'
-        ? 'These payments stay inside one tier group, run between groups drawn in the same column, or run against the money order. They are real flows but cannot be drawn as left-to-right bands.'
-        : 'Payments between companies inside this group.'}));
+        ? 'These payments stay inside one tier group, run between groups drawn in the same column, or run against the money order. They are part of the dark grey stubs.'
+        : 'Payments between companies inside this group, shown as “From/To others in this group” in the chart.'}));
     const list = el('ul', {class:'note-list'});
     for(const item of items.sort((a, b) => b.value - a.value)){
       const detail = item.what || [...item.flows].sort((a, b) => b.usd - a.usd).slice(0, 3).map(f => `${shortName(f.from)} → ${shortName(f.to)} ${fmtUSD(f.usd)}`).join(' · ');
@@ -801,6 +989,71 @@
         el('span', {}, el('strong', {text:item.title}), ' — ' + detail))));
     }
     notes.append(list);
+  }
+
+  // ---------- accounts table ----------
+  const ACCOUNT_COLUMNS = [
+    ['revenue', 'Revenue'], ['trackedIn', 'From tracked'], ['outsideTotal', 'From outside'],
+    ['trackedOut', 'To tracked'], ['other', 'Other suppliers & production'], ['people', 'People, R&D & overhead'], ['profit', 'Operating profit'],
+  ];
+  function renderAccounts({view, graph, group}){
+    const card = $('accountsCard');
+    const head = $('accountsTable').tHead;
+    const body = $('accountsTable').tBodies[0];
+    const basis = $('accountBasis');
+    head.replaceChildren();
+    body.replaceChildren();
+    basis.replaceChildren();
+    if(view.kind === 'pair'){ card.hidden = true; return; }
+    card.hidden = false;
+    const num = value => el('td', {class:'num', text:value > 0 ? fmtUSD(value) : '—'});
+    if(view.kind === 'company'){
+      const a = model.account(view.name);
+      const source = accounts[view.name];
+      head.append(el('tr', {}, el('th', {text:'Line'}), el('th', {class:'num', text:'USD / yr'})));
+      const row = (label, value, role, cls) => {
+        const cell = el('td', {class:'label'});
+        if(role) cell.append(swatch(OUTSIDE_HEX[role] || role));
+        cell.append(label);
+        body.append(el('tr', cls ? {class:cls} : {}, cell, num(value)));
+      };
+      row('From tracked companies', a.trackedIn, model.groupOf.get(view.name).hex);
+      for(const item of a.outside) row(item.label, item.usd, 'customers');
+      if(a.reserves > 0) row(OUTSIDE.reserves, a.reserves, 'reserves');
+      row('Money in', a.inTotal, null, 'total');
+      row('To tracked companies', a.trackedOut, model.groupOf.get(view.name).hex);
+      row(a.otherLabel, a.other, 'other');
+      row(OUTSIDE.people, a.people, 'people');
+      row(OUTSIDE.profit, a.profit, 'profit');
+      row('Money out', a.outTotal, null, 'total');
+      $('accountsNote').textContent = source ? [source.scope, source.period].filter(Boolean).join(' · ') : 'No company figures yet; amounts come from tracked flows only.';
+      if(source){
+        if(source.total) basis.append(el('p', {text:`Total company revenue ${fmtUSD(source.total)}; only the part above is drawn.`}));
+        basis.append(el('p', {}, el('span', {class:'conf-cell'}, el('i', {class:'conf-key '+(source.conf || 'estimated')}), CONF_LABEL[source.conf || 'estimated']), ' — ' + (source.basis || '')));
+        if(source.sources && source.sources.length){
+          const ul = el('ul');
+          for(const s of source.sources) ul.append(el('li', {}, /^https:\/\//.test(s.url || '') ? el('a', {href:s.url, target:'_blank', rel:'noopener noreferrer', text:s.title}) : s.title));
+          basis.append(ul);
+        }
+      }
+      return;
+    }
+    head.append(el('tr', {}, el('th', {text:view.kind === 'overview' ? 'Tier group' : 'Company'}),
+      ...ACCOUNT_COLUMNS.map(([, label]) => el('th', {class:'num', text:label})), el('th', {class:'num', text:'Market cap (live)'})));
+    const rows = view.kind === 'overview'
+      ? model.groups.map(g => ({label:groupLabel(g), hex:g.hex, a:sumAccounts(g.companies), cap:groupCapSpan(g), action:{kind:'group', id:g.id}}))
+      : group.companies.map(name => ({label:name, hex:group.hex, a:model.account(name), cap:capSpan(name), action:{kind:'company', name}}))
+        .sort((x, y) => y.a.revenue - x.a.revenue);
+    for(const r of rows){
+      body.append(el('tr', {},
+        el('td', {}, el('button', {type:'button', class:'co-btn', onclick:() => navigate(r.action, {scroll:true})}, swatch(r.hex), r.label)),
+        ...ACCOUNT_COLUMNS.map(([key]) => num(r.a[key])), el('td', {class:'num'}, r.cap)));
+    }
+    const total = view.kind === 'overview' ? allAccounts : graph.account;
+    body.append(el('tr', {class:'total'}, el('td', {text:'Total'}), ...ACCOUNT_COLUMNS.map(([key]) => num(total[key])), el('td', {class:'num'})));
+    $('accountsNote').textContent = view.kind === 'overview'
+      ? 'Tier 10 counts hardware only. Group totals include payments between companies in the same group.'
+      : 'Sorted by revenue. Select a company for its sources.';
   }
 
   // ---------- table ----------
@@ -830,9 +1083,12 @@
     const button = $('showAll');
     button.hidden = state.showAll || rows.length <= TABLE_PAGE;
     button.textContent = `Show all ${rows.length} flows`;
+    paintCaps();
   }
   function companyButton(name, group){
-    return el('button', {type:'button', class:'co-btn', onclick:() => navigate({kind:'company', name}, {scroll:true})}, swatch(group.hex), name);
+    return el('span', {class:'co-cell'},
+      el('button', {type:'button', class:'co-btn', onclick:() => navigate({kind:'company', name}, {scroll:true})}, swatch(group.hex), name),
+      capSpan(name));
   }
   $('showAll').addEventListener('click', () => {
     state.showAll = true;
@@ -850,7 +1106,7 @@
     if(!q){ msg.textContent = ''; return; }
     const match = companyNames.find(n => n.toLowerCase() === q || shortName(n).toLowerCase() === q)
       || companyNames.filter(n => n.toLowerCase().includes(q) || shortName(n).toLowerCase().includes(q)).sort((a, b) => a.length - b.length)[0];
-    if(!match){ msg.textContent = 'No tracked flows for “' + search.value.trim() + '”.'; return; }
+    if(!match){ msg.textContent = 'No company matches “' + search.value.trim() + '”.'; return; }
     msg.textContent = '';
     search.value = '';
     navigate({kind:'company', name:match}, {scroll:true});
@@ -887,17 +1143,37 @@
     if(!tooltip.hidden && active && chart.contains(active)) positionTooltip({target:active});
   }, {capture:true, passive:true});
 
+  // ---------- live market caps ----------
+  // Same source as the companies page: the visitor's browser asks TradingView.
+  async function loadCaps(){
+    const tickers = data.tickers || {};
+    const names = Object.keys(tickers);
+    if(!names.length || !window.MarketData) return;
+    try {
+      const result = await window.MarketData.fetchQuotes(names.map(name => tickers[name]));
+      for(const name of names){
+        const quote = result.quotes && result.quotes[tickers[name]];
+        if(quote && quote.capUSD > 0) caps.set(name, quote.capUSD);
+      }
+      paintCaps();
+    } catch(error){
+      console.warn('Market caps unavailable:', error);
+    }
+  }
+
   // ---------- header stats & method ----------
   const all = model.summarize(model.flows);
+  $('statRevenue').textContent = fmtUSD(allAccounts.revenue);
   $('statTotal').textContent = fmtUSD(all.total);
   $('statCount').textContent = String(all.count);
-  $('statCompanies').textContent = companyNames.length + ' / ' + model.groupOf.size;
+  $('statCompanies').textContent = trackedNames.size + ' / ' + model.groupOf.size;
   $('methodPeriod').textContent = `${data.meta.period}, in ${data.meta.unit}. Other currencies are converted at fixed 2025 averages: ${data.meta.fx}. Compiled ${data.meta.compiled}.`;
 
   function sum(list){ return list.reduce((s, f) => s + f.usd, 0); }
   function plural(n, word){ return n === 1 ? word : word + 's'; }
 
   render();
+  loadCaps();
 })();
 </script>
 </body>
