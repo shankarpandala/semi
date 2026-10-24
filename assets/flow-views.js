@@ -11,6 +11,7 @@
   // Money that enters or leaves a company without a tracked counterparty.
   const OUTSIDE = {
     customers: 'Customers outside the 119',
+    otherCustomers: 'Other customers outside the 119',
     reserves: 'Operating loss, funded from reserves',
     ahead: 'Purchases ahead of sales, from cash',
     hiddenIn: 'Tracked flows hidden by the filter',
@@ -90,7 +91,7 @@
       const shrink = categoryTotal > outsideTotal ? Math.max(outsideTotal, 0) / categoryTotal : 1;
       const outside = outsideTotal <= EPS ? [] : categories.map(item => ({label: item.label, usd: item.usd * shrink}));
       const rest = outsideTotal - categoryTotal * shrink;
-      if (outsideTotal > EPS && rest > EPS) outside.push({label: OUTSIDE.customers, usd: rest});
+      if (outsideTotal > EPS && rest > EPS) outside.push({label: categories.length ? OUTSIDE.otherCustomers : OUTSIDE.customers, usd: rest});
       const otherLabel = (source && source.otherLabel) || OUTSIDE.other;
       const result = {
         name, known: !!source, revenue, people, profit, loss, ahead, reserves, other, outside, outsideTotal,

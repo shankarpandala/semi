@@ -129,6 +129,15 @@ test('outside customer categories roughly add up to the revenue not paid by trac
   }
 });
 
+test('purchases ahead of sales only arise where there are tracked purchases', () => {
+  const {createModel} = require('../assets/flow-views.js');
+  const model = createModel(data);
+  for (const name of Object.keys(data.accounts)) {
+    const account = model.account(name);
+    assert.ok(account.ahead <= account.trackedOut + 1e-9, `${name}: ahead ${account.ahead} > tracked purchases ${account.trackedOut}`);
+  }
+});
+
 test('Apple counts buy-sell receipts only while Foxconn\u2019s payment for them is tracked', () => {
   const receipts = data.flows.find(flow => flow.from === 'Foxconn (Hon Hai)' && flow.to === 'Apple');
   assert.equal(/buy-sell/.test(data.accounts.Apple.revenueLabel || ''), !!receipts);

@@ -234,6 +234,26 @@ async function run(){
       assert.ok(!legend.some(text => /Operating profit/.test(text)) || model.account(loss).profit > 0, legend.join(' | '));
     });
 
+    await check('Pending amounts, buyers and hidden flows are described as what they are', async () => {
+      // Shin-Etsu Handotai's profit is known, so Tier 1's unsplit amount is costs only.
+      await page.goto(baseURL+'/flows.html#group=t1', {waitUntil:'load'});
+      const sub = await page.locator('#viewSub').textContent();
+      assert.match(sub, /of other costs is not yet split/, sub);
+      assert.match(await page.locator('#accountsNote').textContent(), /† Includes other costs not yet split between suppliers and people/);
+      // A hyperscaler's other money is hardware bought outside the 119.
+      await page.goto(baseURL+'/flows.html#co=Microsoft', {waitUntil:'load'});
+      const node = page.locator('#chart .node[aria-label^="Other hardware suppliers"]');
+      await node.scrollIntoViewIfNeeded();
+      await node.hover();
+      assert.match(await page.locator('#tooltip').textContent(), /Hardware bought from suppliers that are not among the 119/);
+      // With only disclosed flows shown, grey bands are labelled as hidden, not as undrawn.
+      await page.goto(baseURL+'/flows.html#co=NVIDIA', {waitUntil:'load'});
+      for(const conf of ['derived', 'estimated']) await page.locator(`.chip[data-conf="${conf}"]`).click();
+      const legend = await page.locator('#chartLegend li').allTextContents();
+      assert.ok(legend.includes('Tracked flows hidden by the filter'), legend.join(' | '));
+      for(const conf of ['derived', 'estimated']) await page.locator(`.chip[data-conf="${conf}"]`).click();
+    });
+
     await check('A company without tracked flows still shows its revenue, costs and profit', async () => {
       const untracked = [...model.groupOf.keys()].find(name => data.accounts[name] && !model.flows.some(f => f.from === name || f.to === name));
       if(!untracked) return;

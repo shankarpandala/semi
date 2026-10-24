@@ -124,7 +124,7 @@ test('named outside customers keep their amounts; only a remainder or an overflo
     Fab2: {revenue: 4, outside: [{label: 'Car makers', usd: 3}, {label: 'Phone makers', usd: 1}]},
   }));
   assert.deepEqual(model.account('Fab1').outside.map(o => [o.label, o.usd]),
-    [['Car makers', 3], ['Phone makers', 1], ['Customers outside the 119', 4]]);
+    [['Car makers', 3], ['Phone makers', 1], ['Other customers outside the 119', 4]]);
   assert.deepEqual(model.account('Fab2').outside.map(o => [o.label, o.usd]), [['Car makers', 1.5], ['Phone makers', 0.5]]);
 });
 

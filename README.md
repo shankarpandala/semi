@@ -32,7 +32,10 @@ from cash. For Apple, Microsoft, Amazon and Alphabet only the hardware part
 counts: the others' purchases of servers, networking and chips, and Apple's
 device sales plus the $75B Foxconn pays Apple for the components Apple buys and
 resells to it (Apple's gross payment to Foxconn includes those parts).
-Companies with large non-chip businesses count only their chip-related segment.
+Most companies with large non-chip businesses count only their chip-related
+segment; Samsung Electronics and Samsung Electro-Mechanics are shown whole,
+because their phone, camera and component businesses trade with tracked
+companies.
 Where a company publishes no cost breakdown, the rest of its revenue is shown as
 one amount marked "breakdown pending".
 
