@@ -87,11 +87,14 @@
       };
     }
 
-    function focus(list, members, {maxPerSide = 18} = {}) {
+    // outer 'company' shows each counterparty; outer 'group' collapses
+    // counterparties into their tier groups so a whole tier stays readable.
+    function focus(list, members, {maxPerSide = 18, outer = 'company'} = {}) {
       const memberSet = new Set(members);
       const inbound = list.filter(flow => memberSet.has(flow.to) && !memberSet.has(flow.from));
       const outbound = list.filter(flow => memberSet.has(flow.from) && !memberSet.has(flow.to));
       const internal = list.filter(flow => memberSet.has(flow.from) && memberSet.has(flow.to));
+      if (outer === 'group') return focusByGroup(memberSet, inbound, outbound, internal);
       const payers = totals(inbound, 'from');
       const payees = totals(outbound, 'to');
       const midIn = totals(inbound, 'to');
@@ -115,6 +118,41 @@
       }
       for (const flow of outbound) {
         const target = keepRight.has(flow.to) ? 'R:' + flow.to : 'R:*';
+        add(links, 'M:' + flow.from + '>' + target, flow, () => ({source: 'M:' + flow.from, target}));
+      }
+      return {
+        kind: 'focus', members: [...memberSet], nodes: compactColumns(nodes), links: [...links.values()],
+        internal: sortDesc(internal.map(flow => ({flow, value: flow.usd}))).map(item => item.flow),
+        flows: [...inbound, ...outbound, ...internal], order: 'fixed',
+        totals: {in: sum(inbound), out: sum(outbound), internal: sum(internal)},
+      };
+    }
+
+    function focusByGroup(memberSet, inbound, outbound, internal) {
+      const midIn = totals(inbound, 'to');
+      const midOut = totals(outbound, 'from');
+      const middle = new Map();
+      for (const name of new Set([...midIn.keys(), ...midOut.keys()])) {
+        middle.set(name, Math.max(midIn.get(name) || 0, midOut.get(name) || 0));
+      }
+      const leftGroups = new Set(inbound.map(flow => flow.fromGroup));
+      const rightGroups = new Set(outbound.map(flow => flow.toGroup));
+      const sideGroup = (side, group, column) => ({
+        id: side + ':' + group.id, column, kind: 'groupSide', side, group, label: group.tierLabel + ' · ' + group.role,
+      });
+      const midColumn = leftGroups.size ? 1 : 0;
+      const nodes = [
+        ...groups.filter(group => leftGroups.has(group)).map(group => sideGroup('L', group, 0)),
+        ...[...middle.keys()].sort(byGroupThenValue(middle)).map(name => companyNode('M:' + name, name, midColumn)),
+        ...groups.filter(group => rightGroups.has(group)).map(group => sideGroup('R', group, midColumn + 1)),
+      ];
+      const links = new Map();
+      for (const flow of inbound) {
+        const source = 'L:' + flow.fromGroup.id;
+        add(links, source + '>M:' + flow.to, flow, () => ({source, target: 'M:' + flow.to}));
+      }
+      for (const flow of outbound) {
+        const target = 'R:' + flow.toGroup.id;
         add(links, 'M:' + flow.from + '>' + target, flow, () => ({source: 'M:' + flow.from, target}));
       }
       return {

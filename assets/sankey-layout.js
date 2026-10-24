@@ -154,12 +154,17 @@
     node.y1 += dy;
   }
 
-  // A link is drawn as a stroked cubic curve whose stroke width is link.width.
-  function linkPath(link) {
+  // A link is a filled ribbon between two cubic curves. A thick stroked curve
+  // would bulge past its endpoints when a wide band bends over a short distance.
+  function linkPath(link, minWidth = 0) {
     const x0 = link.source.x1;
     const x1 = link.target.x0;
     const xm = (x0 + x1) / 2;
-    return 'M' + x0 + ',' + link.y0 + 'C' + xm + ',' + link.y0 + ' ' + xm + ',' + link.y1 + ' ' + x1 + ',' + link.y1;
+    const half = Math.max(link.width, minWidth) / 2;
+    const top0 = link.y0 - half, bottom0 = link.y0 + half;
+    const top1 = link.y1 - half, bottom1 = link.y1 + half;
+    return 'M' + x0 + ',' + top0 + 'C' + xm + ',' + top0 + ' ' + xm + ',' + top1 + ' ' + x1 + ',' + top1
+      + 'L' + x1 + ',' + bottom1 + 'C' + xm + ',' + bottom1 + ' ' + xm + ',' + bottom0 + ' ' + x0 + ',' + bottom0 + 'Z';
   }
 
   return {layout, linkPath};

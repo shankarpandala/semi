@@ -118,18 +118,18 @@
   #chart .lbl-name{font-size:12px; font-weight:500;}
   #chart .lbl-value{font-family:'IBM Plex Mono',monospace; font-size:10.5px; fill:var(--text-dim);}
   #chart .col-head{font-family:'IBM Plex Mono',monospace; font-size:10px; fill:var(--text-faint); letter-spacing:.06em; stroke:none;}
-  #chart .link{fill:none; stroke-opacity:.36; transition:stroke-opacity .12s;}
-  #chart .hit{fill:none; stroke:transparent; cursor:default;}
+  #chart .link{stroke:none; fill-opacity:.36; transition:fill-opacity .12s;}
+  #chart .hit{fill:transparent; stroke:transparent; stroke-width:8px; cursor:default;}
   #chart .hit.go, #chart .node.go{cursor:pointer;}
   #chart .node{transition:opacity .12s;}
   #chart .node rect{rx:2px;}
-  #chart.has-focus .link{stroke-opacity:.07;}
-  #chart.has-focus .link.on{stroke-opacity:.78;}
+  #chart.has-focus .link{fill-opacity:.07;}
+  #chart.has-focus .link.on{fill-opacity:.78;}
   #chart.has-focus .node{opacity:.32;}
   #chart.has-focus .node.on{opacity:1;}
   #chart .hit:focus, #chart .node:focus{outline:none;}
   #chart .node:focus-visible rect{stroke:var(--accent); stroke-width:2px;}
-  #chart .hit:focus-visible{stroke:var(--accent); stroke-opacity:.5;}
+  #chart .hit:focus-visible{stroke:var(--accent); stroke-width:2px;}
   .chart-empty{padding:60px 18px; text-align:center; color:var(--text-dim); font-size:13.5px;}
   .scroll-hint{display:none; padding:6px 18px 0; font-size:11px; color:var(--text-faint);}
 
@@ -190,6 +190,7 @@
     :root{--gutter:16px;}
     .chart-scroll{padding:0 12px;}
     .scroll-hint{display:block;}
+    .chart-hint span:nth-child(2){display:none;}
     .method dl{grid-template-columns:1fr;}
     .method dt{margin-top:6px;}
     h1{font-size:20px;}
@@ -373,7 +374,7 @@
     const view = state.view;
     if(view.kind === 'group'){
       const group = model.groupById.get(view.id);
-      return {view, list, group, graph:model.focus(list, group.companies)};
+      return {view, list, group, graph:model.focus(list, group.companies, {outer:'group'})};
     }
     if(view.kind === 'company'){
       return {view, list, group:model.groupOf.get(view.name), graph:model.focus(list, [view.name], {maxPerSide:20})};
@@ -451,7 +452,7 @@
       const payees = new Set(graph.flows.filter(f => f.from === view.name).map(f => f.to)).size;
       let text = `Receives ${fmtUSD(t.in)} a year from ${payers} tracked ${plural(payers, 'customer')} and pays ${fmtUSD(t.out)} to ${payees} tracked ${plural(payees, 'supplier')}.`;
       const revenue = data.revenue[view.name];
-      if(revenue && t.in > 0) text += ` Tracked inflows equal about ${pct(t.in, revenue.usd)}% of its ${fmtUSD(revenue.usd)} revenue (${revenue.basis}).`;
+      if(revenue && t.in > 0) text += ` Tracked inflows equal about ${pct(t.in, revenue.usd)}% of its ${fmtUSD(revenue.usd)} revenue — ${revenue.basis.replace(/\.$/, '')}.`;
       sub.append(text + ' ');
       sub.append(el('a', {href:'./#co='+encodeURIComponent(view.name), text:'Open company card ↗'}));
       hintLeft.textContent = 'Paid by';
@@ -496,8 +497,8 @@
     const columnCount = Math.max(...graph.nodes.map(n => n.column)) + 1;
     const perColumn = Array.from({length:columnCount}, (_, c) => graph.nodes.filter(n => n.column === c).length);
     const top = 6, bottom = 10;
-    const marginLeft = overview ? 150 : 170;
-    const marginRight = overview ? 140 : 170;
+    const marginLeft = overview ? 155 : 170;
+    const marginRight = overview ? 130 : 170;
     const innerHeight = overview ? (available < 700 ? 560 : 620) : Math.min(1500, Math.max(380, Math.max(...perColumn) * 30));
     const height = innerHeight + top + bottom;
     const nodePadding = overview ? 22 : Math.max(6, Math.min(14, innerHeight / Math.max(...perColumn) * .3));
@@ -520,11 +521,11 @@
     const linkEls = new Map();
     const nodeEls = new Map();
     result.links.forEach(link => {
-      const d = window.SankeyLayout.linkPath(link);
-      const visible = svgEl('path', {d, class:'link', stroke:colorOf(link.source), 'stroke-width':Math.max(1, link.width)});
+      const d = window.SankeyLayout.linkPath(link, 1);
+      const visible = svgEl('path', {d, class:'link', fill:colorOf(link.source)});
       linkLayer.append(visible);
       const action = linkAction(view, link);
-      const hit = svgEl('path', {d, class:'hit'+(action ? ' go' : ''), 'stroke-width':Math.max(10, link.width), 'pointer-events':'stroke'});
+      const hit = svgEl('path', {d, class:'hit'+(action ? ' go' : ''), 'pointer-events':'all'});
       hit.setAttribute('aria-label', linkSummary(link));
       if(action){ hit.setAttribute('tabindex', '0'); hit.setAttribute('role', 'button'); }
       hitLayer.append(hit);
@@ -545,7 +546,7 @@
         () => [...node.sourceLinks, ...node.targetLinks], () => nodeTooltip(view, node, action));
       if(action) bindActivate(g, action);
     }
-    drawLabels(result, labelLayer, overview);
+    drawLabels(result, labelLayer, marginLeft, marginRight);
 
     function bindHover(target, nodesOf, linksOf, content){
       const on = event => {
@@ -579,11 +580,13 @@
     return null;
   }
   function nodeAction(view, node){
-    if(node.kind === 'group') return {kind:'group', id:node.id};
+    if(node.kind === 'group') return {kind:'group', id:node.group.id};
+    if(node.kind === 'groupSide') return node.side === 'L' ? {kind:'pair', from:node.group.id, to:view.id} : {kind:'pair', from:view.id, to:node.group.id};
     if(node.kind === 'company' && !(view.kind === 'company' && node.name === view.name)) return {kind:'company', name:node.name};
     return null;
   }
-  const nodeTitle = node => node.kind === 'group' ? groupLabel(node.group) : node.kind === 'other' ? node.label : node.name;
+  const isGroup = node => node.kind === 'group' || node.kind === 'groupSide';
+  const nodeTitle = node => isGroup(node) ? groupLabel(node.group) : node.kind === 'other' ? node.label : node.name;
   const linkSummary = link => `${nodeTitle(link.source)} pays ${nodeTitle(link.target)} ${fmtUSD(link.value)} a year`;
   const nodeSummary = node => {
     const parts = [nodeTitle(node)];
@@ -592,8 +595,29 @@
     return parts.join(', ');
   };
 
-  function drawLabels(result, layer, overview){
+  function drawLabels(result, layer, marginLeft, marginRight){
     const lineH = 13;
+    const columnX = result.columns.map(column => column[0]?.x0);
+    const measurer = svgEl('text', {x:0, y:-1000});
+    const probe = svgEl('tspan');
+    measurer.append(probe);
+    layer.append(measurer);
+    // First candidate that fits wins; names may be shortened with an ellipsis, numbers never are.
+    const fitText = (line, maxWidth) => {
+      probe.setAttribute('class', line.cls);
+      for(const text of [line.text, ...(line.alts || [])]){
+        probe.textContent = text;
+        if(probe.getComputedTextLength() <= maxWidth) return text;
+      }
+      if(line.cls === 'lbl-value') return null;
+      let text = line.text;
+      while(text.length > 4){
+        text = text.slice(0, -1).trimEnd();
+        probe.textContent = text + '…';
+        if(probe.getComputedTextLength() <= maxWidth) return text + '…';
+      }
+      return null;
+    };
     for(const column of result.columns){
       const sorted = [...column].sort((a, b) => a.y0 - b.y0);
       sorted.forEach((node, i) => {
@@ -604,14 +628,18 @@
         const fit = Math.min(lines.length, Math.floor((hi - lo) / lineH));
         if(fit < 1) return;
         // Drop the least important lines first: values, then the tier prefix.
-        const keep = overview && fit < lines.length ? lines.filter(l => l.cls === 'lbl-name' || (fit >= 2 && l.cls === 'lbl-value')).slice(0, fit) : lines.slice(0, fit);
+        const keep = isGroup(node) && fit < lines.length ? lines.filter(l => l.cls === 'lbl-name' || (fit >= 2 && l.cls === 'lbl-value')).slice(0, fit) : lines.slice(0, fit);
         const blockH = keep.length * lineH;
         let y = (node.y0 + node.y1) / 2 - blockH / 2;
         y = Math.max(lo, Math.min(y, hi - blockH));
         const left = node.column === 0;
         const x = left ? node.x0 - 8 : node.x1 + 8;
+        const nextX = columnX[node.column + 1];
+        const maxWidth = left ? marginLeft - 12 : nextX != null ? nextX - x - 6 : marginRight - 12;
+        const fitted = keep.map(line => ({...line, text:fitText(line, maxWidth)})).filter(line => line.text);
+        if(!fitted.length) return;
         const text = svgEl('text', {x, y, 'text-anchor':left ? 'end' : 'start'});
-        keep.forEach((line, k) => {
+        fitted.forEach((line, k) => {
           const span = svgEl('tspan', {x, dy:k === 0 ? lineH - 3 : lineH, class:line.cls});
           span.textContent = line.text;
           text.append(span);
@@ -619,12 +647,14 @@
         layer.append(text);
       });
     }
+    measurer.remove();
   }
 
   function labelLines(node){
-    const value = [node.valueIn ? 'in '+fmtUSD(node.valueIn, true) : '', node.valueOut ? 'out '+fmtUSD(node.valueOut, true) : ''].filter(Boolean).join(' · ');
-    if(node.kind === 'group'){
-      return [{cls:'lbl-tier', text:node.group.tierLabel.toUpperCase()}, {cls:'lbl-name', text:node.group.role}, {cls:'lbl-value', text:value}];
+    const parts = [node.valueIn ? 'in '+fmtUSD(node.valueIn, true) : '', node.valueOut ? 'out '+fmtUSD(node.valueOut, true) : ''].filter(Boolean);
+    if(isGroup(node)){
+      return [{cls:'lbl-tier', text:node.group.tierLabel.toUpperCase()}, {cls:'lbl-name', text:node.group.role},
+        {cls:'lbl-value', text:parts.join(' · '), alts:parts.length > 1 ? [parts[0]] : []}];
     }
     const name = node.kind === 'other' ? node.label : shortName(node.name);
     return [{cls:'lbl-name', text:name}, {cls:'lbl-value', text:fmtUSD(node.value, true)}];
@@ -695,7 +725,8 @@
       }
       content.push(el('div', {class:'tt-hint', text:groupLabel(node.group)}));
     }
-    if(action) content.push(el('div', {class:'tt-hint', text:node.kind === 'group' ? 'Select to see its companies' : 'Select to follow this company'}));
+    const hint = node.kind === 'group' ? 'Select to see its companies' : node.kind === 'groupSide' ? 'Select to see the company-to-company flows' : 'Select to follow this company';
+    if(action) content.push(el('div', {class:'tt-hint', text:hint}));
     return content;
   }
 
@@ -804,6 +835,7 @@
     resizeFrame = requestAnimationFrame(() => drawChart(buildView()));
   }).observe(chartScroll);
   document.addEventListener('keydown', event => { if(event.key === 'Escape') hideTooltip(); });
+  document.fonts?.ready.then(() => drawChart(buildView()));
 
   // ---------- header stats & method ----------
   const all = model.summarize(model.flows);

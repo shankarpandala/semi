@@ -65,6 +65,24 @@ test('group focus keeps flows inside the group out of the drawn graph', () => {
   assert.equal(view.totals.internal, 2);
 });
 
+test('group focus can collapse counterparties into their tier groups', () => {
+  const model = createModel(fixture([
+    flow('Sys1', 'Fab1', 4), flow('Sys2', 'Fab1', 1), flow('Chip1', 'Fab2', 5),
+    flow('Fab1', 'Tool1', 2), flow('Fab2', 'Tool2', 3), flow('Fab1', 'Fab2', 1),
+  ]));
+  const view = model.focus(model.flows, ['Fab1', 'Fab2'], {outer: 'group'});
+  assert.deepEqual(view.nodes.map(n => [n.id, n.column, n.kind]), [
+    ['L:sys', 0, 'groupSide'], ['L:chip', 0, 'groupSide'],
+    ['M:Fab1', 1, 'company'], ['M:Fab2', 1, 'company'],
+    ['R:tool', 2, 'groupSide'],
+  ]);
+  const value = (s, t) => view.links.find(l => l.source === s && l.target === t).value;
+  assert.equal(value('L:sys', 'M:Fab1'), 5);
+  assert.equal(value('M:Fab2', 'R:tool'), 3);
+  assert.deepEqual(view.internal.map(f => f.to), ['Fab2']);
+  assert.deepEqual(view.totals, {in: 10, out: 5, internal: 1});
+});
+
 test('pair view links payers to payees and handles a group paying itself', () => {
   const model = createModel(fixture([flow('Chip1', 'Fab1', 5), flow('Chip2', 'Fab1', 3), flow('Fab1', 'Fab2', 2)]));
   const view = model.pair(model.flows, 'chip', 'fab');
@@ -84,7 +102,7 @@ test('every view of the published data can be laid out', () => {
   const model = createModel(data);
   const options = {width: 800, height: 600, nodePadding: 8};
   const views = [model.overview(model.flows)];
-  for (const group of model.groups) views.push(model.focus(model.flows, group.companies));
+  for (const group of model.groups) views.push(model.focus(model.flows, group.companies, {outer: 'group'}));
   for (const name of model.groupOf.keys()) views.push(model.focus(model.flows, [name], {maxPerSide: 20}));
   const pairs = new Set(model.flows.map(f => f.fromGroup.id + '>' + f.toGroup.id));
   for (const key of pairs) views.push(model.pair(model.flows, ...key.split('>')));

@@ -101,10 +101,19 @@ test('rejects graphs it cannot draw left to right', () => {
   assert.throws(() => layout({...base, width: 0}), /size/);
 });
 
-test('draws links from the source edge to the target edge', () => {
+test('draws each link as a closed ribbon from the source edge to the target edge', () => {
   const result = layout(graph());
   const link = result.links[0];
   const d = linkPath(link);
-  assert.ok(d.startsWith('M' + link.source.x1 + ',' + link.y0));
-  assert.ok(d.endsWith(link.target.x0 + ',' + link.y1));
+  const numbers = d.match(/-?[\d.]+(e-?\d+)?/g).map(Number);
+  const xs = numbers.filter((_, i) => i % 2 === 0);
+  const ys = numbers.filter((_, i) => i % 2 === 1);
+  assert.ok(d.startsWith('M' + link.source.x1 + ',' + (link.y0 - link.width / 2)));
+  assert.ok(d.endsWith('Z'));
+  assert.equal(Math.min(...xs), link.source.x1);
+  assert.equal(Math.max(...xs), link.target.x0);
+  assert.ok(Math.abs(Math.max(...ys) - Math.max(link.y0, link.y1) - link.width / 2) < EPS);
+  assert.ok(Math.abs(Math.min(...ys) - Math.min(link.y0, link.y1) + link.width / 2) < EPS);
+  const thin = linkPath({...link, width: 0.1}, 1);
+  assert.ok(thin.startsWith('M' + link.source.x1 + ',' + (link.y0 - 0.5)));
 });
