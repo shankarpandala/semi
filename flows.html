@@ -94,6 +94,7 @@
   .crumbs button{background:none; border:none; padding:0; color:var(--text-dim); cursor:pointer; font-family:inherit; font-size:inherit;}
   .crumbs button:hover{color:var(--text); text-decoration:underline;}
   .crumbs [aria-current="page"]{color:var(--text);}
+  h1:focus{outline:none;}
   h1{font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:24px; letter-spacing:-.01em; margin:0 0 6px; display:flex; align-items:center; gap:10px; flex-wrap:wrap;}
   h1 .sw{width:11px; height:11px; border-radius:3px; display:inline-block;}
   .view-sub{color:var(--text-dim); font-size:13.5px; line-height:1.55; margin:0; max-width:880px;}
@@ -119,8 +120,9 @@
   #chart .lbl-value{font-family:'IBM Plex Mono',monospace; font-size:10.5px; fill:var(--text-dim);}
   #chart .col-head{font-family:'IBM Plex Mono',monospace; font-size:10px; fill:var(--text-faint); letter-spacing:.06em; stroke:none;}
   #chart .link{stroke:none; fill-opacity:.36; transition:fill-opacity .12s;}
-  #chart .hit{fill:transparent; stroke:transparent; stroke-width:8px; cursor:default;}
-  #chart .hit.go, #chart .node.go{cursor:pointer;}
+  #chart .hit{fill:transparent; stroke:none; cursor:default;}
+  #chart .hit-pad{fill:none; stroke:transparent; stroke-width:8px; cursor:default;}
+  #chart .hit.go, #chart .hit-pad.go, #chart .node.go{cursor:pointer;}
   #chart .node{transition:opacity .12s;}
   #chart .node rect{rx:2px;}
   #chart.has-focus .link{fill-opacity:.07;}
@@ -239,7 +241,7 @@
 <main>
   <div class="view-head" id="viewHead">
     <ol class="crumbs" id="crumbs" aria-label="View"></ol>
-    <h1 id="viewTitle"></h1>
+    <h1 id="viewTitle" tabindex="-1"></h1>
     <p class="view-sub" id="viewSub"></p>
     <div class="mix" id="mix"></div>
   </div>
@@ -275,7 +277,7 @@
       <dt>Scope</dt><dd>Only flows between the 119 companies on the dashboard: purchases of chips, memory, wafers, tools, subsystems, materials, gases, IP, packaging, test and assembly. Revenue from untracked customers (Meta, Dell, CXMT and many others) is not shown, so a company's bands can add up to far less than its revenue.</dd>
       <dt>Period</dt><dd id="methodPeriod"></dd>
       <dt>Confidence</dt><dd><span class="conf-cell"><i class="conf-key disclosed"></i>Disclosed</span> — the payer or supplier reports the amount or share for this counterparty (named, or identified with near certainty). <span class="conf-cell"><i class="conf-key derived"></i>Derived</span> — calculated from reported figures plus a stated assumption. <span class="conf-cell"><i class="conf-key estimated"></i>Estimated</span> — analyst estimates or modelling from market shares; treat as an order of magnitude.</dd>
-      <dt>Layout</dt><dd>Tiers follow the dashboard. Tiers 10, 8, 7 and 0–1 are split by role (brands vs. ODMs, OSATs vs. test equipment, substrates vs. ABF film, wafers vs. polysilicon) because each contains a customer–supplier step of its own. Flows within a group, or running against the chain (such as Samsung's phone business buying Snapdragon chips), are listed below the chart instead of being drawn.</dd>
+      <dt>Layout</dt><dd>Tiers follow the dashboard. Tiers 10, 8, 7 and 0–1 are split by role (brands vs. ODMs, OSATs vs. test equipment, substrates vs. ABF film, wafers vs. polysilicon) because each contains a customer–supplier step of its own. Flows within a group, between groups drawn in the same column, or running against the chain (such as Samsung's phone business buying Snapdragon chips) are listed below the chart instead of being drawn.</dd>
     </dl>
     <p>Every flow lists its basis and sources in the table. These are static research figures, not live market data; corrections are welcome.</p>
   </section>
@@ -313,6 +315,7 @@
   const colorOf = node => node.kind === 'other' ? OTHER_HEX : node.group.hex;
   // Compact form for chart labels; one decimal elsewhere.
   function fmtUSD(v, compact = false){
+    if(!(v > 0)) return '$0';
     if(v >= 1000) return '$'+(v/1000).toFixed(2)+'T';
     if(v >= 100 || (compact && v >= 10)) return '$'+v.toFixed(0)+'B';
     if(v >= 1) return '$'+v.toFixed(1)+'B';
@@ -355,9 +358,12 @@
     else if(view.kind === 'pair'){ params.set('from', view.from); params.set('to', view.to); }
     return params.toString();
   }
+  // After a navigation the old control is gone, so focus moves to the new view's title.
+  let focusTitle = false;
   function navigate(view, {scroll = false} = {}){
+    focusTitle = true;
     const hash = hashFor(view);
-    if(hash === location.hash.replace(/^#/, '')) render();
+    if(hash === hashFor(parseHash())) render();
     else if(hash) location.hash = hash; // hashchange renders
     else { history.pushState(null, '', location.pathname + location.search); render(); }
     if(scroll){
@@ -387,15 +393,26 @@
 
   function render(){
     state.view = parseHash();
+    const canonical = hashFor(state.view);
+    if(canonical && canonical !== location.hash.replace(/^#/, '')) history.replaceState(null, '', '#' + canonical);
     state.showAll = false;
     hideTooltip();
+    $('searchMsg').textContent = '';
     const built = buildView();
     renderHead(built);
     renderMix(built.graph.flows);
     drawChart(built);
     renderNotes(built);
-    renderTable(built.graph.flows);
+    renderTable(built);
+    if(focusTitle){ focusTitle = false; $('viewTitle').focus({preventScroll:true}); }
   }
+
+  const isTracked = name => model.flows.some(f => f.from === name || f.to === name);
+  function emptyMessage(view){
+    if(view.kind === 'company' && !isTracked(view.name)) return 'No flows involving this company are tracked yet.';
+    return 'No tracked flows match this view and filter.';
+  }
+  const capitalize = text => text.charAt(0).toUpperCase() + text.slice(1);
 
   function renderHead({view, graph, group}){
     const crumbs = $('crumbs');
@@ -422,7 +439,9 @@
       crumb(`${from.tierLabel} → ${to.tierLabel}`);
       title.append(swatch(from.hex), groupLabel(from) + ' → ' + groupLabel(to));
       const payers = new Set(graph.flows.map(f => f.from)).size, payees = new Set(graph.flows.map(f => f.to)).size;
-      sub.append(`${fmtUSD(sum(graph.flows))} a year across ${graph.flows.length} company flows, from ${payers} ${plural(payers, 'payer')} to ${payees} ${plural(payees, 'supplier')}. Select a company to follow all of its money.`);
+      sub.append(graph.flows.length
+        ? `${fmtUSD(sum(graph.flows))} a year across ${graph.flows.length} company ${plural(graph.flows.length, 'flow')}, from ${payers} ${plural(payers, 'payer')} to ${payees} ${plural(payees, 'supplier')}. Select a company to follow all of its money.`
+        : emptyMessage(view));
       hintLeft.textContent = from.role;
       hintRight.textContent = to.role;
     } else if(view.kind === 'group'){
@@ -430,7 +449,10 @@
       crumb(groupLabel(group));
       title.append(swatch(group.hex), groupLabel(group));
       const t = graph.totals;
-      let text = `Receives ${fmtUSD(t.in)} a year from tracked customers and pays ${fmtUSD(t.out)} to tracked suppliers.`;
+      const parts = [];
+      if(t.in > 0) parts.push(`receives ${fmtUSD(t.in)} a year from tracked customers`);
+      if(t.out > 0) parts.push(`pays ${fmtUSD(t.out)}${t.in > 0 ? '' : ' a year'} to tracked suppliers`);
+      let text = parts.length ? capitalize(parts.join(' and ')) + '.' : emptyMessage(view);
       if(t.internal > 0) text += ` Another ${fmtUSD(t.internal)} changes hands within the group (listed below the chart).`;
       sub.append(text + ' Select a company to follow its money.');
       hintLeft.textContent = 'Paid by';
@@ -442,7 +464,7 @@
       title.append(swatch(group.hex), view.name);
       const t = graph.totals;
       if(!graph.flows.length){
-        sub.append('No tracked flows for this company match the current filter. ');
+        sub.append(isTracked(view.name) ? 'No tracked flows for this company match the current filter. ' : 'No flows involving this company are tracked yet. ');
         sub.append(el('a', {href:'./#co='+encodeURIComponent(view.name), text:'Open company card ↗'}));
         hintLeft.textContent = 'Paid by';
         hintRight.textContent = 'Pays';
@@ -450,7 +472,10 @@
       }
       const payers = new Set(graph.flows.filter(f => f.to === view.name).map(f => f.from)).size;
       const payees = new Set(graph.flows.filter(f => f.from === view.name).map(f => f.to)).size;
-      let text = `Receives ${fmtUSD(t.in)} a year from ${payers} tracked ${plural(payers, 'customer')} and pays ${fmtUSD(t.out)} to ${payees} tracked ${plural(payees, 'supplier')}.`;
+      const parts = [];
+      if(t.in > 0) parts.push(`receives ${fmtUSD(t.in)} a year from ${payers} tracked ${plural(payers, 'customer')}`);
+      if(t.out > 0) parts.push(`pays ${fmtUSD(t.out)}${t.in > 0 ? '' : ' a year'} to ${payees} tracked ${plural(payees, 'supplier')}`);
+      let text = capitalize(parts.join(' and ')) + '.';
       const revenue = data.revenue[view.name];
       if(revenue && t.in > 0) text += ` Tracked inflows equal about ${pct(t.in, revenue.usd)}% of its ${fmtUSD(revenue.usd)} revenue — ${revenue.basis.replace(/\.$/, '')}.`;
       sub.append(text + ' ');
@@ -487,7 +512,7 @@
     scroll.querySelector('.chart-empty')?.remove();
     if(!graph.links.length){
       chart.style.display = 'none';
-      scroll.append(el('p', {class:'chart-empty', text:'No tracked flows match this view and filter.'}));
+      scroll.append(el('p', {class:'chart-empty', text:emptyMessage(view)}));
       return;
     }
     chart.style.display = '';
@@ -512,10 +537,13 @@
     chart.setAttribute('aria-label', $('viewTitle').textContent + '. ' + graph.links.length + ' bands. The table below lists every flow.');
     const root = svgEl('g', {transform:`translate(${marginLeft},${top})`});
     const linkLayer = svgEl('g');
+    // A band's own fill always wins the pointer; the padded outlines underneath
+    // only widen the target where no other band is drawn.
+    const padLayer = svgEl('g', {'aria-hidden':'true'});
     const hitLayer = svgEl('g');
     const nodeLayer = svgEl('g');
     const labelLayer = svgEl('g', {'aria-hidden':'true'});
-    root.append(linkLayer, hitLayer, nodeLayer, labelLayer);
+    root.append(linkLayer, padLayer, hitLayer, nodeLayer, labelLayer);
     chart.append(root);
 
     const linkEls = new Map();
@@ -525,13 +553,17 @@
       const visible = svgEl('path', {d, class:'link', fill:colorOf(link.source)});
       linkLayer.append(visible);
       const action = linkAction(view, link);
-      const hit = svgEl('path', {d, class:'hit'+(action ? ' go' : ''), 'pointer-events':'all'});
+      const hit = svgEl('path', {d, class:'hit'+(action ? ' go' : ''), 'pointer-events':'fill'});
+      const pad = svgEl('path', {d, class:'hit-pad'+(action ? ' go' : ''), 'pointer-events':'stroke'});
       hit.setAttribute('aria-label', linkSummary(link));
       if(action){ hit.setAttribute('tabindex', '0'); hit.setAttribute('role', 'button'); }
       hitLayer.append(hit);
+      padLayer.append(pad);
       linkEls.set(link, visible);
-      bindHover(hit, () => [link.source, link.target], () => [link], () => linkTooltip(link, action));
-      if(action) bindActivate(hit, action);
+      for(const target of [hit, pad]){
+        bindHover(target, () => [link.source, link.target], () => [link], () => linkTooltip(link, action), target === hit && !!action);
+      }
+      if(action){ bindActivate(hit, action); pad.addEventListener('click', () => navigate(action)); }
     });
     for(const node of result.nodes){
       const g = svgEl('g', {class:'node'});
@@ -543,12 +575,12 @@
       nodeLayer.append(g);
       nodeEls.set(node, g);
       bindHover(g, () => [node, ...node.sourceLinks.map(l => l.target), ...node.targetLinks.map(l => l.source)],
-        () => [...node.sourceLinks, ...node.targetLinks], () => nodeTooltip(view, node, action));
+        () => [...node.sourceLinks, ...node.targetLinks], () => nodeTooltip(view, node, action), !!action);
       if(action) bindActivate(g, action);
     }
     drawLabels(result, labelLayer, marginLeft, marginRight);
 
-    function bindHover(target, nodesOf, linksOf, content){
+    function bindHover(target, nodesOf, linksOf, content, focusable){
       const on = event => {
         chart.classList.add('has-focus');
         for(const n of nodesOf()) nodeEls.get(n)?.classList.add('on');
@@ -563,8 +595,11 @@
       target.addEventListener('pointerenter', on);
       target.addEventListener('pointermove', event => positionTooltip(event));
       target.addEventListener('pointerleave', off);
-      target.addEventListener('focus', on);
-      target.addEventListener('blur', off);
+      // Focus listeners alone make an SVG element a Tab stop in Chrome.
+      if(focusable){
+        target.addEventListener('focus', on);
+        target.addEventListener('blur', off);
+      }
     }
   }
 
@@ -673,14 +708,22 @@
     if(event && event.clientX != null && event.type !== 'focus'){ x = event.clientX; y = event.clientY; lastPointer = {x, y}; }
     else {
       const box = event?.target?.getBoundingClientRect?.();
-      if(box){ x = box.left + box.width / 2; y = box.top + Math.min(box.height / 2, 40); }
+      if(box){
+        const frame = chartScroll.getBoundingClientRect();
+        const l = Math.max(box.left, frame.left, 0), r = Math.min(box.right, frame.right, innerWidth);
+        const t = Math.max(box.top, 0), b = Math.min(box.bottom, innerHeight);
+        x = r > l ? (l + r) / 2 : box.left + box.width / 2;
+        y = b > t ? t + Math.min((b - t) / 2, 40) : box.top + Math.min(box.height / 2, 40);
+      }
       else if(lastPointer) ({x, y} = lastPointer);
       else return;
     }
     const w = tooltip.offsetWidth, h = tooltip.offsetHeight;
     let left = x + 14, topY = y + 14;
-    if(left + w > innerWidth - 8) left = Math.max(8, x - w - 14);
-    if(topY + h > innerHeight - 8) topY = Math.max(8, y - h - 14);
+    if(left + w > innerWidth - 8) left = x - w - 14;
+    if(topY + h > innerHeight - 8) topY = y - h - 14;
+    left = Math.max(8, Math.min(left, innerWidth - w - 8));
+    topY = Math.max(8, Math.min(topY, innerHeight - h - 8));
     tooltip.style.left = left + 'px';
     tooltip.style.top = topY + 'px';
   }
@@ -737,6 +780,7 @@
     const items = [];
     if(view.kind === 'overview'){
       for(const w of graph.within) items.push({value:w.value, hex:w.group.hex, title:'Within '+groupLabel(w.group), flows:w.flows, action:{kind:'group', id:w.group.id}});
+      for(const c of graph.lateral) items.push({value:c.value, hex:c.from.hex, title:groupLabel(c.from)+' → '+groupLabel(c.to)+' (same column)', flows:c.flows, action:{kind:'pair', from:c.from.id, to:c.to.id}});
       for(const c of graph.counter) items.push({value:c.value, hex:c.from.hex, title:groupLabel(c.from)+' → '+groupLabel(c.to)+' (against the chain)', flows:c.flows, action:{kind:'pair', from:c.from.id, to:c.to.id}});
     } else if(view.kind === 'group'){
       for(const f of graph.internal) items.push({value:f.usd, hex:f.fromGroup.hex, title:f.from+' → '+f.to, flows:[f], action:{kind:'company', name:f.from}, what:f.what});
@@ -747,7 +791,7 @@
     notes.append(
       el('h2', {text:'Not drawn in this view · '+fmtUSD(total)}),
       el('p', {class:'lead', text:view.kind === 'overview'
-        ? 'These payments stay inside one tier group, or run against the money order. They are real flows but cannot be drawn as left-to-right bands.'
+        ? 'These payments stay inside one tier group, run between groups drawn in the same column, or run against the money order. They are real flows but cannot be drawn as left-to-right bands.'
         : 'Payments between companies inside this group.'}));
     const list = el('ul', {class:'note-list'});
     for(const item of items.sort((a, b) => b.value - a.value)){
@@ -760,7 +804,7 @@
   }
 
   // ---------- table ----------
-  function renderTable(flows){
+  function renderTable({view, graph:{flows}}){
     const tbody = $('flowTable').tBodies[0];
     tbody.replaceChildren();
     const rows = [...flows].sort((a, b) => b.usd - a.usd);
@@ -782,7 +826,7 @@
         el('td', {}, el('span', {class:'conf-cell'}, el('i', {class:'conf-key '+f.conf}), CONF_LABEL[f.conf])),
         el('td', {}, details)));
     }
-    $('tableNote').textContent = rows.length ? `${rows.length} ${plural(rows.length, 'flow')} · ${fmtUSD(sum(rows))} · largest first` : 'No flows match this view and filter.';
+    $('tableNote').textContent = rows.length ? `${rows.length} ${plural(rows.length, 'flow')} · ${fmtUSD(sum(rows))} · largest first` : emptyMessage(view);
     const button = $('showAll');
     button.hidden = state.showAll || rows.length <= TABLE_PAGE;
     button.textContent = `Show all ${rows.length} flows`;
@@ -792,7 +836,8 @@
   }
   $('showAll').addEventListener('click', () => {
     state.showAll = true;
-    renderTable(buildView().graph.flows);
+    renderTable(buildView());
+    $('flowTable').tBodies[0].rows[TABLE_PAGE]?.querySelector('button')?.focus();
   });
 
   // ---------- controls ----------
@@ -810,7 +855,8 @@
     search.value = '';
     navigate({kind:'company', name:match}, {scroll:true});
   }
-  search.addEventListener('change', runSearch);
+  // 'change' also fires on blur, so it only commits an exact pick from the list.
+  search.addEventListener('change', () => { if(companyNames.includes(search.value.trim())) runSearch(); });
   search.addEventListener('keydown', event => { if(event.key === 'Enter') runSearch(); });
 
   document.querySelectorAll('.conf-filter .chip').forEach(button => {
@@ -823,7 +869,7 @@
       button.setAttribute('aria-pressed', String(state.conf.has(conf)));
       const keep = state.showAll;
       render();
-      if(keep){ state.showAll = true; renderTable(buildView().graph.flows); }
+      if(keep){ state.showAll = true; renderTable(buildView()); }
     });
   });
 
@@ -836,6 +882,10 @@
   }).observe(chartScroll);
   document.addEventListener('keydown', event => { if(event.key === 'Escape') hideTooltip(); });
   document.fonts?.ready.then(() => drawChart(buildView()));
+  addEventListener('scroll', () => {
+    const active = document.activeElement;
+    if(!tooltip.hidden && active && chart.contains(active)) positionTooltip({target:active});
+  }, {capture:true, passive:true});
 
   // ---------- header stats & method ----------
   const all = model.summarize(model.flows);

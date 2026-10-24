@@ -27,9 +27,19 @@ test('overview draws forward group flows and lists within-group and counter-flow
   assert.deepEqual(view.links.map(l => [l.source, l.target, l.value]), [['sys', 'chip', 15], ['chip', 'fab', 8], ['sys', 'fab', 4]]);
   assert.deepEqual(view.within.map(w => [w.group.id, w.value]), [['fab', 2]]);
   assert.deepEqual(view.counter.map(c => [c.from.id, c.to.id, c.value]), [['fab', 'chip', 3]]);
-  const shown = total(view.links.flatMap(l => l.flows)) + total(view.within.flatMap(w => w.flows)) + total(view.counter.flatMap(c => c.flows));
+  const shown = [view.links, view.within, view.lateral, view.counter].reduce((sum, items) => sum + total(items.flatMap(i => i.flows)), 0);
   assert.ok(close(shown, total(model.flows)));
   assert.deepEqual(view.nodes.map(n => [n.id, n.column]), [['sys', 0], ['chip', 1], ['fab', 2]]);
+});
+
+test('overview keeps flows between groups that share a column apart from counter-flows', () => {
+  const data = fixture([flow('Fab1', 'Tool1', 2), flow('Tool1', 'Lab1', 0.5), flow('Lab1', 'Fab2', 0.25)]);
+  data.groups.push({id: 'lab', tier: 2, tierLabel: 'Tier 3', role: 'Labs', column: 3, hex: '#444', companies: ['Lab1']});
+  const model = createModel(data);
+  const view = model.overview(model.flows);
+  assert.deepEqual(view.links.map(l => [l.source, l.target]), [['fab', 'tool']]);
+  assert.deepEqual(view.lateral.map(l => [l.from.id, l.to.id, l.value]), [['tool', 'lab', 0.5]]);
+  assert.deepEqual(view.counter.map(c => [c.from.id, c.to.id, c.value]), [['lab', 'fab', 0.25]]);
 });
 
 test('filters by confidence', () => {

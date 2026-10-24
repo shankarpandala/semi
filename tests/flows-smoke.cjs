@@ -31,14 +31,26 @@ async function run(){
     page.on('pageerror', error => errors.push(error.message));
     page.on('request', request => requests.push(request.url()));
     const rows = () => page.locator('#flowTable tbody tr');
-    // A curved band's bounding-box center can miss the stroke; aim at its midpoint.
+    // A band's bounding-box centre can miss a curved ribbon, so walk its centre
+    // line and return the first screen point where the band itself is on top.
     const pointOn = async locator => {
       await locator.scrollIntoViewIfNeeded();
-      return locator.evaluate(path => {
-        const p = path.getPointAtLength(path.getTotalLength() / 2);
+      const point = await locator.evaluate(path => {
+        // d = M x0,top0 C xm,top0 xm,top1 x1,top1 L x1,bottom1 C xm,bottom1 xm,bottom0 x0,bottom0 Z
+        const n = path.getAttribute('d').match(/-?\d*\.?\d+(?:e[-+]?\d+)?/gi).map(Number);
+        const [x0, xm, x1] = [n[0], n[2], n[6]];
+        const y0 = (n[1] + n[15]) / 2, y1 = (n[7] + n[9]) / 2;
         const m = path.getScreenCTM();
-        return {x:m.a*p.x + m.c*p.y + m.e, y:m.b*p.x + m.d*p.y + m.f};
+        for(const t of [.5, .4, .6, .3, .7, .2, .8]){
+          const u = 1 - t, a = u*u*u, b = 3*u*u*t, c = 3*u*t*t, e = t*t*t;
+          const x = a*x0 + (b + c)*xm + e*x1, y = (a + b)*y0 + (c + e)*y1;
+          const p = {x:m.a*x + m.c*y + m.e, y:m.b*x + m.d*y + m.f};
+          if(document.elementFromPoint(p.x, p.y) === path) return p;
+        }
+        return null;
       });
+      assert.ok(point, 'no uncovered point on the band centre line');
+      return point;
     };
     const title = () => page.locator('#viewTitle').textContent();
 
@@ -53,7 +65,7 @@ async function run(){
       assert.equal(await rows().count(), Math.min(30, model.flows.length));
       assert.match(await page.locator('#statTotal').textContent(), /^\$[\d.]+[BT]$/);
       assert.equal(await page.locator('#statCount').textContent(), String(model.flows.length));
-      const notDrawn = overview.within.length + overview.counter.length;
+      const notDrawn = overview.within.length + overview.lateral.length + overview.counter.length;
       assert.equal(await page.locator('#notes .note-list li').count(), notDrawn);
       assert.ok(requests.every(url => url.startsWith(baseURL+'/') || url.startsWith('https://fonts.')), requests.join('\n'));
     });
@@ -155,6 +167,99 @@ async function run(){
       }
     });
 
+    await check('Every overview band owns the pointer over its own ribbon', async () => {
+      await page.goto(baseURL+'/flows.html', {waitUntil:'load'});
+      await page.evaluate(() => scrollTo(0, document.getElementById('chartScroll').getBoundingClientRect().top + scrollY - 90));
+      const report = await page.evaluate(() => {
+        const links = [...document.querySelectorAll('#chart .link')];
+        const hits = [...document.querySelectorAll('#chart .hit')];
+        const pads = [...document.querySelectorAll('#chart .hit-pad')];
+        const sticky = document.querySelector('.controls').getBoundingClientRect().bottom;
+        const result = {checked:0, wrong:[]};
+        links.forEach((link, i) => {
+          const n = link.getAttribute('d').match(/-?\d*\.?\d+(?:e[-+]?\d+)?/gi).map(Number);
+          const [x0, xm, x1] = [n[0], n[2], n[6]];
+          const y0 = (n[1] + n[15]) / 2, y1 = (n[7] + n[9]) / 2;
+          const m = link.getScreenCTM();
+          for(const t of [.5, .35, .65, .2, .8]){
+            const u = 1 - t, x = u*u*u*x0 + 3*u*t*xm + t*t*t*x1, y = (u*u*u + 3*u*u*t)*y0 + (3*u*t*t + t*t*t)*y1;
+            const point = new DOMPoint(x, y);
+            if(!link.isPointInFill(point) || links.some((other, j) => j !== i && other.isPointInFill(point))) continue;
+            const sx = m.a*x + m.c*y + m.e, sy = m.b*x + m.d*y + m.f;
+            if(sy < sticky + 2 || sy > innerHeight - 2) continue;
+            const top = document.elementFromPoint(sx, sy);
+            if(top?.closest('#chart .node')) continue;
+            result.checked++;
+            if(top !== hits[i] && top !== pads[i]) result.wrong.push(hits[i].getAttribute('aria-label'));
+            break;
+          }
+        });
+        return result;
+      });
+      // Bands that are fully covered by other bands or nodes cannot be tested this way.
+      assert.ok(report.checked >= Math.min(10, model.overview(model.flows).links.length), JSON.stringify(report));
+      assert.deepEqual(report.wrong, []);
+    });
+
+    await check('Totals that are zero read as nothing, not "$1M"', async () => {
+      for(const hash of ['#group=t10-brands', '#group=t0', '#co=Apple']){
+        await page.goto(baseURL+'/flows.html'+hash, {waitUntil:'load'});
+        const sub = await page.locator('#viewSub').textContent();
+        assert.ok(!/\$1M|\$0\b| 0 tracked/.test(sub), hash+': '+sub);
+      }
+    });
+
+    await check('A company without tracked flows says so instead of blaming the filter', async () => {
+      const untracked = [...model.groupOf.keys()].find(name => !model.flows.some(f => f.from === name || f.to === name));
+      if(!untracked) return;
+      await page.goto(baseURL+'/flows.html#co='+encodeURIComponent(untracked), {waitUntil:'load'});
+      for(const selector of ['#viewSub', '.chart-empty', '#tableNote']){
+        const text = await page.locator(selector).textContent();
+        assert.match(text, /tracked yet/, selector);
+        assert.ok(!/filter/.test(text), selector+': '+text);
+      }
+    });
+
+    await check('Leaving the search box does not jump to a loosely matched company', async () => {
+      await page.goto(baseURL+'/flows.html', {waitUntil:'load'});
+      await page.locator('#search').fill('sam');
+      await page.locator('[data-conf="estimated"]').click();
+      assert.equal(await page.evaluate(() => location.hash), '');
+      await page.locator('[data-conf="estimated"]').click();
+    });
+
+    await check('Keyboard activation moves focus to the new view, and only actionable chart parts are Tab stops', async () => {
+      await page.goto(baseURL+'/flows.html', {waitUntil:'load'});
+      await page.locator('#chart .node.go').first().focus();
+      await page.keyboard.press('Enter');
+      await page.waitForFunction(() => location.hash.startsWith('#group='));
+      assert.equal(await page.evaluate(() => document.activeElement.id), 'viewTitle');
+      await page.goto(baseURL+'/flows.html#co=TSMC', {waitUntil:'load'});
+      await page.locator('#chart').evaluate(svg => svg.scrollIntoView());
+      await page.locator('#viewSub a').focus();
+      const stops = [];
+      for(let i = 0; i < 120; i++){
+        await page.keyboard.press('Tab');
+        const info = await page.evaluate(() => {
+          const a = document.activeElement;
+          return {inChart:!!a.closest('#chart'), role:a.getAttribute('role'), tabindex:a.getAttribute('tabindex')};
+        });
+        if(!info.inChart){ if(stops.length) break; continue; }
+        stops.push(info);
+      }
+      assert.ok(stops.length > 0);
+      assert.ok(stops.every(s => s.role === 'button' && s.tabindex === '0'), JSON.stringify(stops));
+    });
+
+    await check('Re-selecting the current view from a percent-encoded link adds no history entry', async () => {
+      await page.goto(baseURL+'/flows.html#co='+encodeURIComponent('Samsung Electronics'), {waitUntil:'load'});
+      assert.equal(await title(), 'Samsung Electronics');
+      const before = await page.evaluate(() => history.length);
+      await page.locator('#flowTable .co-btn', {hasText:/^Samsung Electronics$/}).first().click();
+      assert.equal(await title(), 'Samsung Electronics');
+      assert.equal(await page.evaluate(() => history.length), before);
+    });
+
     assert.deepEqual(errors, []);
 
     await check('Mobile layout keeps the page width and scrolls the chart inside its card', async () => {
@@ -167,7 +272,8 @@ async function run(){
         assert.ok(await mobile.evaluate(() => document.documentElement.scrollWidth <= innerWidth), hash);
         assert.ok(await mobile.evaluate(() => {
           const s = document.getElementById('chartScroll');
-          return s.scrollWidth >= s.clientWidth;
+          const overflow = getComputedStyle(s).overflowX;
+          return (overflow === 'auto' || overflow === 'scroll') && s.scrollWidth > s.clientWidth;
         }), hash);
       }
       assert.deepEqual(mobileErrors, []);
