@@ -135,7 +135,7 @@
         ].filter(item => item.usd > EPS);
         const stubOut = [
           {key: 'notDrawn', label: OUTSIDE.notDrawnOut, usd: Math.max(0, sumOf('trackedOut') - outDrawn)},
-          {key: 'other', label: OUTSIDE.other, usd: sumOf('other')},
+          {key: 'other', label: sharedLabel(accounts.filter(item => item.other > EPS).map(item => item.otherLabel)), usd: sumOf('other')},
           {key: 'people', label: OUTSIDE.people, usd: sumOf('people')},
           {key: 'profit', label: OUTSIDE.profit, usd: sumOf('profit')},
         ].filter(item => item.usd > EPS);
@@ -314,6 +314,11 @@
     }
 
     return {groups, groupById, groupOf, flows, account, filter, overview, pair, focus, summarize};
+  }
+
+  // One label when every company uses the same wording for its other costs.
+  function sharedLabel(labels) {
+    return labels.length && labels.every(label => label === labels[0]) ? labels[0] : OUTSIDE.other;
   }
 
   function add(map, key, flow, create) {

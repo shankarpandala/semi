@@ -170,6 +170,11 @@ test('overview stubs make each group\'s height its full account', () => {
   assert.deepEqual(chip.stubOut.map(s => [s.key, s.usd]), [['other', 5], ['people', 5], ['profit', 12]]);
   const fab = view.nodes.find(n => n.id === 'fab');
   assert.deepEqual(fab.stubOut.map(s => s.key), ['notDrawn', 'other', 'people', 'profit']);
+  assert.equal(chip.stubOut[0].label, 'Other suppliers & production');
+  const pending = createModel(withAccounts([flow('Fab1', 'Tool1', 1)], {
+    Tool1: {revenue: 5, otherLabel: 'Costs and profit (breakdown pending)'},
+  })).overview([]).nodes.find(n => n.id === 'tool');
+  assert.equal(pending.stubOut.find(s => s.key === 'other').label, 'Costs and profit (breakdown pending)');
 });
 
 test('pair view links payers to payees and handles a group paying itself', () => {

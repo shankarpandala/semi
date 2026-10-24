@@ -22,11 +22,22 @@ the customer who pays to the supplier who is paid, in USD billions for calendar
   phone business buying Snapdragon chips), are listed below the chart rather than
   drawn.
 
-The figures in `assets/flows-data.js` are static research estimates, not live
-market data. Each flow records what is bought, the amount, a confidence level
-(`disclosed`, `derived` or `estimated`), the calculation behind it and its
+Every company's bands add up to its 2025 revenue. Coloured bands are payments
+between the 119 companies; grey shows money from customers outside the 119 and
+where the rest of each company's revenue goes (other suppliers and production,
+people and R&D, operating profit). Spending beyond revenue, such as an
+operating loss or an inventory build, is shown as money drawn from reserves.
+For Apple, Microsoft, Amazon and Alphabet only the hardware part counts:
+Apple's device sales and the others' purchases of servers, networking and
+chips.
+
+The figures in `assets/flows-data.js` are static research estimates. Each flow
+records what is bought, the amount, a confidence level (`disclosed`, `derived`
+or `estimated`), the calculation behind it and its sources; each company
+account records its revenue scope, costs, profit, outside customers and
 sources. Bands are gross payments, so the same dollar can appear in several
-tiers. Only flows between the 119 tracked companies are shown.
+tiers. Market caps on the flows page are fetched live from TradingView by the
+visitor's browser, as on the dashboard, and are never drawn as bands.
 
 ## Run locally
 
