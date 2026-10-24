@@ -34,7 +34,7 @@
     background:linear-gradient(90deg,var(--r0),var(--r1),var(--r2),var(--r3),var(--r4),var(--r5),var(--r6),var(--r7),var(--r8),var(--r9));
   }
   .topbar-row{display:flex; align-items:center; gap:14px 28px; flex-wrap:wrap; justify-content:space-between;}
-  .brand-group{display:flex; align-items:center; gap:11px; min-width:0;}
+  .brand-group{display:flex; align-items:center; gap:11px; min-width:0; flex-wrap:wrap;}
   .pandala{
     font-family:'IBM Plex Mono',monospace; font-size:13px; color:var(--text-dim);
     text-decoration:none; white-space:nowrap; transition:opacity .15s;
@@ -49,6 +49,13 @@
     background:linear-gradient(90deg,var(--r0),var(--r5),var(--r9));
     -webkit-background-clip:text; background-clip:text; color:transparent;
   }
+  .page-nav{display:flex; gap:4px; margin-left:6px;}
+  .page-nav a{
+    font-family:'IBM Plex Mono',monospace; font-size:11px; padding:5px 9px; border-radius:6px;
+    color:var(--text-dim); text-decoration:none; border:1px solid transparent;
+  }
+  .page-nav a:hover{color:var(--text);}
+  .page-nav a[aria-current="page"]{color:var(--text); border-color:var(--line); background:var(--panel-2);}
   .hero-stats{display:flex; gap:22px; flex-wrap:wrap;}
   .stat{font-family:'IBM Plex Mono',monospace; display:flex; align-items:baseline; gap:6px;}
   .stat b{font-size:15px; font-weight:600; color:var(--text);}
@@ -199,6 +206,7 @@
   .drawer .cap-block .bar-fill{height:100%; border-radius:3px;}
   .drawer .field-label{font-family:'IBM Plex Mono',monospace; font-size:10.5px; text-transform:uppercase; letter-spacing:.1em; color:var(--text-faint); margin:0 0 6px;}
   .drawer .field-value{font-size:14.5px; line-height:1.55; color:var(--text); margin:0 0 20px;}
+  .drawer .drawer-link{color:#5ce0d8;}
   .drawer .tier-desc{font-size:13px; line-height:1.6; color:var(--text-dim); border-top:1px solid var(--line); padding-top:16px;}
   .market-panel{margin:0 0 20px; min-width:0;}
   .market-panel h3{font-family:'Space Grotesk',sans-serif; font-size:16px; margin:0 0 8px;}
@@ -239,6 +247,10 @@
       <a class="pandala" href="https://www.pandala.in">~/<span>pandala.in</span></a>
       <span class="brand-sep" aria-hidden="true">|</span>
       <div class="brand">The <span>Silicon Spectrum</span></div>
+      <nav class="page-nav" aria-label="Pages">
+        <a href="./" aria-current="page">Companies</a>
+        <a href="flows.html">Money flows</a>
+      </nav>
     </div>
     <div class="hero-stats">
       <div class="stat"><b>10</b><span>Tiers</span></div>
@@ -308,6 +320,8 @@
 
   <p class="field-label">Primary domain</p>
   <p class="field-value" id="drawerDomain"></p>
+  <p class="field-label">Money flows</p>
+  <p class="field-value"><a id="drawerFlows" class="drawer-link" href="flows.html">Follow this company’s money →</a></p>
   <p class="tier-desc" id="drawerTierDesc"></p>
 </div>
 
@@ -662,6 +676,7 @@ function buildPage(){
     document.getElementById('drawerName').textContent = co.name;
     document.getElementById('drawerHq').textContent = 'Headquarters — '+co.hq+(co.ticker?' · '+co.ticker:'');
     document.getElementById('drawerDomain').textContent = co.domain;
+    document.getElementById('drawerFlows').href = 'flows.html#co='+encodeURIComponent(co.name);
     document.getElementById('drawerTierDesc').textContent = tier.desc;
     updateDrawerValues();
     drawer.classList.add('open');
