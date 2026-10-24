@@ -10,8 +10,10 @@
 
   // Money that enters or leaves a company without a tracked counterparty.
   const OUTSIDE = {
-    customers: 'Customers outside the 119',
+    customers: 'Customers without a tracked flow',
+    otherCustomers: 'Other customers (not broken down)',
     reserves: 'Operating loss, funded from reserves',
+    ahead: 'Purchases ahead of sales, from cash',
     hiddenIn: 'Tracked flows hidden by the filter',
     internalIn: 'From others in this group',
     notDrawnIn: 'Tracked flows not drawn here',
@@ -19,6 +21,7 @@
     internalOut: 'To others in this group',
     notDrawnOut: 'Tracked flows not drawn here',
     other: 'Other suppliers & production',
+    pending: 'Costs and profit (breakdown pending)',
     people: 'People, R&D & overhead',
     profit: 'Operating profit',
   };
@@ -61,8 +64,10 @@
     };
     const byGroupThenValue = values => (a, b) => sortKey(a) - sortKey(b) || values.get(b) - values.get(a) || a.localeCompare(b);
 
-    // Revenue never falls below tracked inflows; a reported operating loss is
-    // money drawn from reserves, so both sides of the account still balance.
+    // Revenue never falls below tracked inflows. Spending beyond revenue is
+    // drawn from reserves so both sides of every account balance: an operating
+    // loss, or tracked purchases above what the year's costs absorb (inventory,
+    // prepayments, equipment). The two causes are kept apart for wording.
     const accountCache = new Map();
     function account(name) {
       if (accountCache.has(name)) return accountCache.get(name);
@@ -73,17 +78,24 @@
       const people = source && source.people > 0 ? source.people : 0;
       const reported = source && Number.isFinite(source.profit) ? source.profit : 0;
       const profit = Math.max(reported, 0);
-      const reserves = Math.max(-reported, 0);
-      const other = Math.max(0, revenue + reserves - tout - people - profit);
+      const loss = Math.max(-reported, 0);
+      let other = revenue + loss - tout - people - profit;
+      const ahead = other < 0 ? -other : 0;
+      if (other < 0) other = 0;
+      const reserves = loss + ahead;
+      // Named outside customers keep their researched amounts: they only shrink
+      // when they exceed what is left, and any remainder gets its own row.
       const outsideTotal = revenue - tin;
       const categories = ((source && source.outside) || []).filter(item => item.usd > 0);
       const categoryTotal = categories.reduce((total, item) => total + item.usd, 0);
-      const outside = outsideTotal <= EPS ? [] : categoryTotal > 0
-        ? categories.map(item => ({label: item.label, usd: item.usd / categoryTotal * outsideTotal}))
-        : [{label: OUTSIDE.customers, usd: outsideTotal}];
+      const shrink = categoryTotal > outsideTotal ? Math.max(outsideTotal, 0) / categoryTotal : 1;
+      const outside = outsideTotal <= EPS ? [] : categories.map(item => ({label: item.label, usd: item.usd * shrink}));
+      const rest = outsideTotal - categoryTotal * shrink;
+      if (outsideTotal > EPS && rest > EPS) outside.push({label: categories.length ? OUTSIDE.otherCustomers : OUTSIDE.customers, usd: rest});
+      const otherLabel = (source && source.otherLabel) || OUTSIDE.other;
       const result = {
-        name, known: !!source, revenue, people, profit, reserves, other, outside, outsideTotal,
-        otherLabel: (source && source.otherLabel) || OUTSIDE.other,
+        name, known: !!source, revenue, people, profit, loss, ahead, reserves, other, outside, outsideTotal,
+        otherLabel, pending: /breakdown pending/i.test(otherLabel),
         trackedIn: tin, trackedOut: tout,
         inTotal: revenue + reserves, outTotal: tout + people + profit + other,
         scope: source && source.scope, period: source && source.period, total: source && source.total,
@@ -111,6 +123,8 @@
         else if (a.column === b.column) add(lateral, a.id + '>' + b.id, flow, () => ({from: a, to: b}));
         else add(counter, a.id + '>' + b.id, flow, () => ({from: a, to: b}));
       }
+      const listedIn = totals(list.map(flow => ({...flow, group: flow.toGroup.id})), 'group');
+      const listedOut = totals(list.map(flow => ({...flow, group: flow.fromGroup.id})), 'group');
       const drawnIn = new Map();
       const drawnOut = new Map();
       for (const link of links.values()) {
@@ -126,14 +140,23 @@
         const inTotal = sumOf('inTotal');
         const outTotal = sumOf('outTotal');
         if (inTotal <= EPS && outTotal <= EPS && !inDrawn && !outDrawn) continue;
+        const inListed = listedIn.get(group.id) || 0;
+        const outListed = listedOut.get(group.id) || 0;
         const stubIn = [
           {key: 'customers', label: OUTSIDE.customers, usd: sumOf('outsideTotal')},
-          {key: 'reserves', label: OUTSIDE.reserves, usd: sumOf('reserves')},
-          {key: 'notDrawn', label: OUTSIDE.notDrawnIn, usd: Math.max(0, sumOf('trackedIn') - inDrawn)},
+          {key: 'reserves', label: OUTSIDE.reserves, usd: sumOf('loss')},
+          {key: 'ahead', label: OUTSIDE.ahead, usd: sumOf('ahead')},
+          {key: 'hidden', label: OUTSIDE.hiddenIn, usd: Math.max(0, sumOf('trackedIn') - inListed)},
+          {key: 'notDrawn', label: OUTSIDE.notDrawnIn, usd: Math.max(0, inListed - inDrawn)},
         ].filter(item => item.usd > EPS);
+        const otherLabels = accounts.filter(item => item.other > EPS && !item.pending).map(item => item.otherLabel);
+        const pendingLabels = accounts.filter(item => item.other > EPS && item.pending).map(item => item.otherLabel);
+        const otherOf = pending => accounts.filter(item => item.pending === pending).reduce((total, item) => total + item.other, 0);
         const stubOut = [
-          {key: 'notDrawn', label: OUTSIDE.notDrawnOut, usd: Math.max(0, sumOf('trackedOut') - outDrawn)},
-          {key: 'other', label: OUTSIDE.other, usd: sumOf('other')},
+          {key: 'hidden', label: OUTSIDE.hiddenOut, usd: Math.max(0, sumOf('trackedOut') - outListed)},
+          {key: 'notDrawn', label: OUTSIDE.notDrawnOut, usd: Math.max(0, outListed - outDrawn)},
+          {key: 'other', label: sharedLabel(otherLabels), usd: otherOf(false)},
+          {key: 'pending', label: sharedLabel(pendingLabels, OUTSIDE.pending), usd: otherOf(true)},
           {key: 'people', label: OUTSIDE.people, usd: sumOf('people')},
           {key: 'profit', label: OUTSIDE.profit, usd: sumOf('profit')},
         ].filter(item => item.usd > EPS);
@@ -235,7 +258,7 @@
         }
       }
 
-      const summary = {revenue: 0, trackedIn: 0, trackedOut: 0, outside: 0, reserves: 0, people: 0, profit: 0, other: 0};
+      const summary = {revenue: 0, trackedIn: 0, trackedOut: 0, outsideTotal: 0, loss: 0, ahead: 0, reserves: 0, people: 0, profit: 0, other: 0, pendingOther: 0};
       if (accounts) {
         const outsideIn = new Map();
         const outsideOut = new Map();
@@ -250,24 +273,28 @@
         };
         const sumFor = (items, side, name) => items.filter(flow => flow[side] === name).reduce((total, flow) => total + flow.usd, 0);
         const otherLabels = new Set();
+        const pendingLabels = new Set();
         for (const name of [...middle.keys()]) {
           const item = account(name);
-          for (const key of Object.keys(summary)) summary[key] += key === 'outside' ? item.outsideTotal : item[key];
+          for (const key of Object.keys(summary)) summary[key] += key === 'pendingOther' ? (item.pending ? item.other : 0) : item[key];
           if (outer === 'group') toOutside(outsideIn, 'customers', OUTSIDE.customers, 'customers', name, item.outsideTotal, 'L');
           else for (const category of item.outside) toOutside(outsideIn, 'in:' + category.label, category.label, 'customers', name, category.usd, 'L');
-          toOutside(outsideIn, 'reserves', OUTSIDE.reserves, 'reserves', name, item.reserves, 'L');
+          toOutside(outsideIn, 'reserves', OUTSIDE.reserves, 'reserves', name, item.loss, 'L');
+          toOutside(outsideIn, 'ahead', OUTSIDE.ahead, 'ahead', name, item.ahead, 'L');
           const internalIn = sumFor(internal, 'to', name);
           const internalOut = sumFor(internal, 'from', name);
           toOutside(outsideIn, 'internalIn', OUTSIDE.internalIn, 'internal', name, internalIn, 'L');
           toOutside(outsideIn, 'hiddenIn', OUTSIDE.hiddenIn, 'hidden', name, item.trackedIn - (midIn.get(name) || 0) - internalIn, 'L');
           toOutside(outsideOut, 'hiddenOut', OUTSIDE.hiddenOut, 'hidden', name, item.trackedOut - (midOut.get(name) || 0) - internalOut, 'R');
           toOutside(outsideOut, 'internalOut', OUTSIDE.internalOut, 'internal', name, internalOut, 'R');
-          toOutside(outsideOut, 'other', item.otherLabel, 'other', name, item.other, 'R');
-          if (item.other > EPS) otherLabels.add(item.otherLabel);
+          const otherRole = item.pending ? 'pending' : 'other';
+          toOutside(outsideOut, otherRole, item.otherLabel, otherRole, name, item.other, 'R');
+          if (item.other > EPS) (item.pending ? pendingLabels : otherLabels).add(item.otherLabel);
           toOutside(outsideOut, 'people', OUTSIDE.people, 'people', name, item.people, 'R');
           toOutside(outsideOut, 'profit', OUTSIDE.profit, 'profit', name, item.profit, 'R');
         }
         if (otherLabels.size > 1 && outsideOut.has('other')) outsideOut.get('other').label = OUTSIDE.other;
+        if (pendingLabels.size > 1 && outsideOut.has('pending')) outsideOut.get('pending').label = OUTSIDE.pending;
         left.push(...outsideIn.values());
         right.push(...outsideOut.values());
       }
@@ -312,6 +339,11 @@
     }
 
     return {groups, groupById, groupOf, flows, account, filter, overview, pair, focus, summarize};
+  }
+
+  // One label when every company uses the same wording for its other costs.
+  function sharedLabel(labels, fallback = OUTSIDE.other) {
+    return labels.length && labels.every(label => label === labels[0]) ? labels[0] : fallback;
   }
 
   function add(map, key, flow, create) {
