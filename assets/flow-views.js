@@ -9,7 +9,8 @@
 
   // Builds the graphs the flows page draws. Every view is a column graph whose
   // links only move rightward; flows that cannot be drawn that way (within one
-  // group, or against the money order) are returned separately so totals stay honest.
+  // group, between groups sharing a column, or against the money order) are
+  // returned separately so totals stay honest.
   function createModel(data) {
     const groups = data.groups.map((group, index) => ({...group, index}));
     const groupById = new Map(groups.map(group => [group.id, group]));
@@ -41,12 +42,14 @@
     function overview(list) {
       const links = new Map();
       const within = new Map();
+      const lateral = new Map();
       const counter = new Map();
       for (const flow of list) {
         const a = flow.fromGroup;
         const b = flow.toGroup;
         if (a === b) add(within, a.id, flow, () => ({group: a}));
         else if (a.column < b.column) add(links, a.id + '>' + b.id, flow, () => ({source: a.id, target: b.id}));
+        else if (a.column === b.column) add(lateral, a.id + '>' + b.id, flow, () => ({from: a, to: b}));
         else add(counter, a.id + '>' + b.id, flow, () => ({from: a, to: b}));
       }
       const used = new Set();
@@ -59,6 +62,7 @@
         nodes: compactColumns(nodes),
         links: [...links.values()],
         within: sortDesc([...within.values()]),
+        lateral: sortDesc([...lateral.values()]),
         counter: sortDesc([...counter.values()]),
         flows: list,
         order: 'fixed',
