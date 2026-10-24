@@ -6,11 +6,32 @@
   'use strict';
 
   const CONFIDENCE = ['disclosed', 'derived', 'estimated'];
+  const EPS = 1e-9;
+
+  // Money that enters or leaves a company without a tracked counterparty.
+  const OUTSIDE = {
+    customers: 'Customers outside the 119',
+    reserves: 'Operating loss, funded from reserves',
+    hiddenIn: 'Tracked flows hidden by the filter',
+    internalIn: 'From others in this group',
+    notDrawnIn: 'Tracked flows not drawn here',
+    hiddenOut: 'Tracked flows hidden by the filter',
+    internalOut: 'To others in this group',
+    notDrawnOut: 'Tracked flows not drawn here',
+    other: 'Other suppliers & production',
+    people: 'People, R&D & overhead',
+    profit: 'Operating profit',
+  };
 
   // Builds the graphs the flows page draws. Every view is a column graph whose
   // links only move rightward; flows that cannot be drawn that way (within one
   // group, between groups sharing a column, or against the money order) are
   // returned separately so totals stay honest.
+  //
+  // Each company also has an account: its revenue, and where that revenue goes
+  // (tracked suppliers, other suppliers and production costs, people, profit).
+  // Views add it as stubs (overview) or outside nodes (drill-downs), so every
+  // company's money in equals its money out.
   function createModel(data) {
     const groups = data.groups.map((group, index) => ({...group, index}));
     const groupById = new Map(groups.map(group => [group.id, group]));
@@ -27,12 +48,50 @@
       if (!fromGroup || !toGroup) throw new Error('Flow references an unknown company: ' + flow.from + ' → ' + flow.to);
       return {...flow, id: index, fromGroup, toGroup};
     });
+    const accountData = data.accounts || {};
+    for (const name of Object.keys(accountData)) {
+      if (!groupOf.has(name)) throw new Error('Account for an unknown company: ' + name);
+    }
+    const trackedIn = totals(flows, 'to');
+    const trackedOut = totals(flows, 'from');
 
     const sortKey = name => {
       const group = groupOf.get(name);
       return group.column * 100 + group.index;
     };
     const byGroupThenValue = values => (a, b) => sortKey(a) - sortKey(b) || values.get(b) - values.get(a) || a.localeCompare(b);
+
+    // Revenue never falls below tracked inflows; a reported operating loss is
+    // money drawn from reserves, so both sides of the account still balance.
+    const accountCache = new Map();
+    function account(name) {
+      if (accountCache.has(name)) return accountCache.get(name);
+      const source = accountData[name];
+      const tin = trackedIn.get(name) || 0;
+      const tout = trackedOut.get(name) || 0;
+      const revenue = Math.max(source ? source.revenue : Math.max(tin, tout), tin);
+      const people = source && source.people > 0 ? source.people : 0;
+      const reported = source && Number.isFinite(source.profit) ? source.profit : 0;
+      const profit = Math.max(reported, 0);
+      const reserves = Math.max(-reported, 0);
+      const other = Math.max(0, revenue + reserves - tout - people - profit);
+      const outsideTotal = revenue - tin;
+      const categories = ((source && source.outside) || []).filter(item => item.usd > 0);
+      const categoryTotal = categories.reduce((total, item) => total + item.usd, 0);
+      const outside = outsideTotal <= EPS ? [] : categoryTotal > 0
+        ? categories.map(item => ({label: item.label, usd: item.usd / categoryTotal * outsideTotal}))
+        : [{label: OUTSIDE.customers, usd: outsideTotal}];
+      const result = {
+        name, known: !!source, revenue, people, profit, reserves, other, outside, outsideTotal,
+        otherLabel: (source && source.otherLabel) || OUTSIDE.other,
+        trackedIn: tin, trackedOut: tout,
+        inTotal: revenue + reserves, outTotal: tout + people + profit + other,
+        scope: source && source.scope, period: source && source.period, total: source && source.total,
+        conf: source && source.conf, basis: source && source.basis, sources: (source && source.sources) || [],
+      };
+      accountCache.set(name, result);
+      return result;
+    }
 
     function filter(confidence) {
       const allowed = new Set(confidence);
@@ -52,11 +111,39 @@
         else if (a.column === b.column) add(lateral, a.id + '>' + b.id, flow, () => ({from: a, to: b}));
         else add(counter, a.id + '>' + b.id, flow, () => ({from: a, to: b}));
       }
-      const used = new Set();
-      for (const link of links.values()) { used.add(link.source); used.add(link.target); }
-      const nodes = groups.filter(group => used.has(group.id)).map(group => ({
-        id: group.id, column: group.column, kind: 'group', group, label: group.tierLabel + ' · ' + group.role,
-      }));
+      const drawnIn = new Map();
+      const drawnOut = new Map();
+      for (const link of links.values()) {
+        drawnOut.set(link.source, (drawnOut.get(link.source) || 0) + link.value);
+        drawnIn.set(link.target, (drawnIn.get(link.target) || 0) + link.value);
+      }
+      const nodes = [];
+      for (const group of groups) {
+        const accounts = group.companies.map(account);
+        const sumOf = key => accounts.reduce((total, item) => total + item[key], 0);
+        const inDrawn = drawnIn.get(group.id) || 0;
+        const outDrawn = drawnOut.get(group.id) || 0;
+        const inTotal = sumOf('inTotal');
+        const outTotal = sumOf('outTotal');
+        if (inTotal <= EPS && outTotal <= EPS && !inDrawn && !outDrawn) continue;
+        const stubIn = [
+          {key: 'customers', label: OUTSIDE.customers, usd: sumOf('outsideTotal')},
+          {key: 'reserves', label: OUTSIDE.reserves, usd: sumOf('reserves')},
+          {key: 'notDrawn', label: OUTSIDE.notDrawnIn, usd: Math.max(0, sumOf('trackedIn') - inDrawn)},
+        ].filter(item => item.usd > EPS);
+        const stubOut = [
+          {key: 'notDrawn', label: OUTSIDE.notDrawnOut, usd: Math.max(0, sumOf('trackedOut') - outDrawn)},
+          {key: 'other', label: OUTSIDE.other, usd: sumOf('other')},
+          {key: 'people', label: OUTSIDE.people, usd: sumOf('people')},
+          {key: 'profit', label: OUTSIDE.profit, usd: sumOf('profit')},
+        ].filter(item => item.usd > EPS);
+        nodes.push({
+          id: group.id, column: group.column, kind: 'group', group, label: group.tierLabel + ' · ' + group.role,
+          revenue: sumOf('revenue'), stubIn, stubOut,
+          extraIn: stubIn.reduce((total, item) => total + item.usd, 0),
+          extraOut: stubOut.reduce((total, item) => total + item.usd, 0),
+        });
+      }
       return {
         kind: 'overview',
         nodes: compactColumns(nodes),
@@ -93,77 +180,110 @@
 
     // outer 'company' shows each counterparty; outer 'group' collapses
     // counterparties into their tier groups so a whole tier stays readable.
-    function focus(list, members, {maxPerSide = 18, outer = 'company'} = {}) {
+    // With accounts (the default), outside customers and the company's costs
+    // and profit appear as nodes, so each member's in and out equal its revenue.
+    function focus(list, members, {maxPerSide = 18, outer = 'company', accounts = true} = {}) {
       const memberSet = new Set(members);
       const inbound = list.filter(flow => memberSet.has(flow.to) && !memberSet.has(flow.from));
       const outbound = list.filter(flow => memberSet.has(flow.from) && !memberSet.has(flow.to));
       const internal = list.filter(flow => memberSet.has(flow.from) && memberSet.has(flow.to));
-      if (outer === 'group') return focusByGroup(memberSet, inbound, outbound, internal);
-      const payers = totals(inbound, 'from');
-      const payees = totals(outbound, 'to');
       const midIn = totals(inbound, 'to');
       const midOut = totals(outbound, 'from');
       const middle = new Map();
       for (const name of new Set([...midIn.keys(), ...midOut.keys()])) {
         middle.set(name, Math.max(midIn.get(name) || 0, midOut.get(name) || 0));
       }
-      const keepLeft = keep(payers, maxPerSide);
-      const keepRight = keep(payees, maxPerSide);
-      const midColumn = payers.size ? 1 : 0;
-      const nodes = [
-        ...sideNodes('L', payers, keepLeft, 0, 'payers'),
-        ...[...middle.keys()].sort(byGroupThenValue(middle)).map(name => companyNode('M:' + name, name, midColumn)),
-        ...sideNodes('R', payees, keepRight, midColumn + 1, 'payees'),
-      ];
+      if (accounts) {
+        for (const name of memberSet) {
+          const item = account(name);
+          if (item.inTotal > EPS || item.outTotal > EPS) middle.set(name, Math.max(middle.get(name) || 0, item.inTotal));
+        }
+      }
+      const left = [];
+      const right = [];
       const links = new Map();
-      for (const flow of inbound) {
-        const source = keepLeft.has(flow.from) ? 'L:' + flow.from : 'L:*';
-        add(links, source + '>M:' + flow.to, flow, () => ({source, target: 'M:' + flow.to}));
+      if (outer === 'group') {
+        const leftGroups = new Set(inbound.map(flow => flow.fromGroup));
+        const rightGroups = new Set(outbound.map(flow => flow.toGroup));
+        const sideGroup = (side, group) => ({
+          id: side + ':' + group.id, kind: 'groupSide', side, group, label: group.tierLabel + ' · ' + group.role,
+        });
+        left.push(...groups.filter(group => leftGroups.has(group)).map(group => sideGroup('L', group)));
+        right.push(...groups.filter(group => rightGroups.has(group)).map(group => sideGroup('R', group)));
+        for (const flow of inbound) {
+          const source = 'L:' + flow.fromGroup.id;
+          add(links, source + '>M:' + flow.to, flow, () => ({source, target: 'M:' + flow.to}));
+        }
+        for (const flow of outbound) {
+          const target = 'R:' + flow.toGroup.id;
+          add(links, 'M:' + flow.from + '>' + target, flow, () => ({source: 'M:' + flow.from, target}));
+        }
+      } else {
+        const payers = totals(inbound, 'from');
+        const payees = totals(outbound, 'to');
+        const keepLeft = keep(payers, maxPerSide);
+        const keepRight = keep(payees, maxPerSide);
+        left.push(...sideNodes('L', payers, keepLeft, 0, 'payers'));
+        right.push(...sideNodes('R', payees, keepRight, 0, 'payees'));
+        for (const flow of inbound) {
+          const source = keepLeft.has(flow.from) ? 'L:' + flow.from : 'L:*';
+          add(links, source + '>M:' + flow.to, flow, () => ({source, target: 'M:' + flow.to}));
+        }
+        for (const flow of outbound) {
+          const target = keepRight.has(flow.to) ? 'R:' + flow.to : 'R:*';
+          add(links, 'M:' + flow.from + '>' + target, flow, () => ({source: 'M:' + flow.from, target}));
+        }
       }
-      for (const flow of outbound) {
-        const target = keepRight.has(flow.to) ? 'R:' + flow.to : 'R:*';
-        add(links, 'M:' + flow.from + '>' + target, flow, () => ({source: 'M:' + flow.from, target}));
-      }
-      return {
-        kind: 'focus', members: [...memberSet], nodes: compactColumns(nodes), links: [...links.values()],
-        internal: sortDesc(internal.map(flow => ({flow, value: flow.usd}))).map(item => item.flow),
-        flows: [...inbound, ...outbound, ...internal], order: 'fixed',
-        totals: {in: sum(inbound), out: sum(outbound), internal: sum(internal)},
-      };
-    }
 
-    function focusByGroup(memberSet, inbound, outbound, internal) {
-      const midIn = totals(inbound, 'to');
-      const midOut = totals(outbound, 'from');
-      const middle = new Map();
-      for (const name of new Set([...midIn.keys(), ...midOut.keys()])) {
-        middle.set(name, Math.max(midIn.get(name) || 0, midOut.get(name) || 0));
+      const summary = {revenue: 0, trackedIn: 0, trackedOut: 0, outside: 0, reserves: 0, people: 0, profit: 0, other: 0};
+      if (accounts) {
+        const outsideIn = new Map();
+        const outsideOut = new Map();
+        const toOutside = (map, key, label, role, name, usd, side) => {
+          if (!(usd > EPS)) return;
+          if (!map.has(key)) map.set(key, {id: 'X' + side + ':' + key, kind: 'outside', role, side, label});
+          const id = map.get(key).id;
+          const linkKey = side === 'L' ? id + '>M:' + name : 'M:' + name + '>' + id;
+          const entry = links.get(linkKey) || {source: side === 'L' ? id : 'M:' + name, target: side === 'L' ? 'M:' + name : id, value: 0, flows: [], outside: role};
+          entry.value += usd;
+          links.set(linkKey, entry);
+        };
+        const sumFor = (items, side, name) => items.filter(flow => flow[side] === name).reduce((total, flow) => total + flow.usd, 0);
+        const otherLabels = new Set();
+        for (const name of [...middle.keys()]) {
+          const item = account(name);
+          for (const key of Object.keys(summary)) summary[key] += key === 'outside' ? item.outsideTotal : item[key];
+          if (outer === 'group') toOutside(outsideIn, 'customers', OUTSIDE.customers, 'customers', name, item.outsideTotal, 'L');
+          else for (const category of item.outside) toOutside(outsideIn, 'in:' + category.label, category.label, 'customers', name, category.usd, 'L');
+          toOutside(outsideIn, 'reserves', OUTSIDE.reserves, 'reserves', name, item.reserves, 'L');
+          const internalIn = sumFor(internal, 'to', name);
+          const internalOut = sumFor(internal, 'from', name);
+          toOutside(outsideIn, 'internalIn', OUTSIDE.internalIn, 'internal', name, internalIn, 'L');
+          toOutside(outsideIn, 'hiddenIn', OUTSIDE.hiddenIn, 'hidden', name, item.trackedIn - (midIn.get(name) || 0) - internalIn, 'L');
+          toOutside(outsideOut, 'hiddenOut', OUTSIDE.hiddenOut, 'hidden', name, item.trackedOut - (midOut.get(name) || 0) - internalOut, 'R');
+          toOutside(outsideOut, 'internalOut', OUTSIDE.internalOut, 'internal', name, internalOut, 'R');
+          toOutside(outsideOut, 'other', item.otherLabel, 'other', name, item.other, 'R');
+          if (item.other > EPS) otherLabels.add(item.otherLabel);
+          toOutside(outsideOut, 'people', OUTSIDE.people, 'people', name, item.people, 'R');
+          toOutside(outsideOut, 'profit', OUTSIDE.profit, 'profit', name, item.profit, 'R');
+        }
+        if (otherLabels.size > 1 && outsideOut.has('other')) outsideOut.get('other').label = OUTSIDE.other;
+        left.push(...outsideIn.values());
+        right.push(...outsideOut.values());
       }
-      const leftGroups = new Set(inbound.map(flow => flow.fromGroup));
-      const rightGroups = new Set(outbound.map(flow => flow.toGroup));
-      const sideGroup = (side, group, column) => ({
-        id: side + ':' + group.id, column, kind: 'groupSide', side, group, label: group.tierLabel + ' · ' + group.role,
-      });
-      const midColumn = leftGroups.size ? 1 : 0;
+
+      const midColumn = left.length ? 1 : 0;
       const nodes = [
-        ...groups.filter(group => leftGroups.has(group)).map(group => sideGroup('L', group, 0)),
+        ...left.map(node => ({...node, column: 0})),
         ...[...middle.keys()].sort(byGroupThenValue(middle)).map(name => companyNode('M:' + name, name, midColumn)),
-        ...groups.filter(group => rightGroups.has(group)).map(group => sideGroup('R', group, midColumn + 1)),
+        ...right.map(node => ({...node, column: midColumn + 1})),
       ];
-      const links = new Map();
-      for (const flow of inbound) {
-        const source = 'L:' + flow.fromGroup.id;
-        add(links, source + '>M:' + flow.to, flow, () => ({source, target: 'M:' + flow.to}));
-      }
-      for (const flow of outbound) {
-        const target = 'R:' + flow.toGroup.id;
-        add(links, 'M:' + flow.from + '>' + target, flow, () => ({source: 'M:' + flow.from, target}));
-      }
       return {
         kind: 'focus', members: [...memberSet], nodes: compactColumns(nodes), links: [...links.values()],
         internal: sortDesc(internal.map(flow => ({flow, value: flow.usd}))).map(item => item.flow),
         flows: [...inbound, ...outbound, ...internal], order: 'fixed',
         totals: {in: sum(inbound), out: sum(outbound), internal: sum(internal)},
+        account: accounts ? summary : null,
       };
     }
 
@@ -191,7 +311,7 @@
       return {total: sum(list), count: list.length, byConf};
     }
 
-    return {groups, groupById, groupOf, flows, filter, overview, pair, focus, summarize};
+    return {groups, groupById, groupOf, flows, account, filter, overview, pair, focus, summarize};
   }
 
   function add(map, key, flow, create) {
@@ -228,5 +348,5 @@
     return list.reduce((total, flow) => total + flow.usd, 0);
   }
 
-  return {CONFIDENCE, createModel};
+  return {CONFIDENCE, OUTSIDE, createModel};
 });

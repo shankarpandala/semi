@@ -86,6 +86,27 @@ test('applies a minimum height to tiny nodes without overflowing the chart', () 
   }
 });
 
+test('extra amounts size a node and sit below its links', () => {
+  const input = graph();
+  input.nodes = input.nodes.map(node => node.id === 'c' ? {...node, extraIn: 20, extraOut: 50} : node);
+  input.nodes.push({id: 'lonely', column: 2, extraIn: 5});
+  const result = layout(input);
+  const byId = new Map(result.nodes.map(node => [node.id, node]));
+  const c = byId.get('c');
+  assert.equal(c.valueIn, 30);
+  assert.equal(c.valueOut, 25);
+  assert.equal(c.value, 75);
+  assert.ok(Math.abs(c.height - 75 * result.ky) < EPS);
+  assert.ok(Math.abs(c.inStub.y0 - (c.y0 + 30 * result.ky)) < EPS);
+  assert.ok(Math.abs(c.inStub.y1 - c.inStub.y0 - 20 * result.ky) < EPS);
+  assert.ok(Math.abs(c.outStub.y0 - (c.y0 + 25 * result.ky)) < EPS);
+  assert.ok(c.outStub.y1 <= c.y1 + EPS);
+  const lonely = byId.get('lonely');
+  assert.equal(lonely.value, 5);
+  assert.ok(Math.abs(lonely.inStub.y1 - lonely.y1) < EPS);
+  assert.throws(() => layout({...graph(), nodes: [...graph().nodes, {id: 'bad', column: 1, extraIn: -1}]}), /extraIn/);
+});
+
 test('is deterministic', () => {
   const pick = result => result.nodes.map(node => [node.id, node.y0, node.y1]);
   assert.deepEqual(pick(layout(graph())), pick(layout(graph())));
