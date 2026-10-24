@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Money Flows — The Silicon Spectrum</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #0A0C10;
+    --panel: #12151B;
+    --panel-2: #171B22;
+    --line: #262B34;
+    --text: #E7E9EE;
+    --text-dim: #8891A0;
+    --text-faint: #565E6C;
+    --accent: #5ce0d8;
+    --r0:#8B7FD8; --r1:#6AA6D8; --r2:#4FB8AE; --r3:#4FBF7A; --r4:#A8C24E;
+    --r5:#E8B84B; --r6:#E89B4B; --r7:#E27B54; --r8:#DD5B5B; --r9:#C9538B;
+    --gutter: max(32px, calc((100% - 1400px) / 2));
+  }
+  *{box-sizing:border-box;}
+  [hidden]{display:none !important;}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;}
+  ::selection{background:#3a3f4c;}
+  a{color:var(--accent);}
+  button{font:inherit;}
+
+  /* ---------- TOP BAR (matches the dashboard) ---------- */
+  .topbar{position:relative; padding:14px var(--gutter) 13px; border-bottom:1px solid var(--line);}
+  .hero-spectrum{
+    position:absolute; left:0; right:0; top:0; height:3px;
+    background:linear-gradient(90deg,var(--r0),var(--r1),var(--r2),var(--r3),var(--r4),var(--r5),var(--r6),var(--r7),var(--r8),var(--r9));
+  }
+  .topbar-row{display:flex; align-items:center; gap:14px 28px; flex-wrap:wrap; justify-content:space-between;}
+  .brand-group{display:flex; align-items:center; gap:11px; min-width:0; flex-wrap:wrap;}
+  .pandala{font-family:'IBM Plex Mono',monospace; font-size:13px; color:var(--text-dim); text-decoration:none; white-space:nowrap;}
+  .pandala span{color:var(--accent);}
+  .brand-sep{color:var(--text-faint); user-select:none;}
+  .brand{font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:17px; letter-spacing:-.01em; white-space:nowrap; color:var(--text); text-decoration:none;}
+  .brand span{background:linear-gradient(90deg,var(--r0),var(--r5),var(--r9)); -webkit-background-clip:text; background-clip:text; color:transparent;}
+  .page-nav{display:flex; gap:4px; margin-left:6px;}
+  .page-nav a{
+    font-family:'IBM Plex Mono',monospace; font-size:11px; padding:5px 9px; border-radius:6px;
+    color:var(--text-dim); text-decoration:none; border:1px solid transparent;
+  }
+  .page-nav a:hover{color:var(--text);}
+  .page-nav a[aria-current="page"]{color:var(--text); border-color:var(--line); background:var(--panel-2);}
+  .hero-stats{display:flex; gap:22px; flex-wrap:wrap;}
+  .stat{font-family:'IBM Plex Mono',monospace; display:flex; align-items:baseline; gap:6px;}
+  .stat b{font-size:15px; font-weight:600; color:var(--text);}
+  .stat span{font-size:10px; color:var(--text-faint); letter-spacing:.05em; text-transform:uppercase;}
+
+  /* ---------- CONTROLS ---------- */
+  .controls{
+    position:sticky; top:0; z-index:40; background:rgba(10,12,16,0.92); backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line); padding:12px var(--gutter);
+    display:flex; gap:12px 16px; align-items:center; flex-wrap:wrap;
+  }
+  .search-wrap{position:relative; flex:1 1 240px; max-width:340px;}
+  .search-wrap svg{position:absolute; left:12px; top:50%; transform:translateY(-50%); opacity:.5;}
+  #search{
+    width:100%; background:var(--panel-2); border:1px solid var(--line); border-radius:8px;
+    padding:9px 12px 9px 34px; color:var(--text); font-family:'Inter',sans-serif; font-size:13.5px; outline:none;
+  }
+  #search:focus{border-color:#4a5060;}
+  #search::placeholder{color:var(--text-faint);}
+  .control-label{font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--text-faint); letter-spacing:.05em; text-transform:uppercase;}
+  .conf-filter{display:flex; gap:6px; align-items:center; flex-wrap:wrap;}
+  .chip{
+    font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.02em; padding:6px 10px; border-radius:6px;
+    border:1px solid var(--line); background:var(--panel-2); color:var(--text-dim); cursor:pointer;
+    display:inline-flex; align-items:center; gap:6px; white-space:nowrap;
+  }
+  .chip:hover{color:var(--text); border-color:#3a4150;}
+  .chip[aria-pressed="true"]{color:var(--text); border-color:#4a5060; background:#1d222b;}
+  .chip[aria-pressed="false"] .conf-key{opacity:.35;}
+  .chip:focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
+  .search-msg{font-size:12px; color:var(--text-dim); min-height:1em;}
+
+  /* confidence key: solid = disclosed, half = derived, ring = estimated */
+  .conf-key{width:9px; height:9px; border-radius:50%; display:inline-block; flex:none;}
+  .conf-key.disclosed{background:var(--text);}
+  .conf-key.derived{background:linear-gradient(90deg,var(--text) 50%,transparent 50%); box-shadow:inset 0 0 0 1.5px var(--text);}
+  .conf-key.estimated{box-shadow:inset 0 0 0 1.5px var(--text-dim);}
+
+  /* ---------- MAIN ---------- */
+  main{padding:0 var(--gutter) 60px;}
+  .view-head{padding:22px 0 6px; scroll-margin-top:72px;}
+  .crumbs{display:flex; flex-wrap:wrap; gap:4px 6px; align-items:center; font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:var(--text-faint); margin:0 0 10px; padding:0; list-style:none;}
+  .crumbs li{display:flex; align-items:center; gap:6px;}
+  .crumbs li+li::before{content:'›'; color:var(--text-faint);}
+  .crumbs button{background:none; border:none; padding:0; color:var(--text-dim); cursor:pointer; font-family:inherit; font-size:inherit;}
+  .crumbs button:hover{color:var(--text); text-decoration:underline;}
+  .crumbs [aria-current="page"]{color:var(--text);}
+  h1{font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:24px; letter-spacing:-.01em; margin:0 0 6px; display:flex; align-items:center; gap:10px; flex-wrap:wrap;}
+  h1 .sw{width:11px; height:11px; border-radius:3px; display:inline-block;}
+  .view-sub{color:var(--text-dim); font-size:13.5px; line-height:1.55; margin:0; max-width:880px;}
+  .view-sub a{white-space:nowrap;}
+
+  .mix{display:flex; align-items:center; gap:14px; flex-wrap:wrap; margin:14px 0 0; font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--text-dim);}
+  .mix-bar{display:flex; gap:2px; width:220px; max-width:100%; height:8px;}
+  .mix-bar span{height:100%; border-radius:2px; min-width:0;}
+  .mix-bar .disclosed{background:var(--text);}
+  .mix-bar .derived{background:var(--text-dim);}
+  .mix-bar .estimated{background:transparent; box-shadow:inset 0 0 0 1px var(--text-faint);}
+  .mix-item{display:inline-flex; align-items:center; gap:6px;}
+  .mix-item b{color:var(--text); font-weight:500;}
+
+  .card{background:var(--panel); border:1px solid var(--line); border-radius:12px; margin-top:18px;}
+  .chart-card{padding:14px 0 10px;}
+  .chart-hint{display:flex; justify-content:space-between; gap:12px; padding:0 18px 6px; font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:var(--text-faint); letter-spacing:.04em; text-transform:uppercase;}
+  .chart-scroll{overflow-x:auto; overflow-y:hidden; padding:0 18px;}
+  #chart{display:block;}
+  #chart text{pointer-events:none; font-family:'Inter',sans-serif; fill:var(--text); paint-order:stroke; stroke:var(--panel); stroke-width:3px; stroke-linejoin:round;}
+  #chart .lbl-tier{font-family:'IBM Plex Mono',monospace; font-size:9.5px; fill:var(--text-dim); letter-spacing:.06em;}
+  #chart .lbl-name{font-size:12px; font-weight:500;}
+  #chart .lbl-value{font-family:'IBM Plex Mono',monospace; font-size:10.5px; fill:var(--text-dim);}
+  #chart .col-head{font-family:'IBM Plex Mono',monospace; font-size:10px; fill:var(--text-faint); letter-spacing:.06em; stroke:none;}
+  #chart .link{fill:none; stroke-opacity:.36; transition:stroke-opacity .12s;}
+  #chart .hit{fill:none; stroke:transparent; cursor:default;}
+  #chart .hit.go, #chart .node.go{cursor:pointer;}
+  #chart .node{transition:opacity .12s;}
+  #chart .node rect{rx:2px;}
+  #chart.has-focus .link{stroke-opacity:.07;}
+  #chart.has-focus .link.on{stroke-opacity:.78;}
+  #chart.has-focus .node{opacity:.32;}
+  #chart.has-focus .node.on{opacity:1;}
+  #chart .hit:focus, #chart .node:focus{outline:none;}
+  #chart .node:focus-visible rect{stroke:var(--accent); stroke-width:2px;}
+  #chart .hit:focus-visible{stroke:var(--accent); stroke-opacity:.5;}
+  .chart-empty{padding:60px 18px; text-align:center; color:var(--text-dim); font-size:13.5px;}
+  .scroll-hint{display:none; padding:6px 18px 0; font-size:11px; color:var(--text-faint);}
+
+  .tooltip{
+    position:fixed; z-index:60; pointer-events:none; max-width:320px;
+    background:#1b2029; border:1px solid #333a46; border-radius:8px; padding:10px 12px;
+    font-size:12px; line-height:1.45; color:var(--text-dim); box-shadow:0 8px 24px rgba(0,0,0,.45);
+  }
+  .tooltip .tt-value{font-family:'IBM Plex Mono',monospace; font-size:15px; font-weight:600; color:var(--text);}
+  .tooltip .tt-title{color:var(--text); font-weight:500; margin-bottom:4px;}
+  .tooltip .tt-row{display:flex; gap:8px; align-items:center;}
+  .tooltip .tt-row i{width:12px; height:2px; border-radius:1px; flex:none;}
+  .tooltip .tt-row .amt{margin-left:auto; padding-left:10px; font-family:'IBM Plex Mono',monospace; color:var(--text);}
+  .tooltip .tt-hint{margin-top:6px; font-size:11px; color:var(--text-faint);}
+
+  .notes-card{padding:16px 18px;}
+  .notes-card h2, .table-card h2, .method h2{font-family:'Space Grotesk',sans-serif; font-size:15px; font-weight:600; margin:0 0 4px;}
+  .notes-card p.lead{margin:0 0 10px; font-size:12.5px; color:var(--text-dim); line-height:1.5;}
+  .note-list{list-style:none; margin:0 0 12px; padding:0; display:flex; flex-direction:column; gap:6px;}
+  .note-list button{
+    display:flex; gap:10px; align-items:baseline; width:100%; text-align:left; background:var(--panel-2);
+    border:1px solid var(--line); border-radius:8px; padding:9px 12px; color:var(--text-dim); cursor:pointer; font-size:12.5px; line-height:1.45;
+  }
+  .note-list button:hover{border-color:#3a4150; color:var(--text);}
+  .note-list .amt{font-family:'IBM Plex Mono',monospace; color:var(--text); min-width:64px;}
+  .note-list .sw{width:8px; height:8px; border-radius:2px; flex:none; display:inline-block; transform:translateY(-1px);}
+  .note-list strong{color:var(--text); font-weight:500;}
+
+  .table-card{padding:16px 0 8px;}
+  .table-card .table-head{display:flex; justify-content:space-between; align-items:baseline; gap:12px; flex-wrap:wrap; padding:0 18px 10px;}
+  .table-card .table-head p{margin:0; font-size:12px; color:var(--text-faint);}
+  .table-scroll{overflow-x:auto;}
+  table{border-collapse:collapse; width:100%; min-width:760px; font-size:12.5px;}
+  th{font-family:'IBM Plex Mono',monospace; font-weight:500; font-size:10px; letter-spacing:.05em; text-transform:uppercase; color:var(--text-faint); text-align:left; padding:8px 10px; border-bottom:1px solid var(--line);}
+  td{padding:9px 10px; border-bottom:1px solid var(--line); vertical-align:top; color:var(--text-dim); line-height:1.45;}
+  th:first-child, td:first-child{padding-left:18px;}
+  th:last-child, td:last-child{padding-right:18px;}
+  td.num, th.num{text-align:right; font-family:'IBM Plex Mono',monospace; color:var(--text); white-space:nowrap; font-variant-numeric:tabular-nums;}
+  .co-btn{background:none; border:none; padding:0; color:var(--text); cursor:pointer; text-align:left; font-size:12.5px; display:inline-flex; gap:7px; align-items:baseline; line-height:1.35;}
+  .co-btn:hover{text-decoration:underline;}
+  .co-btn .sw{width:7px; height:7px; border-radius:2px; flex:none; transform:translateY(-1px);}
+  .conf-cell{display:inline-flex; align-items:center; gap:6px; white-space:nowrap;}
+  details summary{cursor:pointer; color:var(--text-dim); font-size:12px;}
+  details summary:hover{color:var(--text);}
+  details p{margin:6px 0; color:var(--text-dim);}
+  details ul{margin:4px 0 2px; padding-left:16px;}
+  .show-all{margin:12px 18px 6px; }
+
+  .method{padding:16px 18px; font-size:12.5px; line-height:1.6; color:var(--text-dim);}
+  .method dl{display:grid; grid-template-columns:max-content 1fr; gap:6px 18px; margin:10px 0 0;}
+  .method dt{color:var(--text); font-weight:500;}
+  .method dd{margin:0;}
+  .method p{margin:8px 0 0;}
+
+  footer{padding:24px var(--gutter) 40px; font-size:11px; color:var(--text-faint); line-height:1.7; border-top:1px solid var(--line);}
+
+  @media (max-width: 760px){
+    :root{--gutter:16px;}
+    .chart-scroll{padding:0 12px;}
+    .scroll-hint{display:block;}
+    .method dl{grid-template-columns:1fr;}
+    .method dt{margin-top:6px;}
+    h1{font-size:20px;}
+    .hero-stats{gap:14px;}
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="hero-spectrum"></div>
+  <div class="topbar-row">
+    <div class="brand-group">
+      <a class="pandala" href="https://www.pandala.in">~/<span>pandala.in</span></a>
+      <span class="brand-sep" aria-hidden="true">|</span>
+      <a class="brand" href="./">The <span>Silicon Spectrum</span></a>
+      <nav class="page-nav" aria-label="Pages">
+        <a href="./">Companies</a>
+        <a href="flows.html" aria-current="page">Money flows</a>
+      </nav>
+    </div>
+    <div class="hero-stats">
+      <div class="stat"><b id="statTotal">—</b><span>Tracked flows · USD</span></div>
+      <div class="stat"><b id="statCount">—</b><span>Company links</span></div>
+      <div class="stat"><b id="statCompanies">—</b><span>Companies linked</span></div>
+      <div class="stat"><b id="statPeriod">2025</b><span>Period</span></div>
+    </div>
+  </div>
+</header>
+
+<div class="controls">
+  <div class="search-wrap">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input id="search" type="search" list="companyList" placeholder="Follow a company's money…" autocomplete="off" aria-label="Find a company">
+    <datalist id="companyList"></datalist>
+  </div>
+  <div class="conf-filter" role="group" aria-label="Confidence">
+    <span class="control-label">Show</span>
+    <button class="chip" type="button" data-conf="disclosed" aria-pressed="true"><i class="conf-key disclosed"></i>Disclosed</button>
+    <button class="chip" type="button" data-conf="derived" aria-pressed="true"><i class="conf-key derived"></i>Derived</button>
+    <button class="chip" type="button" data-conf="estimated" aria-pressed="true"><i class="conf-key estimated"></i>Estimated</button>
+  </div>
+  <span class="search-msg" id="searchMsg" role="status"></span>
+</div>
+
+<main>
+  <div class="view-head" id="viewHead">
+    <ol class="crumbs" id="crumbs" aria-label="View"></ol>
+    <h1 id="viewTitle"></h1>
+    <p class="view-sub" id="viewSub"></p>
+    <div class="mix" id="mix"></div>
+  </div>
+
+  <section class="card chart-card" aria-labelledby="viewTitle">
+    <div class="chart-hint" aria-hidden="true"><span id="hintLeft">Customers pay</span><span>money flows left → right</span><span id="hintRight">Suppliers get paid</span></div>
+    <div class="chart-scroll" id="chartScroll">
+      <svg id="chart" role="group" aria-describedby="viewSub"></svg>
+    </div>
+    <p class="scroll-hint">Scroll the chart sideways to see every column.</p>
+  </section>
+
+  <section class="card notes-card" id="notes" hidden></section>
+
+  <section class="card table-card" aria-labelledby="tableTitle">
+    <div class="table-head">
+      <h2 id="tableTitle">Flows in this view</h2>
+      <p id="tableNote"></p>
+    </div>
+    <div class="table-scroll">
+      <table id="flowTable">
+        <thead><tr><th>Paid by</th><th>Paid to</th><th>What</th><th class="num">USD / yr</th><th>Confidence</th><th>Basis &amp; sources</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <button class="chip show-all" type="button" id="showAll" hidden></button>
+  </section>
+
+  <section class="card method" aria-labelledby="methodTitle">
+    <h2 id="methodTitle">How to read this</h2>
+    <dl>
+      <dt>Direction</dt><dd>Each band runs from the customer who pays to the supplier who is paid. Bands are gross payments: a dollar Microsoft pays Foxconn for an AI rack reappears in Foxconn's payment to NVIDIA, and again in NVIDIA's payment to TSMC. Column totals therefore overlap and should not be added together.</dd>
+      <dt>Scope</dt><dd>Only flows between the 119 companies on the dashboard: purchases of chips, memory, wafers, tools, subsystems, materials, gases, IP, packaging, test and assembly. Revenue from untracked customers (Meta, Dell, CXMT and many others) is not shown, so a company's bands can add up to far less than its revenue.</dd>
+      <dt>Period</dt><dd id="methodPeriod"></dd>
+      <dt>Confidence</dt><dd><span class="conf-cell"><i class="conf-key disclosed"></i>Disclosed</span> — the payer or supplier reports the amount or share for this counterparty (named, or identified with near certainty). <span class="conf-cell"><i class="conf-key derived"></i>Derived</span> — calculated from reported figures plus a stated assumption. <span class="conf-cell"><i class="conf-key estimated"></i>Estimated</span> — analyst estimates or modelling from market shares; treat as an order of magnitude.</dd>
+      <dt>Layout</dt><dd>Tiers follow the dashboard. Tiers 10, 8, 7 and 0–1 are split by role (brands vs. ODMs, OSATs vs. test equipment, substrates vs. ABF film, wafers vs. polysilicon) because each contains a customer–supplier step of its own. Flows within a group, or running against the chain (such as Samsung's phone business buying Snapdragon chips), are listed below the chart instead of being drawn.</dd>
+    </dl>
+    <p>Every flow lists its basis and sources in the table. These are static research figures, not live market data; corrections are welcome.</p>
+  </section>
+</main>
+
+<footer>
+  MONEY FLOWS — static estimates compiled from company filings, annual reports, earnings calls and industry research. Bands show payments between tracked companies only. Market values on the companies page are fetched live; these flows are not.<br>
+  <a href="./">← Back to the companies dashboard</a>
+</footer>
+
+<div class="tooltip" id="tooltip" role="tooltip" hidden></div>
+
+<script src="assets/sankey-layout.js"></script>
+<script src="assets/flow-views.js"></script>
+<script src="assets/flows-data.js"></script>
+<script>
+(function(){
+  'use strict';
+  const data = window.FlowsData;
+  const model = window.FlowViews.createModel(data);
+  const SVGNS = 'http://www.w3.org/2000/svg';
+  const OTHER_HEX = '#565E6C';
+  const CONF_LABEL = {disclosed:'Disclosed', derived:'Derived', estimated:'Estimated'};
+  const TABLE_PAGE = 30;
+
+  const $ = id => document.getElementById(id);
+  const chart = $('chart');
+  const chartScroll = $('chartScroll');
+  const tooltip = $('tooltip');
+  const state = {conf:new Set(window.FlowViews.CONFIDENCE), showAll:false, view:{kind:'overview'}};
+  const companyNames = [...model.groupOf.keys()].filter(name => model.flows.some(f => f.from === name || f.to === name)).sort();
+
+  const shortName = name => data.short[name] || name;
+  const groupLabel = group => group.tierLabel + ' · ' + group.role;
+  const colorOf = node => node.kind === 'other' ? OTHER_HEX : node.group.hex;
+  // Compact form for chart labels; one decimal elsewhere.
+  function fmtUSD(v, compact = false){
+    if(v >= 1000) return '$'+(v/1000).toFixed(2)+'T';
+    if(v >= 100 || (compact && v >= 10)) return '$'+v.toFixed(0)+'B';
+    if(v >= 1) return '$'+v.toFixed(1)+'B';
+    return '$'+Math.max(1, Math.round(v*1000))+'M';
+  }
+  const pct = (part, whole) => whole > 0 ? Math.round(part / whole * 100) : 0;
+  const el = (tag, props = {}, ...children) => {
+    const node = document.createElement(tag);
+    for(const [key, value] of Object.entries(props)){
+      if(key === 'class') node.className = value;
+      else if(key === 'text') node.textContent = value;
+      else if(key.startsWith('on')) node.addEventListener(key.slice(2), value);
+      else node.setAttribute(key, value);
+    }
+    for(const child of children) if(child != null) node.append(child);
+    return node;
+  };
+  const svgEl = (tag, attrs = {}) => {
+    const node = document.createElementNS(SVGNS, tag);
+    for(const [key, value] of Object.entries(attrs)) node.setAttribute(key, value);
+    return node;
+  };
+  const swatch = hex => { const s = el('i', {class:'sw'}); s.style.background = hex; return s; };
+
+  // ---------- routing ----------
+  function parseHash(){
+    const params = new URLSearchParams(location.hash.replace(/^#/, ''));
+    const co = params.get('co');
+    if(co && model.groupOf.has(co)) return {kind:'company', name:co};
+    const group = params.get('group');
+    if(group && model.groupById.has(group)) return {kind:'group', id:group};
+    const from = params.get('from'), to = params.get('to');
+    if(from && to && model.groupById.has(from) && model.groupById.has(to)) return {kind:'pair', from, to};
+    return {kind:'overview'};
+  }
+  function hashFor(view){
+    const params = new URLSearchParams();
+    if(view.kind === 'company') params.set('co', view.name);
+    else if(view.kind === 'group') params.set('group', view.id);
+    else if(view.kind === 'pair'){ params.set('from', view.from); params.set('to', view.to); }
+    return params.toString();
+  }
+  function navigate(view, {scroll = false} = {}){
+    const hash = hashFor(view);
+    if(hash === location.hash.replace(/^#/, '')) render();
+    else if(hash) location.hash = hash; // hashchange renders
+    else { history.pushState(null, '', location.pathname + location.search); render(); }
+    if(scroll){
+      const head = $('viewHead');
+      if(head.getBoundingClientRect().top < 0) head.scrollIntoView({behavior:'smooth'});
+    }
+  }
+  window.addEventListener('hashchange', render);
+  window.addEventListener('popstate', render);
+
+  // ---------- views ----------
+  function buildView(){
+    const list = model.filter([...state.conf]);
+    const view = state.view;
+    if(view.kind === 'group'){
+      const group = model.groupById.get(view.id);
+      return {view, list, group, graph:model.focus(list, group.companies)};
+    }
+    if(view.kind === 'company'){
+      return {view, list, group:model.groupOf.get(view.name), graph:model.focus(list, [view.name], {maxPerSide:20})};
+    }
+    if(view.kind === 'pair'){
+      return {view, list, graph:model.pair(list, view.from, view.to)};
+    }
+    return {view, list, graph:model.overview(list)};
+  }
+
+  function render(){
+    state.view = parseHash();
+    state.showAll = false;
+    hideTooltip();
+    const built = buildView();
+    renderHead(built);
+    renderMix(built.graph.flows);
+    drawChart(built);
+    renderNotes(built);
+    renderTable(built.graph.flows);
+  }
+
+  function renderHead({view, graph, group}){
+    const crumbs = $('crumbs');
+    crumbs.replaceChildren();
+    const crumb = (label, target) => crumbs.append(el('li', {}, target
+      ? el('button', {type:'button', text:label, onclick:() => navigate(target)})
+      : el('span', {'aria-current':'page', text:label})));
+    const title = $('viewTitle');
+    const sub = $('viewSub');
+    title.replaceChildren();
+    sub.replaceChildren();
+    const hintLeft = $('hintLeft'), hintRight = $('hintRight');
+    hintLeft.textContent = 'Customers pay';
+    hintRight.textContent = 'Suppliers get paid';
+
+    if(view.kind === 'overview'){
+      crumb('All tiers');
+      title.append('Who pays whom in the chip supply chain');
+      const total = graph.links.reduce((s, l) => s + l.value, 0);
+      sub.append(`${fmtUSD(total)} a year moves between tier groups in the bands below (${data.meta.period.toLowerCase()}). Select a tier to see its companies, or a band to see the company-to-company payments behind it.`);
+    } else if(view.kind === 'pair'){
+      const from = model.groupById.get(view.from), to = model.groupById.get(view.to);
+      crumb('All tiers', {kind:'overview'});
+      crumb(`${from.tierLabel} → ${to.tierLabel}`);
+      title.append(swatch(from.hex), groupLabel(from) + ' → ' + groupLabel(to));
+      const payers = new Set(graph.flows.map(f => f.from)).size, payees = new Set(graph.flows.map(f => f.to)).size;
+      sub.append(`${fmtUSD(sum(graph.flows))} a year across ${graph.flows.length} company flows, from ${payers} ${plural(payers, 'payer')} to ${payees} ${plural(payees, 'supplier')}. Select a company to follow all of its money.`);
+      hintLeft.textContent = from.role;
+      hintRight.textContent = to.role;
+    } else if(view.kind === 'group'){
+      crumb('All tiers', {kind:'overview'});
+      crumb(groupLabel(group));
+      title.append(swatch(group.hex), groupLabel(group));
+      const t = graph.totals;
+      let text = `Receives ${fmtUSD(t.in)} a year from tracked customers and pays ${fmtUSD(t.out)} to tracked suppliers.`;
+      if(t.internal > 0) text += ` Another ${fmtUSD(t.internal)} changes hands within the group (listed below the chart).`;
+      sub.append(text + ' Select a company to follow its money.');
+      hintLeft.textContent = 'Paid by';
+      hintRight.textContent = 'Pays';
+    } else {
+      crumb('All tiers', {kind:'overview'});
+      crumb(groupLabel(group), {kind:'group', id:group.id});
+      crumb(view.name);
+      title.append(swatch(group.hex), view.name);
+      const t = graph.totals;
+      if(!graph.flows.length){
+        sub.append('No tracked flows for this company match the current filter. ');
+        sub.append(el('a', {href:'./#co='+encodeURIComponent(view.name), text:'Open company card ↗'}));
+        hintLeft.textContent = 'Paid by';
+        hintRight.textContent = 'Pays';
+        return;
+      }
+      const payers = new Set(graph.flows.filter(f => f.to === view.name).map(f => f.from)).size;
+      const payees = new Set(graph.flows.filter(f => f.from === view.name).map(f => f.to)).size;
+      let text = `Receives ${fmtUSD(t.in)} a year from ${payers} tracked ${plural(payers, 'customer')} and pays ${fmtUSD(t.out)} to ${payees} tracked ${plural(payees, 'supplier')}.`;
+      const revenue = data.revenue[view.name];
+      if(revenue && t.in > 0) text += ` Tracked inflows equal about ${pct(t.in, revenue.usd)}% of its ${fmtUSD(revenue.usd)} revenue (${revenue.basis}).`;
+      sub.append(text + ' ');
+      sub.append(el('a', {href:'./#co='+encodeURIComponent(view.name), text:'Open company card ↗'}));
+      hintLeft.textContent = 'Paid by';
+      hintRight.textContent = 'Pays';
+    }
+  }
+
+  function renderMix(flows){
+    const mix = $('mix');
+    mix.replaceChildren();
+    const summary = model.summarize(flows);
+    if(!summary.count) return;
+    const bar = el('span', {class:'mix-bar', 'aria-hidden':'true'});
+    for(const conf of window.FlowViews.CONFIDENCE){
+      if(!summary.byConf[conf]) continue;
+      const seg = el('span', {class:conf});
+      seg.style.flex = String(summary.byConf[conf]);
+      bar.append(seg);
+    }
+    mix.append(bar);
+    for(const conf of window.FlowViews.CONFIDENCE){
+      mix.append(el('span', {class:'mix-item'}, el('i', {class:'conf-key '+conf}), el('b', {text:pct(summary.byConf[conf], summary.total)+'%'}), CONF_LABEL[conf].toLowerCase()));
+    }
+    mix.append(el('span', {class:'mix-item', text:'of '+fmtUSD(summary.total)+' by value'}));
+  }
+
+  // ---------- chart ----------
+  function drawChart({view, graph}){
+    chart.replaceChildren();
+    chart.classList.remove('has-focus');
+    const scroll = chartScroll;
+    scroll.querySelector('.chart-empty')?.remove();
+    if(!graph.links.length){
+      chart.style.display = 'none';
+      scroll.append(el('p', {class:'chart-empty', text:'No tracked flows match this view and filter.'}));
+      return;
+    }
+    chart.style.display = '';
+    const overview = view.kind === 'overview';
+    const available = Math.max(320, scroll.clientWidth - 36);
+    const width = Math.max(available, overview ? 940 : 660);
+    const columnCount = Math.max(...graph.nodes.map(n => n.column)) + 1;
+    const perColumn = Array.from({length:columnCount}, (_, c) => graph.nodes.filter(n => n.column === c).length);
+    const top = 6, bottom = 10;
+    const marginLeft = overview ? 150 : 170;
+    const marginRight = overview ? 140 : 170;
+    const innerHeight = overview ? (available < 700 ? 560 : 620) : Math.min(1500, Math.max(380, Math.max(...perColumn) * 30));
+    const height = innerHeight + top + bottom;
+    const nodePadding = overview ? 22 : Math.max(6, Math.min(14, innerHeight / Math.max(...perColumn) * .3));
+    const result = window.SankeyLayout.layout({
+      nodes:graph.nodes, links:graph.links, width:width - marginLeft - marginRight, height:innerHeight,
+      nodeWidth: overview ? 14 : 12, nodePadding, minNodeHeight:2, order:graph.order,
+    });
+    chart.setAttribute('viewBox', `0 0 ${width} ${height}`);
+    chart.setAttribute('width', width);
+    chart.setAttribute('height', height);
+    chart.setAttribute('aria-label', $('viewTitle').textContent + '. ' + graph.links.length + ' bands. The table below lists every flow.');
+    const root = svgEl('g', {transform:`translate(${marginLeft},${top})`});
+    const linkLayer = svgEl('g');
+    const hitLayer = svgEl('g');
+    const nodeLayer = svgEl('g');
+    const labelLayer = svgEl('g', {'aria-hidden':'true'});
+    root.append(linkLayer, hitLayer, nodeLayer, labelLayer);
+    chart.append(root);
+
+    const linkEls = new Map();
+    const nodeEls = new Map();
+    result.links.forEach(link => {
+      const d = window.SankeyLayout.linkPath(link);
+      const visible = svgEl('path', {d, class:'link', stroke:colorOf(link.source), 'stroke-width':Math.max(1, link.width)});
+      linkLayer.append(visible);
+      const action = linkAction(view, link);
+      const hit = svgEl('path', {d, class:'hit'+(action ? ' go' : ''), 'stroke-width':Math.max(10, link.width), 'pointer-events':'stroke'});
+      hit.setAttribute('aria-label', linkSummary(link));
+      if(action){ hit.setAttribute('tabindex', '0'); hit.setAttribute('role', 'button'); }
+      hitLayer.append(hit);
+      linkEls.set(link, visible);
+      bindHover(hit, () => [link.source, link.target], () => [link], () => linkTooltip(link, action));
+      if(action) bindActivate(hit, action);
+    });
+    for(const node of result.nodes){
+      const g = svgEl('g', {class:'node'});
+      const rect = svgEl('rect', {x:node.x0, y:node.y0, width:node.x1 - node.x0, height:Math.max(1, node.y1 - node.y0), fill:colorOf(node)});
+      g.append(rect);
+      const action = nodeAction(view, node);
+      if(action){ g.classList.add('go'); g.setAttribute('tabindex', '0'); g.setAttribute('role', 'button'); }
+      g.setAttribute('aria-label', nodeSummary(node));
+      nodeLayer.append(g);
+      nodeEls.set(node, g);
+      bindHover(g, () => [node, ...node.sourceLinks.map(l => l.target), ...node.targetLinks.map(l => l.source)],
+        () => [...node.sourceLinks, ...node.targetLinks], () => nodeTooltip(view, node, action));
+      if(action) bindActivate(g, action);
+    }
+    drawLabels(result, labelLayer, overview);
+
+    function bindHover(target, nodesOf, linksOf, content){
+      const on = event => {
+        chart.classList.add('has-focus');
+        for(const n of nodesOf()) nodeEls.get(n)?.classList.add('on');
+        for(const l of linksOf()) linkEls.get(l)?.classList.add('on');
+        showTooltip(content(), event);
+      };
+      const off = () => {
+        chart.classList.remove('has-focus');
+        chart.querySelectorAll('.on').forEach(x => x.classList.remove('on'));
+        hideTooltip();
+      };
+      target.addEventListener('pointerenter', on);
+      target.addEventListener('pointermove', event => positionTooltip(event));
+      target.addEventListener('pointerleave', off);
+      target.addEventListener('focus', on);
+      target.addEventListener('blur', off);
+    }
+  }
+
+  function bindActivate(target, action){
+    target.addEventListener('click', () => navigate(action));
+    target.addEventListener('keydown', event => {
+      if(event.key === 'Enter' || event.key === ' '){ event.preventDefault(); navigate(action); }
+    });
+  }
+
+  function linkAction(view, link){
+    if(view.kind === 'overview') return {kind:'pair', from:link.source.id, to:link.target.id};
+    return null;
+  }
+  function nodeAction(view, node){
+    if(node.kind === 'group') return {kind:'group', id:node.id};
+    if(node.kind === 'company' && !(view.kind === 'company' && node.name === view.name)) return {kind:'company', name:node.name};
+    return null;
+  }
+  const nodeTitle = node => node.kind === 'group' ? groupLabel(node.group) : node.kind === 'other' ? node.label : node.name;
+  const linkSummary = link => `${nodeTitle(link.source)} pays ${nodeTitle(link.target)} ${fmtUSD(link.value)} a year`;
+  const nodeSummary = node => {
+    const parts = [nodeTitle(node)];
+    if(node.valueIn) parts.push('receives '+fmtUSD(node.valueIn));
+    if(node.valueOut) parts.push('pays '+fmtUSD(node.valueOut));
+    return parts.join(', ');
+  };
+
+  function drawLabels(result, layer, overview){
+    const lineH = 13;
+    for(const column of result.columns){
+      const sorted = [...column].sort((a, b) => a.y0 - b.y0);
+      sorted.forEach((node, i) => {
+        const prev = sorted[i-1], next = sorted[i+1];
+        const lo = prev ? (prev.y1 + node.y0) / 2 : Math.min(node.y0, Math.max(0, node.y0 - 20));
+        const hi = next ? (node.y1 + next.y0) / 2 : Math.max(node.y1, Math.min(result.height, node.y1 + 20));
+        const lines = labelLines(node);
+        const fit = Math.min(lines.length, Math.floor((hi - lo) / lineH));
+        if(fit < 1) return;
+        // Drop the least important lines first: values, then the tier prefix.
+        const keep = overview && fit < lines.length ? lines.filter(l => l.cls === 'lbl-name' || (fit >= 2 && l.cls === 'lbl-value')).slice(0, fit) : lines.slice(0, fit);
+        const blockH = keep.length * lineH;
+        let y = (node.y0 + node.y1) / 2 - blockH / 2;
+        y = Math.max(lo, Math.min(y, hi - blockH));
+        const left = node.column === 0;
+        const x = left ? node.x0 - 8 : node.x1 + 8;
+        const text = svgEl('text', {x, y, 'text-anchor':left ? 'end' : 'start'});
+        keep.forEach((line, k) => {
+          const span = svgEl('tspan', {x, dy:k === 0 ? lineH - 3 : lineH, class:line.cls});
+          span.textContent = line.text;
+          text.append(span);
+        });
+        layer.append(text);
+      });
+    }
+  }
+
+  function labelLines(node){
+    const value = [node.valueIn ? 'in '+fmtUSD(node.valueIn, true) : '', node.valueOut ? 'out '+fmtUSD(node.valueOut, true) : ''].filter(Boolean).join(' · ');
+    if(node.kind === 'group'){
+      return [{cls:'lbl-tier', text:node.group.tierLabel.toUpperCase()}, {cls:'lbl-name', text:node.group.role}, {cls:'lbl-value', text:value}];
+    }
+    const name = node.kind === 'other' ? node.label : shortName(node.name);
+    return [{cls:'lbl-name', text:name}, {cls:'lbl-value', text:fmtUSD(node.value, true)}];
+  }
+
+  // ---------- tooltip ----------
+  let lastPointer = null;
+  function showTooltip(content, event){
+    tooltip.replaceChildren(...content);
+    tooltip.hidden = false;
+    positionTooltip(event);
+  }
+  function positionTooltip(event){
+    if(tooltip.hidden) return;
+    let x, y;
+    if(event && event.clientX != null && event.type !== 'focus'){ x = event.clientX; y = event.clientY; lastPointer = {x, y}; }
+    else {
+      const box = event?.target?.getBoundingClientRect?.();
+      if(box){ x = box.left + box.width / 2; y = box.top + Math.min(box.height / 2, 40); }
+      else if(lastPointer) ({x, y} = lastPointer);
+      else return;
+    }
+    const w = tooltip.offsetWidth, h = tooltip.offsetHeight;
+    let left = x + 14, topY = y + 14;
+    if(left + w > innerWidth - 8) left = Math.max(8, x - w - 14);
+    if(topY + h > innerHeight - 8) topY = Math.max(8, y - h - 14);
+    tooltip.style.left = left + 'px';
+    tooltip.style.top = topY + 'px';
+  }
+  function hideTooltip(){ tooltip.hidden = true; }
+
+  function flowRows(flows, limit, label){
+    const rows = [...flows].sort((a, b) => b.usd - a.usd);
+    const out = rows.slice(0, limit).map(f => {
+      const key = el('i'); key.style.background = f.fromGroup.hex;
+      return el('div', {class:'tt-row'}, key, el('span', {text:label(f)}), el('span', {class:'amt', text:fmtUSD(f.usd)}));
+    });
+    if(rows.length > limit) out.push(el('div', {class:'tt-hint', text:`+ ${rows.length - limit} more in the table`}));
+    return out;
+  }
+  function confMix(flows){
+    const s = model.summarize(flows);
+    return window.FlowViews.CONFIDENCE.filter(c => s.byConf[c] > 0).map(c => pct(s.byConf[c], s.total)+'% '+c).join(' · ');
+  }
+  function linkTooltip(link, action){
+    const content = [el('div', {class:'tt-value', text:fmtUSD(link.value)+' / yr'}), el('div', {class:'tt-title', text:nodeTitle(link.source)+' → '+nodeTitle(link.target)})];
+    if(link.flows.length === 1){
+      const f = link.flows[0];
+      content.push(el('div', {text:f.what}), el('div', {class:'tt-row'}, el('i', {class:'conf-key '+f.conf}), CONF_LABEL[f.conf]));
+    } else {
+      content.push(...flowRows(link.flows, 5, f => shortName(f.from)+' → '+shortName(f.to)));
+      content.push(el('div', {class:'tt-hint', text:confMix(link.flows)}));
+    }
+    if(action) content.push(el('div', {class:'tt-hint', text:'Select to see the company flows'}));
+    return content;
+  }
+  function nodeTooltip(view, node, action){
+    const content = [el('div', {class:'tt-title', text:nodeTitle(node)})];
+    if(node.valueIn) content.push(el('div', {class:'tt-row'}, 'Receives', el('span', {class:'amt', text:fmtUSD(node.valueIn)})));
+    if(node.valueOut) content.push(el('div', {class:'tt-row'}, 'Pays', el('span', {class:'amt', text:fmtUSD(node.valueOut)})));
+    if(node.kind === 'other'){
+      const names = node.names.slice(0, 8).map(shortName).join(', ') + (node.names.length > 8 ? '…' : '');
+      content.push(el('div', {class:'tt-hint', text:names}));
+    } else if(node.kind === 'company'){
+      const revenue = data.revenue[node.name];
+      if(revenue && node.valueIn && view.kind === 'company' && node.name === view.name){
+        content.push(el('div', {class:'tt-hint', text:`≈ ${pct(node.valueIn, revenue.usd)}% of ${fmtUSD(revenue.usd)} revenue`}));
+      }
+      content.push(el('div', {class:'tt-hint', text:groupLabel(node.group)}));
+    }
+    if(action) content.push(el('div', {class:'tt-hint', text:node.kind === 'group' ? 'Select to see its companies' : 'Select to follow this company'}));
+    return content;
+  }
+
+  // ---------- notes (flows not drawn) ----------
+  function renderNotes({view, graph}){
+    const notes = $('notes');
+    notes.replaceChildren();
+    const items = [];
+    if(view.kind === 'overview'){
+      for(const w of graph.within) items.push({value:w.value, hex:w.group.hex, title:'Within '+groupLabel(w.group), flows:w.flows, action:{kind:'group', id:w.group.id}});
+      for(const c of graph.counter) items.push({value:c.value, hex:c.from.hex, title:groupLabel(c.from)+' → '+groupLabel(c.to)+' (against the chain)', flows:c.flows, action:{kind:'pair', from:c.from.id, to:c.to.id}});
+    } else if(view.kind === 'group'){
+      for(const f of graph.internal) items.push({value:f.usd, hex:f.fromGroup.hex, title:f.from+' → '+f.to, flows:[f], action:{kind:'company', name:f.from}, what:f.what});
+    }
+    if(!items.length){ notes.hidden = true; return; }
+    notes.hidden = false;
+    const total = items.reduce((s, i) => s + i.value, 0);
+    notes.append(
+      el('h2', {text:'Not drawn in this view · '+fmtUSD(total)}),
+      el('p', {class:'lead', text:view.kind === 'overview'
+        ? 'These payments stay inside one tier group, or run against the money order. They are real flows but cannot be drawn as left-to-right bands.'
+        : 'Payments between companies inside this group.'}));
+    const list = el('ul', {class:'note-list'});
+    for(const item of items.sort((a, b) => b.value - a.value)){
+      const detail = item.what || [...item.flows].sort((a, b) => b.usd - a.usd).slice(0, 3).map(f => `${shortName(f.from)} → ${shortName(f.to)} ${fmtUSD(f.usd)}`).join(' · ');
+      list.append(el('li', {}, el('button', {type:'button', onclick:() => navigate(item.action, {scroll:true})},
+        el('span', {class:'amt', text:fmtUSD(item.value)}), swatch(item.hex),
+        el('span', {}, el('strong', {text:item.title}), ' — ' + detail))));
+    }
+    notes.append(list);
+  }
+
+  // ---------- table ----------
+  function renderTable(flows){
+    const tbody = $('flowTable').tBodies[0];
+    tbody.replaceChildren();
+    const rows = [...flows].sort((a, b) => b.usd - a.usd);
+    const shown = state.showAll ? rows : rows.slice(0, TABLE_PAGE);
+    for(const f of shown){
+      const details = el('details', {}, el('summary', {text:'Basis'}), el('p', {text:f.basis}));
+      if(f.sources.length){
+        const ul = el('ul');
+        for(const s of f.sources){
+          ul.append(el('li', {}, /^https:\/\//.test(s.url || '') ? el('a', {href:s.url, target:'_blank', rel:'noopener noreferrer', text:s.title}) : s.title));
+        }
+        details.append(ul);
+      }
+      tbody.append(el('tr', {},
+        el('td', {}, companyButton(f.from, f.fromGroup)),
+        el('td', {}, companyButton(f.to, f.toGroup)),
+        el('td', {text:f.what}),
+        el('td', {class:'num', text:fmtUSD(f.usd)}),
+        el('td', {}, el('span', {class:'conf-cell'}, el('i', {class:'conf-key '+f.conf}), CONF_LABEL[f.conf])),
+        el('td', {}, details)));
+    }
+    $('tableNote').textContent = rows.length ? `${rows.length} ${plural(rows.length, 'flow')} · ${fmtUSD(sum(rows))} · largest first` : 'No flows match this view and filter.';
+    const button = $('showAll');
+    button.hidden = state.showAll || rows.length <= TABLE_PAGE;
+    button.textContent = `Show all ${rows.length} flows`;
+  }
+  function companyButton(name, group){
+    return el('button', {type:'button', class:'co-btn', onclick:() => navigate({kind:'company', name}, {scroll:true})}, swatch(group.hex), name);
+  }
+  $('showAll').addEventListener('click', () => {
+    state.showAll = true;
+    renderTable(buildView().graph.flows);
+  });
+
+  // ---------- controls ----------
+  const datalist = $('companyList');
+  for(const name of companyNames) datalist.append(el('option', {value:name}));
+  const search = $('search');
+  function runSearch(){
+    const q = search.value.trim().toLowerCase();
+    const msg = $('searchMsg');
+    if(!q){ msg.textContent = ''; return; }
+    const match = companyNames.find(n => n.toLowerCase() === q || shortName(n).toLowerCase() === q)
+      || companyNames.filter(n => n.toLowerCase().includes(q) || shortName(n).toLowerCase().includes(q)).sort((a, b) => a.length - b.length)[0];
+    if(!match){ msg.textContent = 'No tracked flows for “' + search.value.trim() + '”.'; return; }
+    msg.textContent = '';
+    search.value = '';
+    navigate({kind:'company', name:match}, {scroll:true});
+  }
+  search.addEventListener('change', runSearch);
+  search.addEventListener('keydown', event => { if(event.key === 'Enter') runSearch(); });
+
+  document.querySelectorAll('.conf-filter .chip').forEach(button => {
+    button.addEventListener('click', () => {
+      const conf = button.dataset.conf;
+      if(state.conf.has(conf)){
+        if(state.conf.size === 1) return;
+        state.conf.delete(conf);
+      } else state.conf.add(conf);
+      button.setAttribute('aria-pressed', String(state.conf.has(conf)));
+      const keep = state.showAll;
+      render();
+      if(keep){ state.showAll = true; renderTable(buildView().graph.flows); }
+    });
+  });
+
+  let resizeFrame = 0, lastWidth = chartScroll.clientWidth;
+  new ResizeObserver(() => {
+    if(chartScroll.clientWidth === lastWidth) return;
+    lastWidth = chartScroll.clientWidth;
+    cancelAnimationFrame(resizeFrame);
+    resizeFrame = requestAnimationFrame(() => drawChart(buildView()));
+  }).observe(chartScroll);
+  document.addEventListener('keydown', event => { if(event.key === 'Escape') hideTooltip(); });
+
+  // ---------- header stats & method ----------
+  const all = model.summarize(model.flows);
+  $('statTotal').textContent = fmtUSD(all.total);
+  $('statCount').textContent = String(all.count);
+  $('statCompanies').textContent = companyNames.length + ' / ' + model.groupOf.size;
+  $('methodPeriod').textContent = `${data.meta.period}, in ${data.meta.unit}. Other currencies are converted at fixed 2025 averages: ${data.meta.fx}. Compiled ${data.meta.compiled}.`;
+
+  function sum(list){ return list.reduce((s, f) => s + f.usd, 0); }
+  function plural(n, word){ return n === 1 ? word : word + 's'; }
+
+  render();
+})();
+</script>
+</body>
+</html>
