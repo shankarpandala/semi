@@ -9,6 +9,9 @@
   // links that move to a later column, so the graph can never contain a cycle.
   // order 'fixed' keeps each column in input order; 'barycenter' reorders
   // columns to reduce crossings. Positions are then relaxed toward linked nodes.
+  // A node may carry extraIn / extraOut: money that enters or leaves it without
+  // a drawn link. It adds to the node's height below its links, and the result
+  // gives its span (inStub / outStub) so the caller can draw it.
   function layout(options) {
     const {
       width, height, nodeWidth = 12, nodePadding = 14, minNodeHeight = 2,
@@ -21,6 +24,10 @@
     for (const node of nodes) {
       if (byId.has(node.id)) throw new Error('Duplicate node: ' + node.id);
       if (!Number.isInteger(node.column) || node.column < 0) throw new Error('Invalid column for node: ' + node.id);
+      for (const key of ['extraIn', 'extraOut']) {
+        if (node[key] === undefined) node[key] = 0;
+        else if (!(node[key] >= 0) || !Number.isFinite(node[key])) throw new Error('Invalid ' + key + ' for node: ' + node.id);
+      }
       byId.set(node.id, node);
     }
     const links = options.links.map(link => {
@@ -36,7 +43,7 @@
       target.valueIn += link.value;
       return out;
     });
-    for (const node of nodes) node.value = Math.max(node.valueIn, node.valueOut);
+    for (const node of nodes) node.value = Math.max(node.valueIn + node.extraIn, node.valueOut + node.extraOut);
 
     const columnCount = nodes.reduce((max, node) => Math.max(max, node.column + 1), 0);
     const columns = Array.from({length: columnCount}, () => []);
@@ -132,8 +139,10 @@
       node.targetLinks.sort((a, b) => a.source.y0 - b.source.y0 || a.source.column - b.source.column);
       let y = node.y0;
       for (const link of node.sourceLinks) { link.y0 = y + link.width / 2; y += link.width; }
+      node.outStub = {y0: y, y1: y + node.extraOut * ky};
       y = node.y0;
       for (const link of node.targetLinks) { link.y1 = y + link.width / 2; y += link.width; }
+      node.inStub = {y0: y, y1: y + node.extraIn * ky};
     }
     return {nodes, links, columns, ky, width, height};
   }

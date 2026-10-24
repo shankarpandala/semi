@@ -54,14 +54,38 @@ test('every flow is well formed and between two different tracked companies', ()
   }
 });
 
-test('display names and revenue entries refer to tracked companies', () => {
+test('display names refer to tracked companies', () => {
   for (const [name, label] of Object.entries(data.short)) {
     assert.ok(names.has(name), name);
     assert.ok(label.length > 0 && label.length <= name.length, name);
   }
-  for (const [name, revenue] of Object.entries(data.revenue)) {
-    assert.ok(names.has(name), name);
-    assert.ok(revenue.usd > 0 && typeof revenue.basis === 'string' && revenue.basis.length > 0, name);
+});
+
+test('tickers match the dashboard listings', () => {
+  const listed = {};
+  for (const tier of tiers) for (const company of tier.companies) {
+    if (company.ticker && company.status !== 'private') listed[company.name] = company.ticker;
+  }
+  assert.deepEqual(data.tickers, listed);
+});
+
+test('every company has a sourced 2025 account', () => {
+  assert.deepEqual(Object.keys(data.accounts).sort(), [...names].sort());
+  for (const [name, account] of Object.entries(data.accounts)) {
+    assert.ok(account.revenue > 0 && Number.isFinite(account.revenue), 'revenue ' + name);
+    assert.ok(account.people >= 0 && Number.isFinite(account.people), 'people ' + name);
+    assert.ok(Number.isFinite(account.profit), 'profit ' + name);
+    if (account.total !== undefined) assert.ok(account.total >= account.revenue, 'total ' + name);
+    if (account.buyer) assert.ok(account.people === 0 && account.profit === 0, 'buyer ' + name);
+    assert.ok(['disclosed', 'derived', 'estimated'].includes(account.conf), 'confidence ' + name);
+    for (const key of ['scope', 'period']) assert.ok(typeof account[key] === 'string' && account[key].length > 0, key + ' ' + name);
+    assert.ok(typeof account.basis === 'string' && account.basis.length >= 10, 'basis ' + name);
+    assert.ok(Array.isArray(account.outside), 'outside ' + name);
+    for (const item of account.outside) assert.ok(item.label && item.usd >= 0, 'outside item ' + name);
+    for (const source of account.sources) {
+      assert.ok(source.title, 'source title ' + name);
+      if (source.url !== undefined) assert.match(source.url, /^https:\/\/[^\s"<>]+$/, 'source url ' + name);
+    }
   }
 });
 
@@ -69,8 +93,8 @@ test('no company receives more from tracked customers than its reported revenue'
   const inflow = new Map();
   for (const flow of data.flows) inflow.set(flow.to, (inflow.get(flow.to) || 0) + flow.usd);
   for (const [name, total] of inflow) {
-    const revenue = data.revenue[name];
-    if (revenue) assert.ok(total <= revenue.usd * 1.001, `${name}: inflows ${total.toFixed(2)} > revenue ${revenue.usd}`);
+    const account = data.accounts[name];
+    assert.ok(account && total <= account.revenue * 1.001, `${name}: inflows ${total.toFixed(2)} > revenue ${account && account.revenue}`);
   }
 });
 

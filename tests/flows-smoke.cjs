@@ -56,9 +56,13 @@ async function run(){
 
     await page.goto(baseURL+'/flows.html', {waitUntil:'load'});
 
-    await check('Overview draws every tier group that has a forward band, with a table and header totals', async () => {
+    await check('Overview draws every tier group with its full revenue, stubs for outside money, and tables', async () => {
       const overview = model.overview(model.flows);
       assert.equal(await page.locator('#chart .node').count(), overview.nodes.length);
+      const stubs = overview.nodes.reduce((n, node) => n + node.stubIn.length + node.stubOut.length, 0);
+      assert.equal(await page.locator('#chart .stub').count(), stubs);
+      assert.equal(await page.locator('#accountsTable tbody tr').count(), model.groups.length + 1);
+      assert.match(await page.locator('#statRevenue').textContent(), /^\$[\d.]+[BT]$/);
       assert.equal(await page.locator('#chart .link').count(), overview.links.length);
       assert.equal(await page.locator('#chart .hit.go').count(), overview.links.length);
       assert.match(await title(), /Who pays whom/);
@@ -67,7 +71,8 @@ async function run(){
       assert.equal(await page.locator('#statCount').textContent(), String(model.flows.length));
       const notDrawn = overview.within.length + overview.lateral.length + overview.counter.length;
       assert.equal(await page.locator('#notes .note-list li').count(), notDrawn);
-      assert.ok(requests.every(url => url.startsWith(baseURL+'/') || url.startsWith('https://fonts.')), requests.join('\n'));
+      // Only the page itself, fonts, and the market-cap request leave the browser.
+      assert.ok(requests.every(url => url.startsWith(baseURL+'/') || url.startsWith('https://fonts.') || url.startsWith('https://scanner.tradingview.com/')), requests.join('\n'));
     });
 
     await check('Hovering a band shows its value; selecting it opens the company flows for that tier pair', async () => {
@@ -117,7 +122,7 @@ async function run(){
       assert.equal(await title(), 'TSMC');
       const expected = model.flows.filter(f => f.from === 'TSMC' || f.to === 'TSMC').length;
       assert.match(await page.locator('#tableNote').textContent(), new RegExp('^'+expected+' flows?'));
-      const cells = await rows().evaluateAll(trs => trs.map(tr => [tr.cells[0].textContent, tr.cells[1].textContent]));
+      const cells = await rows().evaluateAll(trs => trs.map(tr => [tr.cells[0].querySelector('.co-btn').textContent, tr.cells[1].querySelector('.co-btn').textContent]));
       assert.ok(cells.every(([from, to]) => from === 'TSMC' || to === 'TSMC'));
       assert.equal(await page.locator('#viewSub a').getAttribute('href'), './#co=TSMC');
       assert.equal(await page.locator('#crumbs li').count(), 3);
@@ -130,7 +135,7 @@ async function run(){
       assert.equal(await title(), 'NVIDIA');
       await page.locator('#search').fill('no such company');
       await page.locator('#search').press('Enter');
-      assert.match(await page.locator('#searchMsg').textContent(), /No tracked flows/);
+      assert.match(await page.locator('#searchMsg').textContent(), /No company matches/);
     });
 
     await check('Confidence filters scope the chart and table, and one category always stays on', async () => {
@@ -209,15 +214,27 @@ async function run(){
       }
     });
 
-    await check('A company without tracked flows says so instead of blaming the filter', async () => {
-      const untracked = [...model.groupOf.keys()].find(name => !model.flows.some(f => f.from === name || f.to === name));
+    await check('A company without tracked flows still shows its revenue, costs and profit', async () => {
+      const untracked = [...model.groupOf.keys()].find(name => data.accounts[name] && !model.flows.some(f => f.from === name || f.to === name));
       if(!untracked) return;
       await page.goto(baseURL+'/flows.html#co='+encodeURIComponent(untracked), {waitUntil:'load'});
-      for(const selector of ['#viewSub', '.chart-empty', '#tableNote']){
-        const text = await page.locator(selector).textContent();
-        assert.match(text, /tracked yet/, selector);
-        assert.ok(!/filter/.test(text), selector+': '+text);
-      }
+      const account = model.account(untracked);
+      assert.match(await page.locator('#viewSub').textContent(), /took in/);
+      assert.ok(await page.locator('#chart .node').count() >= 3);
+      const note = await page.locator('#tableNote').textContent();
+      assert.match(note, /outside the 119/);
+      assert.ok(!/filter/.test(note), note);
+      const moneyIn = await page.locator('#accountsTable tr.total td.num').first().textContent();
+      assert.equal(moneyIn, account.inTotal >= 100 ? '$'+account.inTotal.toFixed(0)+'B' : account.inTotal >= 1 ? '$'+account.inTotal.toFixed(1)+'B' : '$'+Math.round(account.inTotal*1000)+'M');
+    });
+
+    await check('A company view balances money in and money out, with outside customers, costs and profit', async () => {
+      await page.goto(baseURL+'/flows.html#co=TSMC', {waitUntil:'load'});
+      const labels = await page.locator('#chart .node').evaluateAll(nodes => nodes.map(n => n.getAttribute('aria-label')));
+      for(const label of ['People, R&D & overhead', 'Operating profit']) assert.ok(labels.some(l => l.startsWith(label)), labels.join(' | '));
+      const totals = await page.locator('#accountsTable tr.total td.num').allTextContents();
+      assert.equal(totals.length, 2);
+      assert.equal(totals[0], totals[1]);
     });
 
     await check('Leaving the search box does not jump to a loosely matched company', async () => {
@@ -278,6 +295,29 @@ async function run(){
       }
       assert.deepEqual(mobileErrors, []);
       await mobile.close();
+    });
+
+    await check('Live market caps appear in the company heading, tooltips and tables', async () => {
+      const capsContext = await browser.newContext({viewport:{width:1440, height:1000}});
+      await capsContext.route('https://fonts.googleapis.com/**', route => route.abort());
+      const scans = [];
+      await capsContext.route('https://scanner.tradingview.com/**', async route => {
+        const body = route.request().postDataJSON();
+        scans.push(body);
+        const data = body.symbols.tickers.filter(s => s === 'NYSE:TSM' || s === 'NASDAQ:NVDA')
+          .map(s => ({s, d:[100, s === 'NYSE:TSM' ? 1.5e12 : 4.4e12, 1, 'delayed_streaming_900', 'USD', 'USD']}));
+        return route.fulfill({contentType:'application/json', headers:{'access-control-allow-origin':'*'}, body:JSON.stringify({data})});
+      });
+      const capsPage = await capsContext.newPage();
+      await capsPage.goto(baseURL+'/flows.html#co=TSMC', {waitUntil:'load'});
+      await capsPage.waitForFunction(() => document.querySelector('#viewTitle .cap')?.textContent);
+      assert.equal(await capsPage.locator('#viewTitle .cap').textContent(), 'cap $1.50T');
+      assert.equal(scans[0].symbols.tickers.length, Object.keys(data.tickers).length);
+      assert.ok(await capsPage.locator('#flowTable .cap', {hasText:'cap $4.40T'}).count() > 0);
+      await capsPage.goto(baseURL+'/flows.html#group=t6', {waitUntil:'load'});
+      await capsPage.waitForFunction(() => [...document.querySelectorAll('#accountsTable .cap')].some(c => c.textContent));
+      assert.ok(await capsPage.locator('#accountsTable .cap', {hasText:'cap $1.50T'}).count() === 1);
+      await capsContext.close();
     });
 
     await check('The companies dashboard links to the flows page and each company’s flows', async () => {
