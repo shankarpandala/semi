@@ -23,7 +23,8 @@ the customer who pays to the supplier who is paid, in USD billions for calendar
   drawn.
 
 Every company's bands add up to its 2025 revenue. Coloured bands are payments
-between the 119 companies; grey shows money from customers outside the 119 and
+between the 119 companies; grey shows money from customers without a tracked
+flow (mostly companies outside the 119) and
 where the rest of each company's revenue goes (other suppliers and production,
 people and R&D, operating profit). An operating loss is shown as money drawn
 from reserves; tracked purchases above what a profitable company's costs
@@ -33,9 +34,9 @@ counts: the others' purchases of servers, networking and chips, and Apple's
 device sales plus the $75B Foxconn pays Apple for the components Apple buys and
 resells to it (Apple's gross payment to Foxconn includes those parts).
 Most companies with large non-chip businesses count only their chip-related
-segment; Samsung Electronics and Samsung Electro-Mechanics are shown whole,
-because their phone, camera and component businesses trade with tracked
-companies.
+segment; a few are shown whole because their other businesses trade with
+tracked companies (Samsung Electronics, Samsung Electro-Mechanics, Tata
+Electronics and board makers such as Zhen Ding).
 Where a company publishes no cost breakdown, the rest of its revenue is shown as
 one amount marked "breakdown pending".
 

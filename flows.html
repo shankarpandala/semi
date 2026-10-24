@@ -302,8 +302,8 @@
     <h2 id="methodTitle">How to read this</h2>
     <dl>
       <dt>Direction</dt><dd>Each band runs from the customer who pays to the supplier who is paid. Bands are gross payments: a dollar Microsoft pays Foxconn for an AI rack reappears in Foxconn's payment to NVIDIA, and again in NVIDIA's payment to TSMC. Column totals therefore overlap and should not be added together.</dd>
-      <dt>Scope</dt><dd>Every company's bands add up to its 2025 revenue. Coloured bands are payments between the 119 companies on the dashboard: chips, memory, wafers, tools, subsystems, materials, gases, IP, packaging, test and assembly. Grey shows money from customers outside the 119 (consumers, enterprises, Meta, Dell, Chinese fabs and many others) and where the rest of each company's revenue goes: other suppliers and production costs, people and R&amp;D, and operating profit. An operating loss appears as money drawn from reserves; when a profitable company’s tracked purchases exceed what the year’s costs absorbed (inventory, prepayments or equipment bought ahead of sales), the difference appears as purchases paid from cash. Where the split of a company’s remaining revenue between other suppliers, people and profit is still being researched, it is shown as one amount marked “breakdown pending”.</dd>
-      <dt>Partial scopes</dt><dd>Most of Amazon's, Alphabet's and Microsoft's revenue (retail, ads, software) and Apple's services revenue have little to do with chips. For these four, only the hardware part is counted: the hyperscalers' purchases of servers, networking and chips, and Apple's device sales ($307B) plus the $75B Foxconn pays Apple for components Apple buys and resells to it. Apple does not book those receipts as revenue, but its gross payment to Foxconn includes the parts, so both legs are shown. Most companies with large non-chip businesses, such as Linde, BASF, Canon or Kyocera, count only their chip-related segment. Samsung Electronics and Samsung Electro-Mechanics are the exceptions: they are shown whole, because their phone, camera and component businesses trade with tracked companies. The company view states each scope and the full revenue.</dd>
+      <dt>Scope</dt><dd>Every company's bands add up to its 2025 revenue. Coloured bands are payments between the 119 companies on the dashboard: chips, memory, wafers, tools, subsystems, materials, gases, IP, packaging, test and assembly. Grey shows money from customers without a tracked flow (mostly companies outside the 119, such as consumers, enterprises, Meta, Dell and Chinese fabs, plus purchases by tracked companies too small or uncertain to draw) and where the rest of each company's revenue goes: other suppliers and production costs, people and R&amp;D, and operating profit. An operating loss appears as money drawn from reserves; when a profitable company’s tracked purchases exceed what the year’s costs absorbed (inventory, prepayments or equipment bought ahead of sales), the difference appears as purchases paid from cash. Where the split of a company’s remaining revenue between other suppliers, people and profit is still being researched, it is shown as one amount marked “breakdown pending”.</dd>
+      <dt>Partial scopes</dt><dd>Most of Amazon's, Alphabet's and Microsoft's revenue (retail, ads, software) and Apple's services revenue have little to do with chips. For these four, only the hardware part is counted: the hyperscalers' purchases of servers, networking and chips, and Apple's device sales ($307B) plus the $75B Foxconn pays Apple for components Apple buys and resells to it. Apple does not book those receipts as revenue, but its gross payment to Foxconn includes the parts, so both legs are shown. Most companies with large non-chip businesses, such as Linde, BASF, Canon or Kyocera, count only their chip-related segment. A few are shown whole because their other businesses trade with tracked companies: Samsung Electronics (phones and TVs), Samsung Electro-Mechanics (cameras and capacitors), Tata Electronics (iPhone assembly) and board makers such as Zhen Ding and AT&amp;S. The company view states each scope and the full revenue.</dd>
       <dt>Market cap</dt><dd>Market value is fetched live when the page opens, as on the companies page, and shown in tooltips and tables. It is a valuation of future profits, not money that moves in a year, so it is never drawn as a band. It values the whole company, while the revenue shown is often only the chip-related part, so the two should not be read as a price-to-sales ratio.</dd>
       <dt>Period</dt><dd id="methodPeriod"></dd>
       <dt>Confidence</dt><dd><span class="conf-cell"><i class="conf-key disclosed"></i>Disclosed</span> — the payer or supplier reports the amount or share for this counterparty (named, or identified with near certainty). <span class="conf-cell"><i class="conf-key derived"></i>Derived</span> — calculated from reported figures plus a stated assumption. <span class="conf-cell"><i class="conf-key estimated"></i>Estimated</span> — analyst estimates or modelling from market shares; treat as an order of magnitude.</dd>
@@ -339,7 +339,7 @@
     other:'#4E5562', pending:'#6B6683', people:'#959DAA', profit:'#D3D7DE',
   };
   const OUTSIDE_NOTE = {
-    customers:'Revenue from customers that are not among the 119 companies.',
+    customers:'Revenue that arrives without a tracked flow: mostly from customers outside the 119, plus purchases by tracked companies too small or too uncertain to draw.',
     reserves:'An operating loss: costs above revenue, paid from cash reserves or borrowing.',
     ahead:'Tracked purchases above what the year’s costs absorbed (inventory, prepayments or equipment bought ahead of sales), paid from cash on hand.',
     internal:'Payments between companies inside this group.',
@@ -352,13 +352,13 @@
   };
   // Legend rows in drawing order; only the kinds of money the current view draws are listed.
   const LEGEND = [
-    ['customers', 'From customers outside the 119'], ['reserves', 'Operating loss, from reserves'], ['ahead', 'Purchases ahead of sales, from cash'],
+    ['customers', 'From customers without a tracked flow'], ['reserves', 'Operating loss, from reserves'], ['ahead', 'Purchases ahead of sales, from cash'],
     ['notDrawn', 'Tracked flows not drawn as bands'], ['other', 'Other suppliers & production'], ['pending', 'Not yet broken down (breakdown pending)'],
     ['people', 'People, R&D & overhead'], ['profit', 'Operating profit'],
   ];
   const legendRole = role => role === 'internal' || role === 'hidden' ? 'notDrawn' : role;
   // Diversified companies count only their chip-related segment; Tier 10 counts hardware only.
-  const partialScope = source => !!source && !source.buyer && !/^(Total revenue|Whole company)/.test(source.scope || '');
+  const partialScope = source => !!source && !source.buyer && !source.wholeBusiness && !/^(Total revenue|Whole company)/.test(source.scope || '');
   // What an unsplit amount holds: some companies' profit is known and drawn separately.
   function pendingWhat(names){
     const pending = names.map(name => model.account(name)).filter(a => a.pending && a.other > 0.0005);
@@ -384,6 +384,7 @@
   const linkColor = link => link.outside ? OUTSIDE_HEX[link.outside] : colorOf(link.source);
   // Compact form for chart labels; one decimal elsewhere.
   function fmtUSD(v, compact = false){
+    v = Math.round(v * 1e6) / 1e6;  // sums of floats must not round 1.25 down to 1.2
     if(!(v > 0)) return '$0';
     if(v >= 1000) return '$'+(v/1000).toFixed(2)+'T';
     if(v >= 100 || (compact && v >= 10)) return '$'+v.toFixed(0)+'B';
@@ -512,7 +513,7 @@
   const hasAccount = name => !!accounts[name];
   function emptyMessage(view){
     if(view.kind === 'company' && !trackedNames.has(view.name) && !hasAccount(view.name)) return 'No flows or revenue figures for this company yet.';
-    if(view.kind === 'company' && !trackedNames.has(view.name)) return 'No flows with other tracked companies; all of its revenue comes from outside the 119.';
+    if(view.kind === 'company' && !trackedNames.has(view.name)) return 'No flows with other tracked companies; all of its revenue comes from customers without a tracked flow.';
     return 'No tracked flows match this view and filter.';
   }
   const capitalize = text => text.charAt(0).toUpperCase() + text.slice(1);
@@ -527,7 +528,7 @@
     const pendingOther = a.pendingOther !== undefined ? a.pendingOther : a.pending ? a.other : 0;
     const sources = [];
     if(a.trackedIn > 0) sources.push(`${fmtUSD(a.trackedIn)} (${pct(a.trackedIn, a.revenue)}%) from tracked companies`);
-    if(a.outsideTotal > 0) sources.push(`${fmtUSD(a.outsideTotal)} from customers outside the 119`);
+    if(a.outsideTotal > 0) sources.push(`${fmtUSD(a.outsideTotal)} from customers without a tracked flow`);
     const uses = [];
     if(a.trackedOut > 0) uses.push(`${fmtUSD(a.trackedOut)} to tracked suppliers`);
     if(a.other - pendingOther > 0.0005) uses.push(`${fmtUSD(a.other - pendingOther)} to other suppliers and production`);
@@ -568,11 +569,11 @@
       const drawn = graph.links.reduce((total, link) => total + link.value, 0);
       const notDrawn = sum(graph.flows) - drawn;
       const hidden = sum(model.flows) - sum(graph.flows);
-      sub.append(`The 119 companies took in ${fmtUSD(allAccounts.revenue)} in 2025. Tier 10 counts hardware only. Most companies with large non-chip businesses count only their chip-related segment; Samsung Electronics and Samsung Electro-Mechanics are shown whole, because their phone, camera and component businesses trade with tracked companies. `
+      sub.append(`The 119 companies took in ${fmtUSD(allAccounts.revenue)} in 2025. Tier 10 counts hardware only. Most companies with large non-chip businesses count only their chip-related segment; a few are shown whole because their other businesses trade with tracked companies, such as Samsung Electronics, Samsung Electro-Mechanics, Tata Electronics (iPhone assembly) and board makers like Zhen Ding. `
         + `Coloured bands show ${fmtUSD(drawn)} of payments between tracked companies`
         + (notDrawn > 0.0005 ? `; another ${fmtUSD(notDrawn)} is listed below the chart` : '')
         + (hidden > 0.0005 ? `; ${fmtUSD(hidden)} is hidden by the confidence filter` : '')
-        + '. Grey stubs show money arriving from customers outside the 119, and money leaving as other suppliers, people and profit. '
+        + '. Grey stubs show money arriving from customers without a tracked flow (mostly companies outside the 119), and money leaving as other suppliers, people and profit. '
         + 'Select a tier or a band to see the companies behind it.');
     } else if(view.kind === 'pair'){
       const from = model.groupById.get(view.from), to = model.groupById.get(view.to);
@@ -653,7 +654,8 @@
     for(const [role, label] of LEGEND){
       if(!drawn.has(role)) continue;
       const key = el('i'); key.style.background = OUTSIDE_HEX[role];
-      legend.append(el('li', {}, key, role === 'notDrawn' && notDrawnLabel ? notDrawnLabel : label));
+      const buyerView = view.kind === 'company' && accounts[view.name] && accounts[view.name].buyer;
+      legend.append(el('li', {}, key, role === 'notDrawn' && notDrawnLabel ? notDrawnLabel : role === 'other' && buyerView ? 'Other hardware suppliers' : label));
     }
   }
 
@@ -974,9 +976,10 @@
   }
   // Hyperscalers' 'other' money is hardware bought outside the 119, not cost of revenue.
   const isBuyer = node => node && node.kind === 'company' && !!(accounts[node.name] && accounts[node.name].buyer);
-  const outsideNote = (role, payers) => role === 'other' && payers.length && payers.every(isBuyer)
-    ? 'Hardware bought from suppliers that are not among the 119: networking, storage, optics and other servers.'
-    : OUTSIDE_NOTE[role];
+  const BUYER_OTHER = 'Hardware bought from suppliers that are not among the 119: networking, storage, optics and other servers.';
+  const outsideNote = (role, payers) => role !== 'other' || !payers.some(isBuyer) ? OUTSIDE_NOTE[role]
+    : payers.every(isBuyer) ? BUYER_OTHER
+    : OUTSIDE_NOTE.other.replace(/\.$/, '') + '; for Amazon, Alphabet and Microsoft, hardware bought from suppliers that are not among the 119.';
   function topOutsideCustomers(names, limit){
     const byLabel = new Map();
     for(const name of names) for(const item of model.account(name).outside) byLabel.set(item.label, (byLabel.get(item.label) || 0) + item.usd);
@@ -984,7 +987,9 @@
   }
   function stubTooltip(node, item, side){
     const content = [el('div', {class:'tt-value', text:fmtUSD(item.usd)+' / yr'}), el('div', {class:'tt-title', text:item.label}),
-      el('div', {class:'tt-hint', text:OUTSIDE_NOTE[item.key]})];
+      el('div', {class:'tt-hint', text:item.key === 'other'
+        ? outsideNote('other', node.group.companies.filter(name => model.account(name).other > 0.0005).map(name => ({kind:'company', name})))
+        : OUTSIDE_NOTE[item.key]})];
     if(side === 'in' && item.key === 'customers'){
       for(const [label, usd] of topOutsideCustomers(node.group.companies, 5)) content.push(ttRow(OUTSIDE_HEX.customers, label, usd));
     }
@@ -1127,7 +1132,7 @@
     const pendingNote = rows.some(r => pendingOf(r.a) > 0.0005) || pendingOf(total) > 0.0005
       ? ` † Includes ${what} not yet split${what === 'other costs' ? ' between suppliers and people' : ''}.` : '';
     $('accountsNote').textContent = (view.kind === 'overview'
-      ? 'Tier 10 counts hardware only. Most companies with large non-chip businesses count only their chip-related segment; Samsung Electronics and Samsung Electro-Mechanics are shown whole, because their phone, camera and component businesses trade with tracked companies. Group totals include payments between companies in the same group. Market cap values the whole company.'
+      ? 'Tier 10 counts hardware only. Most companies with large non-chip businesses count only their chip-related segment; a few are shown whole because their other businesses trade with tracked companies, such as Samsung Electronics, Samsung Electro-Mechanics, Tata Electronics (iPhone assembly) and board makers like Zhen Ding. Group totals include payments between companies in the same group. Market cap values the whole company.'
       : 'Sorted by revenue. Select a company for its sources. Market cap values the whole company.') + pendingNote;
   }
 

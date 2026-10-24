@@ -219,7 +219,7 @@ async function run(){
       await page.goto(baseURL+'/flows.html#group=t6', {waitUntil:'load'});
       const foundries = model.focus(model.flows, model.groupById.get('t6').companies, {outer:'group'}).account;
       assert.ok(foundries.outsideTotal > 0);
-      assert.match(await page.locator('#viewSub').textContent(), /from customers outside the 119/);
+      assert.match(await page.locator('#viewSub').textContent(), /from customers without a tracked flow/);
       const pending = Object.keys(data.accounts).find(name => /breakdown pending/.test(data.accounts[name].otherLabel || '') && !data.accounts[name].buyer);
       await page.goto(baseURL+'/flows.html#co='+encodeURIComponent(pending), {waitUntil:'load'});
       const sub = await page.locator('#viewSub').textContent();
@@ -262,7 +262,7 @@ async function run(){
       assert.match(await page.locator('#viewSub').textContent(), /took in/);
       assert.ok(await page.locator('#chart .node').count() >= 3);
       const note = await page.locator('#tableNote').textContent();
-      assert.match(note, /outside the 119/);
+      assert.match(note, /without a tracked flow/);
       assert.ok(!/filter/.test(note), note);
       const moneyIn = await page.locator('#accountsTable tr.total td.num').first().textContent();
       assert.equal(moneyIn, account.inTotal >= 100 ? '$'+account.inTotal.toFixed(0)+'B' : account.inTotal >= 1 ? '$'+account.inTotal.toFixed(1)+'B' : '$'+Math.round(account.inTotal*1000)+'M');

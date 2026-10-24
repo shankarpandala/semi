@@ -10,8 +10,8 @@
 
   // Money that enters or leaves a company without a tracked counterparty.
   const OUTSIDE = {
-    customers: 'Customers outside the 119',
-    otherCustomers: 'Other customers outside the 119',
+    customers: 'Customers without a tracked flow',
+    otherCustomers: 'Other customers (not broken down)',
     reserves: 'Operating loss, funded from reserves',
     ahead: 'Purchases ahead of sales, from cash',
     hiddenIn: 'Tracked flows hidden by the filter',
