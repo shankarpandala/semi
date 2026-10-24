@@ -11,7 +11,7 @@
   // Money that enters or leaves a company without a tracked counterparty.
   const OUTSIDE = {
     customers: 'Customers outside the 119',
-    reserves: 'Operating loss, funded from reserves',
+    reserves: 'Spending beyond revenue, from reserves',
     hiddenIn: 'Tracked flows hidden by the filter',
     internalIn: 'From others in this group',
     notDrawnIn: 'Tracked flows not drawn here',
@@ -61,8 +61,9 @@
     };
     const byGroupThenValue = values => (a, b) => sortKey(a) - sortKey(b) || values.get(b) - values.get(a) || a.localeCompare(b);
 
-    // Revenue never falls below tracked inflows; a reported operating loss is
-    // money drawn from reserves, so both sides of the account still balance.
+    // Revenue never falls below tracked inflows. Spending beyond revenue (an
+    // operating loss, or purchases ahead of sales such as inventory or tools)
+    // is money drawn from reserves, so both sides of every account balance.
     const accountCache = new Map();
     function account(name) {
       if (accountCache.has(name)) return accountCache.get(name);
@@ -73,8 +74,9 @@
       const people = source && source.people > 0 ? source.people : 0;
       const reported = source && Number.isFinite(source.profit) ? source.profit : 0;
       const profit = Math.max(reported, 0);
-      const reserves = Math.max(-reported, 0);
-      const other = Math.max(0, revenue + reserves - tout - people - profit);
+      let reserves = Math.max(-reported, 0);
+      let other = revenue + reserves - tout - people - profit;
+      if (other < 0) { reserves -= other; other = 0; }
       const outsideTotal = revenue - tin;
       const categories = ((source && source.outside) || []).filter(item => item.usd > 0);
       const categoryTotal = categories.reduce((total, item) => total + item.usd, 0);

@@ -302,7 +302,7 @@
     <h2 id="methodTitle">How to read this</h2>
     <dl>
       <dt>Direction</dt><dd>Each band runs from the customer who pays to the supplier who is paid. Bands are gross payments: a dollar Microsoft pays Foxconn for an AI rack reappears in Foxconn's payment to NVIDIA, and again in NVIDIA's payment to TSMC. Column totals therefore overlap and should not be added together.</dd>
-      <dt>Scope</dt><dd>Every company's bands add up to its 2025 revenue. Coloured bands are payments between the 119 companies on the dashboard: chips, memory, wafers, tools, subsystems, materials, gases, IP, packaging, test and assembly. Grey shows money from customers outside the 119 (consumers, enterprises, Meta, Dell, Chinese fabs and many others) and where the rest of each company's revenue goes: other suppliers and production costs, people and R&amp;D, and operating profit. An operating loss appears as money drawn from reserves.</dd>
+      <dt>Scope</dt><dd>Every company's bands add up to its 2025 revenue. Coloured bands are payments between the 119 companies on the dashboard: chips, memory, wafers, tools, subsystems, materials, gases, IP, packaging, test and assembly. Grey shows money from customers outside the 119 (consumers, enterprises, Meta, Dell, Chinese fabs and many others) and where the rest of each company's revenue goes: other suppliers and production costs, people and R&amp;D, and operating profit. Spending beyond revenue (an operating loss, or buying inventory and equipment ahead of sales) appears as money drawn from reserves.</dd>
       <dt>Tier 10</dt><dd>Most of Amazon's, Alphabet's and Microsoft's revenue (retail, ads, software) and Apple's services revenue have little to do with chips. For these four, only the hardware part is counted: Apple's device sales, and the hyperscalers' purchases of servers, networking and chips. Their full revenue is given in the company view.</dd>
       <dt>Market cap</dt><dd>Market value is fetched live when the page opens, as on the companies page, and shown in tooltips and tables. It is a valuation of future profits, not money that moves in a year, so it is never drawn as a band.</dd>
       <dt>Period</dt><dd id="methodPeriod"></dd>
@@ -340,7 +340,7 @@
   };
   const OUTSIDE_NOTE = {
     customers:'Revenue from customers that are not among the 119 companies.',
-    reserves:'Spending beyond revenue: an operating loss covered from reserves or borrowing.',
+    reserves:'Spending beyond revenue — an operating loss, or purchases ahead of sales such as inventory or equipment — paid from cash reserves or borrowing.',
     internal:'Payments between companies inside this group.',
     hidden:'Tracked flows hidden by the confidence filter.',
     notDrawn:'Tracked flows that stay inside a tier group, run between groups in one column, or run against the chain. They are listed below the chart.',
@@ -516,7 +516,7 @@
     let text = `${subject} took in ${fmtUSD(a.revenue)} in 2025${sources.length ? ': ' + listJoin(sources) : ''}.`;
     if(uses.length) text += ` It paid ${listJoin(uses)}`;
     text += a.profit > 0 ? `${uses.length ? ', and' : ' It'} kept ${fmtUSD(a.profit)} as operating profit.` : uses.length ? '.' : '';
-    if(a.reserves > 0) text += ` Costs exceeded revenue by ${fmtUSD(a.reserves)} (an operating loss), funded from reserves.`;
+    if(a.reserves > 0) text += ` It spent ${fmtUSD(a.reserves)} more than it took in (an operating loss or purchases ahead of sales), funded from reserves.`;
     return text;
   }
 

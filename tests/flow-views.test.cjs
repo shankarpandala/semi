@@ -108,11 +108,12 @@ test('accounts balance revenue against tracked suppliers, other costs, people an
   assert.deepEqual([fab1.revenue, fab1.trackedIn, fab1.trackedOut, fab1.other, fab1.reserves], [10, 6, 3, 1, 0]);
   assert.deepEqual(fab1.outside.map(o => [o.label, o.usd]), [['Car makers', 3], ['Phone makers', 1]]);
   assert.equal(fab1.inTotal, fab1.outTotal);
-  // Revenue is raised to tracked inflows; the loss is funded from reserves.
+  // Revenue is raised to tracked inflows; the loss and the purchases beyond it
+  // are funded from reserves, so both sides still balance.
   const fab2 = model.account('Fab2');
-  assert.deepEqual([fab2.revenue, fab2.reserves, fab2.profit, fab2.outsideTotal], [1, 2, 0, 0]);
+  assert.deepEqual([fab2.revenue, fab2.reserves, fab2.profit, fab2.other, fab2.outsideTotal], [1, 4, 0, 0, 0]);
   assert.equal(fab2.outTotal, 4 + 1);
-  assert.equal(fab2.inTotal, 3);
+  assert.equal(fab2.inTotal, 5);
   // Without account data a company's revenue is its tracked inflow or outflow.
   assert.deepEqual([model.account('Tool1').revenue, model.account('Sys1').revenue], [3, 0]);
 });
@@ -201,6 +202,7 @@ test('every view of the published data can be laid out', () => {
     const out = view.links.filter(l => l.source === 'M:' + name).reduce((t, l) => t + l.value, 0);
     assert.ok(Math.abs(into - item.inTotal) < 1e-6, name + ' in');
     assert.ok(Math.abs(out - item.outTotal) < 1e-6, name + ' out');
+    assert.ok(Math.abs(item.inTotal - item.outTotal) < 1e-6, name + ' balances');
   }
   for (const view of views) {
     if (!view.links.length) continue;
