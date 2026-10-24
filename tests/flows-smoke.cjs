@@ -193,7 +193,8 @@ async function run(){
             const sx = m.a*x + m.c*y + m.e, sy = m.b*x + m.d*y + m.f;
             if(sy < sticky + 2 || sy > innerHeight - 2) continue;
             const top = document.elementFromPoint(sx, sy);
-            if(top?.closest('#chart .node')) continue;
+            // Nodes and outside-money stubs are drawn above the bands.
+            if(top?.closest('#chart .node') || top?.classList.contains('stub')) continue;
             result.checked++;
             if(top !== hits[i] && top !== pads[i]) result.wrong.push(hits[i].getAttribute('aria-label'));
             break;
@@ -214,6 +215,45 @@ async function run(){
       }
     });
 
+    await check('Tier and company summaries name outside customers, losses and pending splits as such', async () => {
+      await page.goto(baseURL+'/flows.html#group=t6', {waitUntil:'load'});
+      const foundries = model.focus(model.flows, model.groupById.get('t6').companies, {outer:'group'}).account;
+      assert.ok(foundries.outsideTotal > 0);
+      assert.match(await page.locator('#viewSub').textContent(), /from customers without a tracked flow/);
+      const pending = Object.keys(data.accounts).find(name => /breakdown pending/.test(data.accounts[name].otherLabel || '') && !data.accounts[name].buyer);
+      await page.goto(baseURL+'/flows.html#co='+encodeURIComponent(pending), {waitUntil:'load'});
+      const sub = await page.locator('#viewSub').textContent();
+      assert.match(sub, /still being researched/, pending+': '+sub);
+      assert.doesNotMatch(sub, /to other suppliers and production/, pending+': '+sub);
+      const loss = Object.keys(data.accounts).find(name => model.account(name).loss > 0.05 && !data.accounts[name].buyer);
+      await page.goto(baseURL+'/flows.html#co='+encodeURIComponent(loss), {waitUntil:'load'});
+      assert.match(await page.locator('#viewSub').textContent(), /operating loss/, loss);
+      // The legend lists only what the view draws.
+      const legend = await page.locator('#chartLegend li').allTextContents();
+      assert.ok(legend.some(text => /Operating loss/.test(text)), legend.join(' | '));
+      assert.ok(!legend.some(text => /Operating profit/.test(text)) || model.account(loss).profit > 0, legend.join(' | '));
+    });
+
+    await check('Pending amounts, buyers and hidden flows are described as what they are', async () => {
+      // Shin-Etsu Handotai's profit is known, so Tier 1's unsplit amount is costs only.
+      await page.goto(baseURL+'/flows.html#group=t1', {waitUntil:'load'});
+      const sub = await page.locator('#viewSub').textContent();
+      assert.match(sub, /of other costs is not yet split/, sub);
+      assert.match(await page.locator('#accountsNote').textContent(), /† Includes other costs not yet split between suppliers and people/);
+      // A hyperscaler's other money is hardware bought outside the 119.
+      await page.goto(baseURL+'/flows.html#co=Microsoft', {waitUntil:'load'});
+      const node = page.locator('#chart .node[aria-label^="Other hardware suppliers"]');
+      await node.scrollIntoViewIfNeeded();
+      await node.hover();
+      assert.match(await page.locator('#tooltip').textContent(), /Hardware bought from suppliers that are not among the 119/);
+      // With only disclosed flows shown, grey bands are labelled as hidden, not as undrawn.
+      await page.goto(baseURL+'/flows.html#co=NVIDIA', {waitUntil:'load'});
+      for(const conf of ['derived', 'estimated']) await page.locator(`.chip[data-conf="${conf}"]`).click();
+      const legend = await page.locator('#chartLegend li').allTextContents();
+      assert.ok(legend.includes('Tracked flows hidden by the filter'), legend.join(' | '));
+      for(const conf of ['derived', 'estimated']) await page.locator(`.chip[data-conf="${conf}"]`).click();
+    });
+
     await check('A company without tracked flows still shows its revenue, costs and profit', async () => {
       const untracked = [...model.groupOf.keys()].find(name => data.accounts[name] && !model.flows.some(f => f.from === name || f.to === name));
       if(!untracked) return;
@@ -222,7 +262,7 @@ async function run(){
       assert.match(await page.locator('#viewSub').textContent(), /took in/);
       assert.ok(await page.locator('#chart .node').count() >= 3);
       const note = await page.locator('#tableNote').textContent();
-      assert.match(note, /outside the 119/);
+      assert.match(note, /without a tracked flow/);
       assert.ok(!/filter/.test(note), note);
       const moneyIn = await page.locator('#accountsTable tr.total td.num').first().textContent();
       assert.equal(moneyIn, account.inTotal >= 100 ? '$'+account.inTotal.toFixed(0)+'B' : account.inTotal >= 1 ? '$'+account.inTotal.toFixed(1)+'B' : '$'+Math.round(account.inTotal*1000)+'M');

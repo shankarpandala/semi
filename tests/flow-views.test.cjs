@@ -108,13 +108,59 @@ test('accounts balance revenue against tracked suppliers, other costs, people an
   assert.deepEqual([fab1.revenue, fab1.trackedIn, fab1.trackedOut, fab1.other, fab1.reserves], [10, 6, 3, 1, 0]);
   assert.deepEqual(fab1.outside.map(o => [o.label, o.usd]), [['Car makers', 3], ['Phone makers', 1]]);
   assert.equal(fab1.inTotal, fab1.outTotal);
-  // Revenue is raised to tracked inflows; the loss is funded from reserves.
+  // Revenue is raised to tracked inflows; the loss and the purchases beyond it
+  // are funded from reserves, so both sides still balance.
   const fab2 = model.account('Fab2');
-  assert.deepEqual([fab2.revenue, fab2.reserves, fab2.profit, fab2.outsideTotal], [1, 2, 0, 0]);
+  assert.deepEqual([fab2.revenue, fab2.reserves, fab2.loss, fab2.ahead, fab2.profit, fab2.other, fab2.outsideTotal], [1, 4, 2, 2, 0, 0, 0]);
   assert.equal(fab2.outTotal, 4 + 1);
-  assert.equal(fab2.inTotal, 3);
+  assert.equal(fab2.inTotal, 5);
   // Without account data a company's revenue is its tracked inflow or outflow.
   assert.deepEqual([model.account('Tool1').revenue, model.account('Sys1').revenue], [3, 0]);
+});
+
+test('named outside customers keep their amounts; only a remainder or an overflow changes them', () => {
+  const model = createModel(withAccounts([flow('Chip1', 'Fab1', 2), flow('Chip1', 'Fab2', 2)], {
+    Fab1: {revenue: 10, outside: [{label: 'Car makers', usd: 3}, {label: 'Phone makers', usd: 1}]},
+    Fab2: {revenue: 4, outside: [{label: 'Car makers', usd: 3}, {label: 'Phone makers', usd: 1}]},
+  }));
+  assert.deepEqual(model.account('Fab1').outside.map(o => [o.label, o.usd]),
+    [['Car makers', 3], ['Phone makers', 1], ['Other customers (not broken down)', 4]]);
+  assert.deepEqual(model.account('Fab2').outside.map(o => [o.label, o.usd]), [['Car makers', 1.5], ['Phone makers', 0.5]]);
+});
+
+test('a profitable company buying ahead of sales is not described as making a loss', () => {
+  const model = createModel(withAccounts([flow('Fab1', 'Tool1', 6)], {Fab1: {revenue: 10, people: 2, profit: 4}}));
+  const fab = model.account('Fab1');
+  assert.deepEqual([fab.loss, fab.ahead, fab.reserves, fab.other], [0, 2, 2, 0]);
+  assert.equal(fab.inTotal, fab.outTotal);
+});
+
+test('accounts with a pending cost split are flagged and kept apart in tier views', () => {
+  const model = createModel(withAccounts([flow('Chip1', 'Fab1', 1)], {
+    Fab1: {revenue: 5, otherLabel: 'Costs and profit (breakdown pending)'},
+    Fab2: {revenue: 3, people: 1, profit: 1},
+  }));
+  assert.equal(model.account('Fab1').pending, true);
+  assert.equal(model.account('Fab2').pending, false);
+  const view = model.focus(model.flows, ['Fab1', 'Fab2'], {outer: 'group'});
+  const ids = view.nodes.map(n => n.id);
+  assert.ok(ids.includes('XR:pending') && ids.includes('XR:other'), ids.join());
+  assert.equal(view.nodes.find(n => n.id === 'XR:pending').role, 'pending');
+  assert.equal(view.nodes.find(n => n.id === 'XR:other').role, 'other');
+  assert.equal(view.account.pendingOther, 5);
+});
+
+test('overview stubs separate flows hidden by the filter from flows not drawn as bands', () => {
+  const model = createModel(withAccounts(
+    [flow('Chip1', 'Fab1', 4, 'disclosed'), flow('Chip2', 'Fab1', 3), flow('Fab1', 'Fab2', 1, 'disclosed')],
+    {Fab1: {revenue: 10, people: 1, profit: 1}},
+  ));
+  const fab = model.overview(model.filter(['disclosed'])).nodes.find(n => n.id === 'fab');
+  const stub = (side, key) => (fab[side].find(s => s.key === key) || {}).usd;
+  assert.equal(stub('stubIn', 'hidden'), 3);
+  assert.equal(stub('stubIn', 'notDrawn'), 1);
+  assert.equal(stub('stubOut', 'notDrawn'), 1);
+  assert.equal(stub('stubOut', 'hidden'), undefined);
 });
 
 test('company focus with accounts balances the company on both sides', () => {
@@ -130,7 +176,7 @@ test('company focus with accounts balances the company on both sides', () => {
   const ids = view.nodes.map(n => n.id);
   assert.ok(ids.includes('XL:in:Car makers') && ids.includes('XL:hiddenIn') && ids.includes('XR:profit'), ids.join());
   assert.equal(view.links.find(l => l.source === 'XL:hiddenIn').value, 1);
-  assert.deepEqual(view.account, {revenue: 10, trackedIn: 7, trackedOut: 3, outside: 3, reserves: 0, people: 2, profit: 4, other: 1});
+  assert.deepEqual(view.account, {revenue: 10, trackedIn: 7, trackedOut: 3, outsideTotal: 3, loss: 0, ahead: 0, reserves: 0, people: 2, profit: 4, other: 1, pendingOther: 0});
 });
 
 test('group focus with accounts shows payments inside the group on both sides', () => {
@@ -169,6 +215,11 @@ test('overview stubs make each group\'s height its full account', () => {
   assert.deepEqual(chip.stubOut.map(s => [s.key, s.usd]), [['other', 5], ['people', 5], ['profit', 12]]);
   const fab = view.nodes.find(n => n.id === 'fab');
   assert.deepEqual(fab.stubOut.map(s => s.key), ['notDrawn', 'other', 'people', 'profit']);
+  assert.equal(chip.stubOut[0].label, 'Other suppliers & production');
+  const pending = createModel(withAccounts([flow('Fab1', 'Tool1', 1)], {
+    Tool1: {revenue: 5, otherLabel: 'Costs and profit (breakdown pending)'},
+  })).overview([]).nodes.find(n => n.id === 'tool');
+  assert.deepEqual(pending.stubOut.map(s => [s.key, s.label, s.usd]), [['pending', 'Costs and profit (breakdown pending)', 5]]);
 });
 
 test('pair view links payers to payees and handles a group paying itself', () => {
@@ -201,6 +252,7 @@ test('every view of the published data can be laid out', () => {
     const out = view.links.filter(l => l.source === 'M:' + name).reduce((t, l) => t + l.value, 0);
     assert.ok(Math.abs(into - item.inTotal) < 1e-6, name + ' in');
     assert.ok(Math.abs(out - item.outTotal) < 1e-6, name + ' out');
+    assert.ok(Math.abs(item.inTotal - item.outTotal) < 1e-6, name + ' balances');
   }
   for (const view of views) {
     if (!view.links.length) continue;
