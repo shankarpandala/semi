@@ -6,6 +6,28 @@ Open the live portal at **https://www.pandala.in/semi/**. A downloaded copy of
 `index.html` alone is incomplete: the files in `assets/` are also required to
 load market data. Use the deployed portal, or serve the complete repository.
 
+## Money flows
+
+`flows.html` is a Sankey chart of who pays whom across the chain. Bands run from
+the customer who pays to the supplier who is paid, in USD billions for calendar
+2025 (or the fiscal year that mostly overlaps it).
+
+- The overview groups companies by tier. Tiers 10, 8, 7 and 0–1 are split by role
+  because each contains a customer–supplier step of its own.
+- Select a tier to see its companies, a band to see the company-to-company flows
+  behind it, or search for a company to follow all of its money. Views are
+  deep-linkable (`#group=t6`, `#from=t9&to=t6`, `#co=TSMC`), and each company card
+  on the dashboard links to its flows.
+- Flows within one group, or running against the chain (for example Samsung's
+  phone business buying Snapdragon chips), are listed below the chart rather than
+  drawn.
+
+The figures in `assets/flows-data.js` are static research estimates, not live
+market data. Each flow records what is bought, the amount, a confidence level
+(`disclosed`, `derived` or `estimated`), the calculation behind it and its
+sources. Bands are gross payments, so the same dollar can appear in several
+tiers. Only flows between the 119 tracked companies are shown.
+
 ## Run locally
 
 Serve the repository with Python's standard library:
@@ -64,6 +86,12 @@ With the local server running, the integration checks use Playwright and Chromiu
 
 ```sh
 node tests/browser-smoke.cjs
+```
+
+The flows page has its own browser checks:
+
+```sh
+node tests/flows-smoke.cjs
 ```
 
 Set `SEMI_BASE_URL` to use a different server and `CHROMIUM_PATH` to override
