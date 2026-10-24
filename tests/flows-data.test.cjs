@@ -42,7 +42,8 @@ test('every flow is well formed and between two different tracked companies', ()
     assert.notEqual(flow.from, flow.to, id);
     assert.ok(!pairs.has(id), 'duplicate ' + id);
     pairs.add(id);
-    assert.ok(typeof flow.usd === 'number' && Number.isFinite(flow.usd) && flow.usd >= 0.05, 'amount ' + id);
+    // At least $10M: smaller disclosed or capped amounts are real, near-zero placeholders are not.
+    assert.ok(typeof flow.usd === 'number' && Number.isFinite(flow.usd) && flow.usd >= 0.01, 'amount ' + id);
     assert.ok(['disclosed', 'derived', 'estimated'].includes(flow.conf), 'confidence ' + id);
     assert.ok(typeof flow.what === 'string' && flow.what.length > 0 && flow.what.length <= 60, 'what ' + id);
     assert.ok(typeof flow.basis === 'string' && flow.basis.length >= 10, 'basis ' + id);
@@ -82,6 +83,7 @@ test('every company has a sourced 2025 account', () => {
     assert.ok(typeof account.basis === 'string' && account.basis.length >= 10, 'basis ' + name);
     assert.ok(Array.isArray(account.outside), 'outside ' + name);
     for (const item of account.outside) assert.ok(item.label && item.usd >= 0, 'outside item ' + name);
+    assert.ok(account.sources.length > 0, 'sources ' + name);
     for (const source of account.sources) {
       assert.ok(source.title, 'source title ' + name);
       if (source.url !== undefined) assert.match(source.url, /^https:\/\/[^\s"<>]+$/, 'source url ' + name);
@@ -95,6 +97,54 @@ test('no company receives more from tracked customers than its reported revenue'
   for (const [name, total] of inflow) {
     const account = data.accounts[name];
     assert.ok(account && total <= account.revenue * 1.001, `${name}: inflows ${total.toFixed(2)} > revenue ${account && account.revenue}`);
+  }
+});
+
+test('accounts without a cost split say so, and estimated splits are not badged disclosed', () => {
+  for (const [name, account] of Object.entries(data.accounts)) {
+    if (!account.buyer && !(account.people > 0)) assert.match(account.otherLabel || '', /breakdown pending/, 'pending label ' + name);
+    if (/\bestimat/i.test(account.scope)) assert.notEqual(account.conf, 'disclosed', 'confidence ' + name);
+  }
+});
+
+test('the revenue in each basis is the revenue drawn', () => {
+  for (const [name, account] of Object.entries(data.accounts)) {
+    // A segment-scoped account states the company total first, then its segment.
+    const match = account.basis.match(account.total ? /of which \$([\d.]+)([BM])/ : /: revenue \$([\d.]+)([BM])/);
+    if (!match) continue;
+    const stated = match[2] === 'M' ? match[1] / 1000 : Number(match[1]);
+    if (/shown at the \$[\d.]+[BM] paid by tracked customers/.test(account.basis)) continue;
+    assert.ok(Math.abs(stated - account.revenue) <= Math.max(0.06, 0.015 * account.revenue), `${name}: ${match[0]} vs ${account.revenue}`);
+  }
+});
+
+test('outside customer categories roughly add up to the revenue not paid by tracked companies', () => {
+  const {createModel} = require('../assets/flow-views.js');
+  const model = createModel(data);
+  for (const [name, account] of Object.entries(data.accounts)) {
+    const listed = account.outside.reduce((total, item) => total + item.usd, 0);
+    const outside = model.account(name).outsideTotal;
+    // Within a factor of 2.5 either way: a list researched for another scope would be far off.
+    if (listed > 0.01 && outside > 0.01) assert.ok(outside / listed <= 2.5 && outside / listed >= 0.4, `${name}: categories ${listed.toFixed(2)} vs ${outside.toFixed(2)}`);
+  }
+});
+
+test('Apple counts buy-sell receipts only while Foxconn\u2019s payment for them is tracked', () => {
+  const receipts = data.flows.find(flow => flow.from === 'Foxconn (Hon Hai)' && flow.to === 'Apple');
+  assert.equal(/buy-sell/.test(data.accounts.Apple.revenueLabel || ''), !!receipts);
+});
+
+test('text shown to readers carries no research-process notes', () => {
+  const internal = /merged[-\w]*\.json|fetch returned|seen in search results|\bthe dataset\b|\brelevant_revenue\b|revenue not found|filing not retrieved/i;
+  for (const [name, account] of Object.entries(data.accounts)) {
+    for (const text of [account.basis, account.scope, account.otherLabel || '', ...account.outside.map(item => item.label), ...account.sources.map(source => source.title)]) {
+      assert.doesNotMatch(text, internal, name);
+    }
+  }
+  for (const flow of data.flows) {
+    for (const text of [flow.basis, flow.what, ...flow.sources.map(source => source.title)]) {
+      assert.doesNotMatch(text, internal, flow.from + ' → ' + flow.to);
+    }
   }
 });
 

@@ -193,7 +193,8 @@ async function run(){
             const sx = m.a*x + m.c*y + m.e, sy = m.b*x + m.d*y + m.f;
             if(sy < sticky + 2 || sy > innerHeight - 2) continue;
             const top = document.elementFromPoint(sx, sy);
-            if(top?.closest('#chart .node')) continue;
+            // Nodes and outside-money stubs are drawn above the bands.
+            if(top?.closest('#chart .node') || top?.classList.contains('stub')) continue;
             result.checked++;
             if(top !== hits[i] && top !== pads[i]) result.wrong.push(hits[i].getAttribute('aria-label'));
             break;
@@ -212,6 +213,25 @@ async function run(){
         const sub = await page.locator('#viewSub').textContent();
         assert.ok(!/\$1M|\$0\b| 0 tracked/.test(sub), hash+': '+sub);
       }
+    });
+
+    await check('Tier and company summaries name outside customers, losses and pending splits as such', async () => {
+      await page.goto(baseURL+'/flows.html#group=t6', {waitUntil:'load'});
+      const foundries = model.focus(model.flows, model.groupById.get('t6').companies, {outer:'group'}).account;
+      assert.ok(foundries.outsideTotal > 0);
+      assert.match(await page.locator('#viewSub').textContent(), /from customers outside the 119/);
+      const pending = Object.keys(data.accounts).find(name => /breakdown pending/.test(data.accounts[name].otherLabel || '') && !data.accounts[name].buyer);
+      await page.goto(baseURL+'/flows.html#co='+encodeURIComponent(pending), {waitUntil:'load'});
+      const sub = await page.locator('#viewSub').textContent();
+      assert.match(sub, /still being researched/, pending+': '+sub);
+      assert.doesNotMatch(sub, /to other suppliers and production/, pending+': '+sub);
+      const loss = Object.keys(data.accounts).find(name => model.account(name).loss > 0.05 && !data.accounts[name].buyer);
+      await page.goto(baseURL+'/flows.html#co='+encodeURIComponent(loss), {waitUntil:'load'});
+      assert.match(await page.locator('#viewSub').textContent(), /operating loss/, loss);
+      // The legend lists only what the view draws.
+      const legend = await page.locator('#chartLegend li').allTextContents();
+      assert.ok(legend.some(text => /Operating loss/.test(text)), legend.join(' | '));
+      assert.ok(!legend.some(text => /Operating profit/.test(text)) || model.account(loss).profit > 0, legend.join(' | '));
     });
 
     await check('A company without tracked flows still shows its revenue, costs and profit', async () => {

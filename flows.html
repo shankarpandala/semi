@@ -302,14 +302,14 @@
     <h2 id="methodTitle">How to read this</h2>
     <dl>
       <dt>Direction</dt><dd>Each band runs from the customer who pays to the supplier who is paid. Bands are gross payments: a dollar Microsoft pays Foxconn for an AI rack reappears in Foxconn's payment to NVIDIA, and again in NVIDIA's payment to TSMC. Column totals therefore overlap and should not be added together.</dd>
-      <dt>Scope</dt><dd>Every company's bands add up to its 2025 revenue. Coloured bands are payments between the 119 companies on the dashboard: chips, memory, wafers, tools, subsystems, materials, gases, IP, packaging, test and assembly. Grey shows money from customers outside the 119 (consumers, enterprises, Meta, Dell, Chinese fabs and many others) and where the rest of each company's revenue goes: other suppliers and production costs, people and R&amp;D, and operating profit. Spending beyond revenue (an operating loss, or buying inventory and equipment ahead of sales) appears as money drawn from reserves.</dd>
-      <dt>Tier 10</dt><dd>Most of Amazon's, Alphabet's and Microsoft's revenue (retail, ads, software) and Apple's services revenue have little to do with chips. For these four, only the hardware part is counted: Apple's device sales, and the hyperscalers' purchases of servers, networking and chips. Their full revenue is given in the company view.</dd>
-      <dt>Market cap</dt><dd>Market value is fetched live when the page opens, as on the companies page, and shown in tooltips and tables. It is a valuation of future profits, not money that moves in a year, so it is never drawn as a band.</dd>
+      <dt>Scope</dt><dd>Every company's bands add up to its 2025 revenue. Coloured bands are payments between the 119 companies on the dashboard: chips, memory, wafers, tools, subsystems, materials, gases, IP, packaging, test and assembly. Grey shows money from customers outside the 119 (consumers, enterprises, Meta, Dell, Chinese fabs and many others) and where the rest of each company's revenue goes: other suppliers and production costs, people and R&amp;D, and operating profit. An operating loss appears as money drawn from reserves; when a profitable company’s tracked purchases exceed what the year’s costs absorbed (inventory, prepayments or equipment bought ahead of sales), the difference appears as purchases paid from cash. Where the split of a company’s remaining revenue between other suppliers, people and profit is still being researched, it is shown as one amount marked “breakdown pending”.</dd>
+      <dt>Partial scopes</dt><dd>Most of Amazon's, Alphabet's and Microsoft's revenue (retail, ads, software) and Apple's services revenue have little to do with chips. For these four, only the hardware part is counted: the hyperscalers' purchases of servers, networking and chips, and Apple's device sales ($307B) plus the $75B Foxconn pays Apple for components Apple buys and resells to it. Apple does not book those receipts as revenue, but its gross payment to Foxconn includes the parts, so both legs are shown. Companies with large non-chip businesses, such as Linde, BASF, Canon or Kyocera, count only their chip-related segment. The company view states each scope and the full revenue.</dd>
+      <dt>Market cap</dt><dd>Market value is fetched live when the page opens, as on the companies page, and shown in tooltips and tables. It is a valuation of future profits, not money that moves in a year, so it is never drawn as a band. It values the whole company, while the revenue shown is often only the chip-related part, so the two should not be read as a price-to-sales ratio.</dd>
       <dt>Period</dt><dd id="methodPeriod"></dd>
       <dt>Confidence</dt><dd><span class="conf-cell"><i class="conf-key disclosed"></i>Disclosed</span> — the payer or supplier reports the amount or share for this counterparty (named, or identified with near certainty). <span class="conf-cell"><i class="conf-key derived"></i>Derived</span> — calculated from reported figures plus a stated assumption. <span class="conf-cell"><i class="conf-key estimated"></i>Estimated</span> — analyst estimates or modelling from market shares; treat as an order of magnitude.</dd>
       <dt>Layout</dt><dd>Tiers follow the dashboard. Tiers 10, 8, 7 and 0–1 are split by role (brands vs. ODMs, OSATs vs. test equipment, substrates vs. ABF film, wafers vs. polysilicon) because each contains a customer–supplier step of its own. Flows within a group, between groups drawn in the same column, or running against the chain (such as Samsung's phone business buying Snapdragon chips) are listed below the chart instead of being drawn.</dd>
     </dl>
-    <p>Every flow and every company account lists its basis and sources. These are static research figures; only market caps are live. Corrections are welcome.</p>
+    <p>Every flow and every company account states its basis, with sources where a filing or report backs the figure; some estimates rest on modelling alone. These are static research figures; only market caps are live. Corrections are welcome.</p>
   </section>
 </main>
 
@@ -335,20 +335,30 @@
   const OTHER_HEX = '#565E6C';
   // Neutral greys for money that is not a payment between two tracked companies.
   const OUTSIDE_HEX = {
-    customers:'#77808E', reserves:'#8A7A73', internal:'#454C58', hidden:'#454C58', notDrawn:'#454C58',
-    other:'#4E5562', people:'#959DAA', profit:'#D3D7DE',
+    customers:'#77808E', reserves:'#8A7A73', ahead:'#A08C70', internal:'#454C58', hidden:'#454C58', notDrawn:'#454C58',
+    other:'#4E5562', pending:'#6B6683', people:'#959DAA', profit:'#D3D7DE',
   };
   const OUTSIDE_NOTE = {
     customers:'Revenue from customers that are not among the 119 companies.',
-    reserves:'Spending beyond revenue — an operating loss, or purchases ahead of sales such as inventory or equipment — paid from cash reserves or borrowing.',
+    reserves:'An operating loss: costs above revenue, paid from cash reserves or borrowing.',
+    ahead:'Tracked purchases above what the year’s costs absorbed (inventory, prepayments or equipment bought ahead of sales), paid from cash on hand.',
     internal:'Payments between companies inside this group.',
     hidden:'Tracked flows hidden by the confidence filter.',
     notDrawn:'Tracked flows that stay inside a tier group, run between groups in one column, or run against the chain. They are listed below the chart.',
     other:'Cost of revenue not paid to a tracked company: other suppliers, factory staff, depreciation, energy.',
+    pending:'Revenue not paid to tracked suppliers, shown as one amount while its split between other suppliers, people and (where not shown separately) operating profit is still being researched.',
     people:'Research and development, sales, general and administrative costs.',
     profit:'Operating profit: revenue minus all operating costs.',
   };
-  const LEGEND = [['customers', 'From customers outside the 119'], ['other', 'Other suppliers & production'], ['people', 'People, R&D & overhead'], ['profit', 'Operating profit']];
+  // Legend rows in drawing order; only the kinds of money the current view draws are listed.
+  const LEGEND = [
+    ['customers', 'From customers outside the 119'], ['reserves', 'Operating loss, from reserves'], ['ahead', 'Purchases ahead of sales, from cash'],
+    ['notDrawn', 'Tracked flows not drawn as bands'], ['other', 'Other suppliers & production'], ['pending', 'Not yet broken down (breakdown pending)'],
+    ['people', 'People, R&D & overhead'], ['profit', 'Operating profit'],
+  ];
+  const legendRole = role => role === 'internal' || role === 'hidden' ? 'notDrawn' : role;
+  // Diversified companies count only their chip-related segment; Tier 10 counts hardware only.
+  const partialScope = source => !!source && !source.buyer && !/^(Total revenue|Whole company)/.test(source.scope || '');
   const CONF_LABEL = {disclosed:'Disclosed', derived:'Derived', estimated:'Estimated'};
   const TABLE_PAGE = 30;
 
@@ -394,12 +404,13 @@
   const swatch = hex => { const s = el('i', {class:'sw'}); s.style.background = hex; return s; };
 
   // ---------- accounts ----------
-  const ACCOUNT_KEYS = ['revenue', 'trackedIn', 'outsideTotal', 'reserves', 'trackedOut', 'other', 'people', 'profit', 'inTotal', 'outTotal'];
+  const ACCOUNT_KEYS = ['revenue', 'trackedIn', 'outsideTotal', 'loss', 'ahead', 'reserves', 'trackedOut', 'other', 'people', 'profit', 'inTotal', 'outTotal'];
   function sumAccounts(names){
-    const total = Object.fromEntries(ACCOUNT_KEYS.map(key => [key, 0]));
+    const total = Object.fromEntries([...ACCOUNT_KEYS, 'pendingOther'].map(key => [key, 0]));
     for(const name of names){
       const item = model.account(name);
       for(const key of ACCOUNT_KEYS) total[key] += item[key];
+      if(item.pending) total.pendingOther += item.other;
     }
     return total;
   }
@@ -502,21 +513,32 @@
   const listJoin = items => items.length < 2 ? items.join('') : items.slice(0, -1).join(', ') + ' and ' + items[items.length - 1];
 
   // One sentence each for money in and money out, from an account or a sum of accounts.
-  function accountSentences(a, {subject = 'It', buyer = false} = {}){
+  // scope says what the revenue covers when it is not the whole company; group sums speak of members.
+  function accountSentences(a, {subject = 'It', buyer = false, scope = '', group = false} = {}){
     if(buyer){
       return `${subject} spent ${fmtUSD(a.inTotal)} on hardware: ${fmtUSD(a.trackedOut)} with tracked companies and ${fmtUSD(a.other)} with other hardware suppliers.`;
     }
+    const pendingOther = a.pendingOther !== undefined ? a.pendingOther : a.pending ? a.other : 0;
     const sources = [];
     if(a.trackedIn > 0) sources.push(`${fmtUSD(a.trackedIn)} (${pct(a.trackedIn, a.revenue)}%) from tracked companies`);
     if(a.outsideTotal > 0) sources.push(`${fmtUSD(a.outsideTotal)} from customers outside the 119`);
     const uses = [];
     if(a.trackedOut > 0) uses.push(`${fmtUSD(a.trackedOut)} to tracked suppliers`);
-    if(a.other > 0) uses.push(`${fmtUSD(a.other)} to other suppliers and production`);
+    if(a.other - pendingOther > 0.0005) uses.push(`${fmtUSD(a.other - pendingOther)} to other suppliers and production`);
     if(a.people > 0) uses.push(`${fmtUSD(a.people)} to people, R&D and overhead`);
-    let text = `${subject} took in ${fmtUSD(a.revenue)} in 2025${sources.length ? ': ' + listJoin(sources) : ''}.`;
-    if(uses.length) text += ` It paid ${listJoin(uses)}`;
-    text += a.profit > 0 ? `${uses.length ? ', and' : ' It'} kept ${fmtUSD(a.profit)} as operating profit.` : uses.length ? '.' : '';
-    if(a.reserves > 0) text += ` It spent ${fmtUSD(a.reserves)} more than it took in (an operating loss or purchases ahead of sales), funded from reserves.`;
+    const they = group ? 'Members' : 'It';
+    let text = `${subject} took in ${fmtUSD(a.revenue)}${scope ? ' ' + scope : ''} in 2025${sources.length ? ': ' + listJoin(sources) : ''}.`;
+    if(uses.length) text += ` ${they} paid ${listJoin(uses)}`;
+    text += a.profit > 0 ? `${uses.length ? ', and' : ' ' + they} kept ${fmtUSD(a.profit)} as operating profit.` : uses.length ? '.' : '';
+    if(pendingOther > 0.0005) text += group
+      ? ` For members whose figures are still being researched, ${fmtUSD(pendingOther)} of other costs and profit is not yet split.`
+      : uses.length || a.profit > 0
+        ? ` The remaining ${fmtUSD(pendingOther)} covers its other costs${/profit/i.test(a.otherLabel || '') ? ' and profit' : ''}; the split is still being researched.`
+        : ` How it splits between suppliers, people and profit is still being researched.`;
+    if(a.loss > 0.0005) text += group
+      ? ` Loss-making members spent ${fmtUSD(a.loss)} more than they took in, funded from reserves.`
+      : ` It made an operating loss of ${fmtUSD(a.loss)}, funded from reserves.`;
+    if(a.ahead > 0.0005) text += ` ${group ? 'Some members’' : 'Its'} tracked purchases ran ${fmtUSD(a.ahead)} above what the year’s costs absorbed (inventory, prepayments or equipment bought ahead of sales), paid from cash on hand.`;
     return text;
   }
 
@@ -537,9 +559,14 @@
     if(view.kind === 'overview'){
       crumb('All tiers');
       title.append('Who pays whom in the chip supply chain');
-      const tracked = sum(model.flows);
-      sub.append(`The 119 companies took in ${fmtUSD(allAccounts.revenue)} in 2025 (for Tier 10, the hardware part only). `
-        + `Coloured bands are the ${fmtUSD(tracked)} one tracked company paid another. Grey stubs show money arriving from customers outside the 119, and money leaving as other suppliers, people and profit. `
+      const drawn = graph.links.reduce((total, link) => total + link.value, 0);
+      const notDrawn = sum(graph.flows) - drawn;
+      const hidden = sum(model.flows) - sum(graph.flows);
+      sub.append(`The 119 companies took in ${fmtUSD(allAccounts.revenue)} in 2025. Tier 10 counts hardware only, and companies with large non-chip businesses count only their chip-related segment. `
+        + `Coloured bands show ${fmtUSD(drawn)} of payments between tracked companies`
+        + (notDrawn > 0.0005 ? `; another ${fmtUSD(notDrawn)} is listed below the chart` : '')
+        + (hidden > 0.0005 ? `; ${fmtUSD(hidden)} is hidden by the confidence filter` : '')
+        + '. Grey stubs show money arriving from customers outside the 119, and money leaving as other suppliers, people and profit. '
         + 'Select a tier or a band to see the companies behind it.');
     } else if(view.kind === 'pair'){
       const from = model.groupById.get(view.from), to = model.groupById.get(view.to);
@@ -556,8 +583,10 @@
       crumb('All tiers', {kind:'overview'});
       crumb(groupLabel(group));
       title.append(swatch(group.hex), groupLabel(group));
-      let text = accountSentences(graph.account, {subject:'The group'});
-      if(graph.totals.internal > 0) text += ` ${fmtUSD(graph.totals.internal)} of that changes hands within the group.`;
+      const scope = group.id === 't10-brands' ? '(hardware only)'
+        : group.companies.some(name => partialScope(accounts[name])) ? 'from chip-related business' : '';
+      let text = accountSentences(graph.account, {subject:'The group', group:true, scope});
+      if(graph.totals.internal > 0) text += ` ${fmtUSD(graph.totals.internal)} of the tracked payments run between members.`;
       sub.append(text + ' Select a company to follow its money.');
       hintLeft.textContent = 'Paid by';
       hintRight.textContent = 'Pays';
@@ -569,7 +598,8 @@
       const a = model.account(view.name);
       const source = accounts[view.name];
       if(!a.inTotal && !a.outTotal) sub.append(emptyMessage(view) + ' ');
-      else sub.append(accountSentences(a, {buyer:!!(source && source.buyer)}) + ' ');
+      else sub.append(accountSentences(a, {buyer:!!(source && source.buyer),
+        scope:source && source.revenueLabel ? `(${source.revenueLabel})` : partialScope(source) ? 'from its chip-related business' : ''}) + ' ');
       sub.append(el('a', {href:'./#co='+encodeURIComponent(view.name), text:'Open company card ↗'}));
       hintLeft.textContent = 'Paid by';
       hintRight.textContent = 'Pays';
@@ -600,12 +630,18 @@
     }
   }
 
-  function renderLegend({view}){
+  function renderLegend({view, graph}){
     const legend = $('chartLegend');
     legend.replaceChildren();
     if(view.kind === 'pair') return;
     legend.append(el('li', {}, el('i', {style:'background:linear-gradient(90deg,var(--r9),var(--r5),var(--r0))'}), 'Payments between tracked companies (colour = payer’s tier)'));
+    const drawn = new Set();
+    for(const node of graph.nodes){
+      if(node.kind === 'outside') drawn.add(legendRole(node.role));
+      for(const item of [...(node.stubIn || []), ...(node.stubOut || [])]) drawn.add(legendRole(item.key));
+    }
     for(const [role, label] of LEGEND){
+      if(!drawn.has(role)) continue;
       const key = el('i'); key.style.background = OUTSIDE_HEX[role];
       legend.append(el('li', {}, key, label));
     }
@@ -646,18 +682,20 @@
     chart.setAttribute('viewBox', `0 0 ${width} ${height}`);
     chart.setAttribute('width', width);
     chart.setAttribute('height', height);
-    chart.setAttribute('aria-label', $('viewTitle').textContent + '. ' + graph.links.length + ' bands. The tables below list every amount.');
+    const titleText = [...$('viewTitle').childNodes].filter(n => n.nodeType === Node.TEXT_NODE).map(n => n.textContent).join('').trim();
+    chart.setAttribute('aria-label', titleText + '. ' + graph.links.length + ' bands. The tables below list every amount.');
     const defs = svgEl('defs');
     const root = svgEl('g', {transform:`translate(${marginLeft},${top})`});
     const linkLayer = svgEl('g');
     const stubLayer = svgEl('g');
     // A band's own fill always wins the pointer; the padded outlines underneath
-    // only widen the target where no other band is drawn.
+    // only widen the target where no other band is drawn. Stubs sit above both
+    // so a padded outline never covers them.
     const padLayer = svgEl('g', {'aria-hidden':'true'});
     const hitLayer = svgEl('g');
     const nodeLayer = svgEl('g');
     const labelLayer = svgEl('g', {'aria-hidden':'true'});
-    root.append(linkLayer, stubLayer, padLayer, hitLayer, nodeLayer, labelLayer);
+    root.append(linkLayer, padLayer, hitLayer, stubLayer, nodeLayer, labelLayer);
     chart.append(defs, root);
 
     const linkEls = new Map();
@@ -774,9 +812,14 @@
     : `${nodeTitle(link.source)} pays ${nodeTitle(link.target)} ${fmtUSD(link.value)} a year`;
   const nodeSummary = node => {
     const parts = [nodeTitle(node)];
-    if(node.kind === 'group') parts.push('revenue '+fmtUSD(node.revenue));
-    if(node.valueIn) parts.push('receives '+fmtUSD(node.valueIn)+' from tracked companies');
-    if(node.valueOut) parts.push('pays '+fmtUSD(node.valueOut)+' to tracked companies');
+    if(node.kind === 'group'){
+      parts.push('revenue '+fmtUSD(node.revenue));
+      if(node.valueIn) parts.push(fmtUSD(node.valueIn)+' in drawn bands from other tiers');
+      if(node.valueOut) parts.push(fmtUSD(node.valueOut)+' in drawn bands to other tiers');
+    } else {
+      if(node.valueIn) parts.push('money in '+fmtUSD(node.valueIn));
+      if(node.valueOut) parts.push('money out '+fmtUSD(node.valueOut));
+    }
     return parts.join(', ');
   };
 
@@ -846,7 +889,9 @@
       return [{cls:'lbl-tier', text:node.group.tierLabel.toUpperCase()}, {cls:'lbl-name', text:node.group.role}, {cls:'lbl-value', text:value}];
     }
     const name = node.kind === 'other' || node.kind === 'outside' ? node.label : shortName(node.name);
-    return [{cls:'lbl-name', text:name}, {cls:'lbl-value', text:fmtUSD(node.value, true)}];
+    // Shorter forms before an ellipsis: "Costs and profit, pending", then the label without its examples.
+    const alts = node.kind === 'outside' ? [name.replace(/ \(breakdown pending\)$/, ', pending'), name.replace(/ \(.*$/, '')].filter(alt => alt !== name) : [];
+    return [{cls:'lbl-name', text:name, alts}, {cls:'lbl-value', text:fmtUSD(node.value, true)}];
   }
 
   // ---------- tooltip ----------
@@ -942,15 +987,16 @@
     } else if(node.kind === 'outside'){
       content.push(el('div', {class:'tt-value', text:fmtUSD(node.value)+' / yr'}), el('div', {class:'tt-hint', text:OUTSIDE_NOTE[node.role]}));
     } else {
-      if(node.valueIn) content.push(el('div', {class:'tt-row'}, 'Receives', el('span', {class:'amt', text:fmtUSD(node.valueIn)})));
-      if(node.valueOut) content.push(el('div', {class:'tt-row'}, 'Pays', el('span', {class:'amt', text:fmtUSD(node.valueOut)})));
+      if(node.valueIn) content.push(el('div', {class:'tt-row'}, 'Money in', el('span', {class:'amt', text:fmtUSD(node.valueIn)})));
+      if(node.valueOut) content.push(el('div', {class:'tt-row'}, 'Money out', el('span', {class:'amt', text:fmtUSD(node.valueOut)})));
     }
     if(node.kind === 'other'){
       const names = node.names.slice(0, 8).map(shortName).join(', ') + (node.names.length > 8 ? '…' : '');
       content.push(el('div', {class:'tt-hint', text:names}));
     } else if(node.kind === 'company'){
       const a = model.account(node.name);
-      if(a.revenue > 0) content.push(el('div', {class:'tt-hint', text:`Revenue ${fmtUSD(a.revenue)}` + (a.trackedIn > 0 ? ` · ${pct(a.trackedIn, a.revenue)}% from tracked companies` : '')}));
+      const label = (accounts[node.name] && accounts[node.name].revenueLabel) || 'revenue';
+      if(a.revenue > 0) content.push(el('div', {class:'tt-hint', text:`${capitalize(label)} ${fmtUSD(a.revenue)}` + (a.trackedIn > 0 ? ` · ${pct(a.trackedIn, a.revenue)}% from tracked companies` : '')}));
       content.push(capLine([node.name]));
       content.push(el('div', {class:'tt-hint', text:groupLabel(node.group)}));
     } else if(node.kind === 'groupSide'){
@@ -993,7 +1039,7 @@
 
   // ---------- accounts table ----------
   const ACCOUNT_COLUMNS = [
-    ['revenue', 'Revenue'], ['trackedIn', 'From tracked'], ['outsideTotal', 'From outside'],
+    ['revenue', 'Revenue'], ['trackedIn', 'From tracked'], ['outsideTotal', 'From outside'], ['reserves', 'From reserves'],
     ['trackedOut', 'To tracked'], ['other', 'Other suppliers & production'], ['people', 'People, R&D & overhead'], ['profit', 'Operating profit'],
   ];
   function renderAccounts({view, graph, group}){
@@ -1007,6 +1053,13 @@
     if(view.kind === 'pair'){ card.hidden = true; return; }
     card.hidden = false;
     const num = value => el('td', {class:'num', text:value > 0 ? fmtUSD(value) : '—'});
+    const pendingOf = a => a.pendingOther !== undefined ? a.pendingOther : a.pending ? a.other : 0;
+    // Other costs that still hold an unsplit share are marked with a dagger.
+    const cell = (a, key) => {
+      const td = num(a[key]);
+      if(key === 'other' && pendingOf(a) > 0.0005) td.textContent += ' †';
+      return td;
+    };
     if(view.kind === 'company'){
       const a = model.account(view.name);
       const source = accounts[view.name];
@@ -1019,10 +1072,11 @@
       };
       row('From tracked companies', a.trackedIn, model.groupOf.get(view.name).hex);
       for(const item of a.outside) row(item.label, item.usd, 'customers');
-      if(a.reserves > 0) row(OUTSIDE.reserves, a.reserves, 'reserves');
+      if(a.loss > 0) row(OUTSIDE.reserves, a.loss, 'reserves');
+      if(a.ahead > 0) row(OUTSIDE.ahead, a.ahead, 'ahead');
       row('Money in', a.inTotal, null, 'total');
       row('To tracked companies', a.trackedOut, model.groupOf.get(view.name).hex);
-      row(a.otherLabel, a.other, 'other');
+      row(a.otherLabel, a.other, a.pending ? 'pending' : 'other');
       row(OUTSIDE.people, a.people, 'people');
       row(OUTSIDE.profit, a.profit, 'profit');
       row('Money out', a.outTotal, null, 'total');
@@ -1039,7 +1093,7 @@
       return;
     }
     head.append(el('tr', {}, el('th', {text:view.kind === 'overview' ? 'Tier group' : 'Company'}),
-      ...ACCOUNT_COLUMNS.map(([, label]) => el('th', {class:'num', text:label})), el('th', {class:'num', text:'Market cap (live)'})));
+      ...ACCOUNT_COLUMNS.map(([, label]) => el('th', {class:'num', text:label})), el('th', {class:'num', text:'Market cap (whole company, live)'})));
     const rows = view.kind === 'overview'
       ? model.groups.map(g => ({label:groupLabel(g), hex:g.hex, a:sumAccounts(g.companies), cap:groupCapSpan(g), action:{kind:'group', id:g.id}}))
       : group.companies.map(name => ({label:name, hex:group.hex, a:model.account(name), cap:capSpan(name), action:{kind:'company', name}}))
@@ -1047,13 +1101,15 @@
     for(const r of rows){
       body.append(el('tr', {},
         el('td', {}, el('button', {type:'button', class:'co-btn', onclick:() => navigate(r.action, {scroll:true})}, swatch(r.hex), r.label)),
-        ...ACCOUNT_COLUMNS.map(([key]) => num(r.a[key])), el('td', {class:'num'}, r.cap)));
+        ...ACCOUNT_COLUMNS.map(([key]) => cell(r.a, key)), el('td', {class:'num'}, r.cap)));
     }
     const total = view.kind === 'overview' ? allAccounts : graph.account;
-    body.append(el('tr', {class:'total'}, el('td', {text:'Total'}), ...ACCOUNT_COLUMNS.map(([key]) => num(total[key])), el('td', {class:'num'})));
-    $('accountsNote').textContent = view.kind === 'overview'
-      ? 'Tier 10 counts hardware only. Group totals include payments between companies in the same group.'
-      : 'Sorted by revenue. Select a company for its sources.';
+    body.append(el('tr', {class:'total'}, el('td', {text:'Total'}), ...ACCOUNT_COLUMNS.map(([key]) => cell(total, key)), el('td', {class:'num'})));
+    const pendingNote = rows.some(r => pendingOf(r.a) > 0.0005) || pendingOf(total) > 0.0005
+      ? ' † Includes costs and profit not yet split into suppliers, people and profit.' : '';
+    $('accountsNote').textContent = (view.kind === 'overview'
+      ? 'Tier 10 counts hardware only, and companies with large non-chip businesses count only their chip-related segment. Group totals include payments between companies in the same group. Market cap values the whole company.'
+      : 'Sorted by revenue. Select a company for its sources. Market cap values the whole company.') + pendingNote;
   }
 
   // ---------- table ----------

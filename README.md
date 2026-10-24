@@ -25,11 +25,16 @@ the customer who pays to the supplier who is paid, in USD billions for calendar
 Every company's bands add up to its 2025 revenue. Coloured bands are payments
 between the 119 companies; grey shows money from customers outside the 119 and
 where the rest of each company's revenue goes (other suppliers and production,
-people and R&D, operating profit). Spending beyond revenue, such as an
-operating loss or an inventory build, is shown as money drawn from reserves.
-For Apple, Microsoft, Amazon and Alphabet only the hardware part counts:
-Apple's device sales and the others' purchases of servers, networking and
-chips.
+people and R&D, operating profit). An operating loss is shown as money drawn
+from reserves; tracked purchases above what a profitable company's costs
+absorbed that year (inventory, prepayments, equipment) are shown as purchases
+from cash. For Apple, Microsoft, Amazon and Alphabet only the hardware part
+counts: the others' purchases of servers, networking and chips, and Apple's
+device sales plus the $75B Foxconn pays Apple for the components Apple buys and
+resells to it (Apple's gross payment to Foxconn includes those parts).
+Companies with large non-chip businesses count only their chip-related segment.
+Where a company publishes no cost breakdown, the rest of its revenue is shown as
+one amount marked "breakdown pending".
 
 The figures in `assets/flows-data.js` are static research estimates. Each flow
 records what is bought, the amount, a confidence level (`disclosed`, `derived`
@@ -37,7 +42,8 @@ or `estimated`), the calculation behind it and its sources; each company
 account records its revenue scope, costs, profit, outside customers and
 sources. Bands are gross payments, so the same dollar can appear in several
 tiers. Market caps on the flows page are fetched live from TradingView by the
-visitor's browser, as on the dashboard, and are never drawn as bands.
+visitor's browser, as on the dashboard, and are never drawn as bands. They value
+the whole company, while the revenue shown may be only its chip-related part.
 
 ## Run locally
 
