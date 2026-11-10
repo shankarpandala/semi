@@ -203,6 +203,23 @@ async function run(){
       assert.equal(await page.locator('#segToggle').textContent(), 'Expand all groups');
       assert.equal(await page.locator('.strip:visible').count(), 0);
       assert.equal(await page.locator('.seg-head[aria-expanded="true"]').count(), 0);
+      // With every group collapsed, each tier shows its groups as heat-map tiles instead.
+      const groups = roster.tiers.reduce((n, tier) => n + new Set(tier.companies.map(company => company.seg)).size, 0);
+      assert.equal(await page.locator('.heat-tile:visible').count(), groups);
+      assert.equal(await page.locator('.seg:visible').count(), 0);
+      const tile = page.locator('#tier-8 .heat-tile', {hasText:'Processors, GPUs & AI accelerators'});
+      assert.match(await tile.locator('.heat-cap').textContent(), /^\$150\.0B$/);
+      // A search shows the matching cards, not the heat map.
+      await page.locator('#search').fill('nvidia');
+      assert.equal(await page.locator('.heat-tile:visible').count(), 0);
+      await page.locator('#search').fill('');
+      assert.equal(await page.locator('.heat-tile:visible').count(), groups);
+      // Opening a tile shows that group's companies and leaves the heat map.
+      await tile.click();
+      assert.equal(await compute.locator('.strip').isVisible(), true);
+      assert.equal(await page.locator('.heat-tile:visible').count(), 0);
+      await compute.locator('.seg-head').click();
+      assert.equal(await page.locator('#segToggle').textContent(), 'Expand all groups');
       await page.locator('#segToggle').click();
       assert.equal(await page.locator('#segToggle').textContent(), 'Collapse all groups');
       assert.equal(await page.locator('.strip:visible').count(), await page.locator('.seg').count());
