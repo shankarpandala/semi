@@ -75,17 +75,21 @@ the customer who pays to the supplier who is paid, in USD billions for calendar
   phone business buying Snapdragon chips), are listed below the chart rather than
   drawn.
 
-The flows page covers the 119 companies whose figures have been researched, not
-the whole roster; only those companies' cards link to it. Every company's bands
-add up to its 2025 revenue. Coloured bands are payments between the 119
-companies; grey shows money from customers without a tracked flow (mostly
-companies outside the 119) and
+The flows page covers the companies whose figures have been researched, not
+the whole roster; only those companies' cards link to it. The set started with
+119 companies and was extended in November 2026 to the largest additions to the
+roster: hyperscalers and device brands, the big analog, power and memory chipmakers,
+leading fabless designers, back-end and inspection equipment, materials, substrates
+and probe-card makers. Every company's bands add up to its 2025 revenue. Coloured
+bands are payments between tracked companies; grey shows money from customers
+without a tracked flow (mostly companies whose figures have not been researched) and
 where the rest of each company's revenue goes (other suppliers and production,
 people and R&D, operating profit). An operating loss is shown as money drawn
 from reserves; tracked purchases above what a profitable company's costs
 absorbed that year (inventory, prepayments, equipment) are shown as purchases
-from cash. For Apple, Microsoft, Amazon and Alphabet only the hardware part
-counts: the others' purchases of servers, networking and chips, and Apple's
+from cash. For the hyperscalers (Amazon, Alphabet, Microsoft, Meta, Oracle),
+Tesla and Apple only the hardware part counts: the others' purchases of servers,
+networking and chips (Tesla's AI training hardware), and Apple's
 device sales plus the $75B Foxconn pays Apple for the components Apple buys and
 resells to it (Apple's gross payment to Foxconn includes those parts).
 Most companies with large non-chip businesses count only their chip-related
