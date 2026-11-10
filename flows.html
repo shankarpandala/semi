@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<script src="assets/theme.js"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Money Flows — The Silicon Spectrum</title>
@@ -16,14 +17,54 @@
     --text-dim: #8891A0;
     --text-faint: #565E6C;
     --accent: #5ce0d8;
+    --line-strong: #525a6a;
+    --line-hover: #3a4150;
+    --pressed: #1d222b;
+    --selection: #3a3f4c;
+    --bar-bg: rgba(10,12,16,0.92);
+    --backdrop: rgba(6,7,10,.55);
+    --pop-bg: #1b2029;
+    --pop-line: #333a46;
+    --pop-shadow: rgba(0,0,0,.45);
     --r0:#8B7FD8; --r1:#6AA6D8; --r2:#4FB8AE; --r3:#4FBF7A; --r4:#A8C24E;
     --r5:#E8B84B; --r6:#E89B4B; --r7:#E27B54; --r8:#DD5B5B; --r9:#C9538B;
     --gutter: max(32px, calc((100% - 1400px) / 2));
   }
+  /* Day mode: the same tokens, light. Tier colours are darkened enough to read as text on white. */
+  :root[data-theme="light"]{
+    --bg: #F6F7F9;
+    --panel: #FFFFFF;
+    --panel-2: #EEF0F4;
+    --line: #D9DDE4;
+    --text: #161A21;
+    --text-dim: #4D5563;
+    --text-faint: #7A8290;
+    --accent: #0E8C85;
+    --line-strong: #B9C0CB;
+    --line-hover: #A9B1BD;
+    --pressed: #E1E5EC;
+    --selection: #CDE7E5;
+    --bar-bg: rgba(246,247,249,0.92);
+    --backdrop: rgba(20,24,32,.35);
+    --pop-bg: #FFFFFF;
+    --pop-line: #CBD1DA;
+    --pop-shadow: rgba(20,24,32,.18);
+    --r0:#6A5CC4; --r1:#3B7EBE; --r2:#23887E; --r3:#23894D; --r4:#6E8A1C;
+    --r5:#A9780C; --r6:#B8661A; --r7:#B5512C; --r8:#C03838; --r9:#A8306A;
+  }
+  .theme-toggle{
+    font-family:'IBM Plex Mono',monospace; font-size:11px; padding:5px 9px; border-radius:6px;
+    color:var(--text-dim); background:transparent; border:1px solid var(--line); cursor:pointer;
+    display:inline-flex; align-items:center; gap:5px; white-space:nowrap;
+  }
+  .theme-toggle:hover{color:var(--text); border-color:var(--line-hover);}
+  .theme-toggle:focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
+  .theme-icon{font-size:12px; line-height:1;}
+
   *{box-sizing:border-box;}
   [hidden]{display:none !important;}
   html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;}
-  ::selection{background:#3a3f4c;}
+  ::selection{background:var(--selection);}
   a{color:var(--accent);}
   button{font:inherit;}
 
@@ -54,7 +95,7 @@
 
   /* ---------- CONTROLS ---------- */
   .controls{
-    position:sticky; top:0; z-index:40; background:rgba(10,12,16,0.92); backdrop-filter:blur(10px);
+    position:sticky; top:0; z-index:40; background:var(--bar-bg); backdrop-filter:blur(10px);
     border-bottom:1px solid var(--line); padding:12px var(--gutter);
     display:flex; gap:12px 16px; align-items:center; flex-wrap:wrap;
   }
@@ -64,7 +105,7 @@
     width:100%; background:var(--panel-2); border:1px solid var(--line); border-radius:8px;
     padding:9px 12px 9px 34px; color:var(--text); font-family:'Inter',sans-serif; font-size:13.5px; outline:none;
   }
-  #search:focus{border-color:#4a5060;}
+  #search:focus{border-color:var(--line-hover);}
   #search::placeholder{color:var(--text-faint);}
   .control-label{font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--text-faint); letter-spacing:.05em; text-transform:uppercase;}
   .conf-filter{display:flex; gap:6px; align-items:center; flex-wrap:wrap;}
@@ -73,8 +114,8 @@
     border:1px solid var(--line); background:var(--panel-2); color:var(--text-dim); cursor:pointer;
     display:inline-flex; align-items:center; gap:6px; white-space:nowrap;
   }
-  .chip:hover{color:var(--text); border-color:#3a4150;}
-  .chip[aria-pressed="true"]{color:var(--text); border-color:#4a5060; background:#1d222b;}
+  .chip:hover{color:var(--text); border-color:var(--line-hover);}
+  .chip[aria-pressed="true"]{color:var(--text); border-color:var(--line-hover); background:var(--pressed);}
   .chip[aria-pressed="false"] .conf-key{opacity:.35;}
   .chip:focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
   .search-msg{font-size:12px; color:var(--text-dim); min-height:1em;}
@@ -148,12 +189,12 @@
   .account-basis:empty{display:none;}
   .account-basis ul{margin:4px 0 0; padding-left:16px;}
   #accountsTable td.label{color:var(--text);}
-  #accountsTable tr.total td{border-top:1px solid #3a4150; color:var(--text); font-weight:500;}
+  #accountsTable tr.total td{border-top:1px solid var(--line-hover); color:var(--text); font-weight:500;}
   #accountsTable td .sw{width:8px; height:8px; border-radius:2px; display:inline-block; margin-right:7px;}
   .tooltip{
     position:fixed; z-index:60; pointer-events:none; max-width:320px;
-    background:#1b2029; border:1px solid #333a46; border-radius:8px; padding:10px 12px;
-    font-size:12px; line-height:1.45; color:var(--text-dim); box-shadow:0 8px 24px rgba(0,0,0,.45);
+    background:var(--pop-bg); border:1px solid var(--pop-line); border-radius:8px; padding:10px 12px;
+    font-size:12px; line-height:1.45; color:var(--text-dim); box-shadow:0 8px 24px var(--pop-shadow);
   }
   .tooltip .tt-value{font-family:'IBM Plex Mono',monospace; font-size:15px; font-weight:600; color:var(--text);}
   .tooltip .tt-title{color:var(--text); font-weight:500; margin-bottom:4px;}
@@ -170,7 +211,7 @@
     display:flex; gap:10px; align-items:baseline; width:100%; text-align:left; background:var(--panel-2);
     border:1px solid var(--line); border-radius:8px; padding:9px 12px; color:var(--text-dim); cursor:pointer; font-size:12.5px; line-height:1.45;
   }
-  .note-list button:hover{border-color:#3a4150; color:var(--text);}
+  .note-list button:hover{border-color:var(--line-hover); color:var(--text);}
   .note-list .amt{font-family:'IBM Plex Mono',monospace; color:var(--text); min-width:64px;}
   .note-list .sw{width:8px; height:8px; border-radius:2px; flex:none; display:inline-block; transform:translateY(-1px);}
   .note-list strong{color:var(--text); font-weight:500;}
@@ -228,6 +269,7 @@
         <a href="./">Companies</a>
         <a href="flows.html" aria-current="page">Money flows</a>
       </nav>
+      <div class="theme-slot" data-theme-slot></div>
     </div>
     <div class="hero-stats">
       <div class="stat"><b id="statRevenue">—</b><span>Revenue accounted</span></div>
@@ -334,12 +376,26 @@
   // How many companies have researched figures; the wording below quotes it.
   const TRACKED = model.groupOf.size;
   const SVGNS = 'http://www.w3.org/2000/svg';
-  const OTHER_HEX = '#565E6C';
+  let OTHER_HEX = '#565E6C';
   // Neutral greys for money that is not a payment between two tracked companies.
-  const OUTSIDE_HEX = {
-    customers:'#77808E', reserves:'#8A7A73', ahead:'#A08C70', internal:'#454C58', hidden:'#454C58', notDrawn:'#454C58',
-    other:'#4E5562', pending:'#6B6683', people:'#959DAA', profit:'#D3D7DE',
+  // Night greys run from dark (costs) to light (profit); day greys keep the same order of emphasis on white.
+  const NEUTRALS = {
+    dark: {other:'#565E6C', outside:{
+      customers:'#77808E', reserves:'#8A7A73', ahead:'#A08C70', internal:'#454C58', hidden:'#454C58', notDrawn:'#454C58',
+      other:'#4E5562', pending:'#6B6683', people:'#959DAA', profit:'#D3D7DE',
+    }},
+    light: {other:'#8C93A0', outside:{
+      customers:'#8A929F', reserves:'#A08A80', ahead:'#B39A72', internal:'#B9BFC9', hidden:'#B9BFC9', notDrawn:'#B9BFC9',
+      other:'#A3AAB5', pending:'#9C93BC', people:'#6C7482', profit:'#3F4652',
+    }},
   };
+  const OUTSIDE_HEX = {};
+  function useNeutrals(){
+    const set = NEUTRALS[document.documentElement.dataset.theme === 'light' ? 'light' : 'dark'];
+    OTHER_HEX = set.other;
+    Object.assign(OUTSIDE_HEX, set.outside);
+  }
+  useNeutrals();
   const OUTSIDE_NOTE = {
     customers:`Revenue that arrives without a tracked flow: mostly from customers outside the ${TRACKED} tracked companies, plus purchases by tracked companies too small or too uncertain to draw.`,
     reserves:'An operating loss: costs above revenue, paid from cash reserves or borrowing.',
@@ -476,6 +532,8 @@
     }
   }
   window.addEventListener('hashchange', render);
+  // A theme change redraws with that theme's greys; the view and scroll position stay.
+  document.addEventListener('themechange', () => { useNeutrals(); const keep = state.showAll; render(); if(keep){ state.showAll = true; renderTable(buildView()); } });
   window.addEventListener('popstate', render);
 
   // ---------- views ----------
