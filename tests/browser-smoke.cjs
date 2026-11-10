@@ -11,6 +11,8 @@ const COMPANIES = roster.companies.length;
 const LISTED = roster.listed.length;
 const fmt = value => value.toLocaleString('en-US');
 const NEW_COMPANY = roster.companies.find(company => !company.flows && company.ticker);
+// Listed on an exchange the provider does not carry: counted as listed, never requested.
+const UNCOVERED = roster.companies.filter(company => company.status === 'uncovered');
 
 const baseURL = process.env.SEMI_BASE_URL || 'http://127.0.0.1:8000';
 const scannerURL = 'https://scanner.tradingview.com';
@@ -116,7 +118,7 @@ async function run(){
       assert.equal(await page.locator('#statCompanies').textContent(), fmt(COMPANIES));
       assert.equal(await page.locator('#resultCount').textContent(), fmt(COMPANIES)+' companies');
       assert.equal(await page.locator('#scopeCount').textContent(), fmt(COMPANIES));
-      assert.equal(await page.locator('#scopeListed').textContent(), fmt(LISTED));
+      assert.equal(await page.locator('#scopeListed').textContent(), fmt(LISTED + UNCOVERED.length));
       assert.equal(await page.locator('#statTotalCap').textContent(), 'Loading…');
       assert.equal(await page.locator('#statPricedCount').textContent(), '0 / '+fmt(LISTED));
       assert.equal(await page.locator('#statUpdated').textContent(), 'Loading…');
@@ -223,6 +225,22 @@ async function run(){
       await page.locator('#search').fill('');
     });
 
+    await check('Companies on an exchange the provider does not cover are shown as listed without a value', async () => {
+      assert.ok(UNCOVERED.length > 0, 'the roster has uncovered listings');
+      const company = UNCOVERED[0];
+      const card = await findCompany(company.name);
+      assert.equal(await card.locator('.cap-value').textContent(), 'Listed');
+      assert.match(await card.locator('.cap-sub').textContent(), /not covered by the data provider/);
+      assert.equal(await card.locator('.quote-price').isVisible(), false);
+      await card.click();
+      assert.equal(await page.locator('#drawerCapBig').textContent(), 'No market data');
+      assert.equal(await page.locator('#drawerCapSub').textContent(), company.note);
+      assert.equal(await page.locator('#marketPanel').isVisible(), false);
+      assert.equal(await page.locator('#drawerPrice').isVisible(), false);
+      await page.keyboard.press('Escape');
+      await page.locator('#search').fill('');
+    });
+
     await check('Native prices and market caps use fetched FX and their independent currencies', async () => {
       quotes = [quote('TSE:3436', 1500, 1.5e12, 'JPY'), quote('NYSE:TSM', 300, 30e12, 'USD', 'TWD')];
       await refresh();
@@ -309,7 +327,7 @@ async function run(){
 
     await check('Private companies have no public quote panel and make no extra market request', async () => {
       const before = requests.filter(url => /tradingview/.test(url)).length;
-      await (await findCompany('Hemlock')).click();
+      await (await findCompany('Hemlock Semiconductor')).click();
       assert.equal(await page.locator('#drawerCapBig').textContent(), 'Private');
       assert.equal(await page.locator('#marketPanel').isVisible(), false);
       assert.equal(await page.locator('#drawerPrice').isVisible(), false);

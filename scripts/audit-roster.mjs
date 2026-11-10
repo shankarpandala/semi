@@ -3,8 +3,10 @@
 //
 //   node scripts/audit-roster.mjs            (behind a proxy: NODE_USE_ENV_PROXY=1 node ...)
 //
-// 1. Listings. Every symbol on the roster must resolve at the provider and
-//    carry a market cap, or the page would show it as unavailable.
+// 1. Listings. Every symbol on the roster must resolve at the provider. A
+//    listing with a price but no market cap yet (a company that listed days
+//    ago) is reported as a notice: the page shows it as unavailable until
+//    the provider has a value.
 // 2. Coverage. Every primary listing the provider files under its
 //    Semiconductors or Electronic Production Equipment industries must either
 //    be on the roster or be listed, with a reason, in roster-exclusions.tsv.
@@ -58,12 +60,14 @@ const problems = [];
 // 1. Listings
 const quotes = new Map((await scan({
   symbols: {tickers: listed.map(company => company.ticker), query: {types: []}},
-  columns: ['description', 'market_cap_basic', 'is_primary'],
+  columns: ['description', 'market_cap_basic', 'is_primary', 'close'],
 })).map(row => [row.s, row.d]));
+const unvalued = [];
 for (const company of listed) {
   const quote = quotes.get(company.ticker);
   if (!quote) problems.push('not found at the provider: ' + company.ticker + ' ' + company.name + ' (' + company.tier + ')');
-  else if (!(quote[1] > 0)) problems.push('no market cap: ' + company.ticker + ' ' + company.name);
+  else if (!(quote[1] > 0) && quote[3] > 0) unvalued.push(company);
+  else if (!(quote[1] > 0)) problems.push('no price or market cap: ' + company.ticker + ' ' + company.name);
 }
 const secondary = listed.filter(company => quotes.get(company.ticker)?.[2] === false);
 
@@ -96,6 +100,10 @@ console.log(excluded.size + ' listings ruled out in scripts/roster-exclusions.ts
 if (secondary.length) {
   console.log('\n' + secondary.length + ' roster listings are not the company’s primary line (kept deliberately, for example US ADRs):');
   for (const company of secondary) console.log('  ' + company.ticker + '  ' + company.name);
+}
+if (unvalued.length) {
+  console.log('\n' + unvalued.length + ' roster listings have a price but no market cap at the provider yet:');
+  for (const company of unvalued) console.log('  ' + company.ticker + '  ' + company.name);
 }
 if (unreviewed.length) {
   console.log('\n' + unreviewed.length + ' provider listings are neither on the roster nor ruled out:');

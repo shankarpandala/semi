@@ -1,15 +1,493 @@
 symbol	name	reason	note
+AMEX:LGL	LGL Group, Inc.	unrelated business	Frequency and time reference instruments; holding company
+AMEX:MPTI	M-tron Industries Inc	passive components	RF filters and crystal oscillators
+CSE:MRM	Micromem Technologies Inc.	unrelated business	Development-stage sensor company with negligible revenue
+CSE:QNCR	QuantumCore Ltd	business not confirmed	Pre-revenue developer of cryogenic chips for quantum computers; no shipping product confirmed (qncor.ca)
+CSE:VTI	Valdor Technology International Inc	unrelated business	Dormant fibre-optic component shell
+CSE:ZTE	ZTEST Electronics Inc.	unrelated business	Small contract electronics assembler (Permatech)
 EURONEXT:ASML	ASML Holding NV	on the roster through another listing	ASML is listed here as NASDAQ:ASML
+HKEX:1024	Kuaishou Technology Class B	unrelated business	Short-video platform; a buyer of AI compute but not a cloud or hardware company
+HKEX:117	EYANG Holdings (Group) Co., Limited	passive components	MLCCs
+HKEX:1305	Wai Chi Holdings Co., Ltd.	display	LED backlight products
+HKEX:1392	Shenzhen HQVT Technology Co., Ltd. Class H	unrelated business	Multispectral AI camera modules
+HKEX:1402	i-Control Holdings Limited	unrelated business	Audio-visual system integration
+HKEX:1415	Cowell e Holdings Inc.	modules without own chips	Camera modules
+HKEX:1478	Q Technology (Group) Co. Ltd.	modules without own chips	Camera modules
+HKEX:148	Kingboard Holdings Limited	printed circuit boards	PCBs, laminates and chemicals
+HKEX:1611	Bitfire Group Holdings Limited	unrelated business	Crypto-asset services (formerly Sinohope / New Huo Technology)
+HKEX:1710	Trio Industrial Electronics Group Limited	unrelated business	Industrial electronics contract manufacturing, below the ODM revenue threshold
+HKEX:1725	China Strategic Technology Group Limited	unrelated business	EMS below the ODM revenue threshold; satellite business (formerly USPACE Technology)
+HKEX:1770	DKE Holding Company Limited Class H	display	E-paper display modules
+HKEX:1799	Xinte Energy Co., Ltd. Class H	solar	Solar-grade polysilicon and PV power plants
+HKEX:1888	Kingboard Laminates Holdings Limited	printed circuit boards	Copper-clad laminates for PCBs
+HKEX:1967	Confidence Intelligence Holdings Limited	unrelated business	PCBA contract manufacturing, below the ODM revenue threshold
+HKEX:1970	IMAX China Holding Inc	unrelated business	Cinema technology
+HKEX:1979	Ten Pao Group Holdings Limited	power, battery or cooling	Power supplies and chargers
+HKEX:2000	SIM Technology Group Limited	unrelated business	Handset and IoT terminal ODM, below the ODM revenue threshold
+HKEX:2018	AAC Technologies Holdings Inc.	unrelated business	Acoustic, haptic and optical components for smartphones and cars
+HKEX:2166	Smart-Core Holdings Ltd.	distributor	Chip distribution
+HKEX:2239	SMIT Holdings Limited	unrelated business	Pay-TV conditional access modules
+HKEX:2382	Sunny Optical Technology (Group) Co., Ltd.	modules without own chips	Lens sets and camera modules
+HKEX:2436	LX Technology Group Limited	unrelated business	IT device leasing and recycling services
+HKEX:2488	Launch Tech Co. Ltd. Class H	unrelated business	Automotive diagnostic equipment
+HKEX:2498	RoboSense Technology Company., Ltd	unrelated business	LiDAR sensors
+HKEX:259	Yeebo (International Holdings) Limited	display	LCD and LCM products
+HKEX:303	VTech Holdings Limited	unrelated business	Cordless phones and learning toys; below the size used for consumer-electronics brands in Tier 10
+HKEX:31	China Aerospace International Holdings Limited	unrelated business	Conglomerate: plastics, PCBs, LCDs and property
+HKEX:3315	Goldpac Group Ltd.	unrelated business	Smart cards and personalisation services
+HKEX:332	Yuan Heng Gas Holdings Ltd	unrelated business	LNG production and trading
+HKEX:334	China Display Optoelectronics Technology Holdings Ltd	display	LCD modules
+HKEX:3355	FS.COM Limited Class H	modules without own chips	Optical modules and network gear sold online
+HKEX:3800	GCL Technology Holdings Limited	solar	Solar-grade granular polysilicon
+HKEX:400	IngDan, Inc.	distributor	Chip distribution platform
+HKEX:438	IRICO Group New Energy Co. Ltd. Class H	solar	PV glass
+HKEX:485	China Sinostar Group Company Limited	unrelated business	Property development and hydropower
+HKEX:595	AV Concept Holdings Limited	distributor	Electronic component distribution
+HKEX:6088	FIT Hon Teng Limited	passive components	Connectors and cable assemblies
+HKEX:6802	Shenzhen Camsense Technologies Co., Ltd. Class H	unrelated business	LiDAR and spatial-sensing modules for robot vacuums
+HKEX:710	BOE Varitronix Ltd	display	Automotive display modules
+HKEX:732	Truly International Holdings Limited	display	Display and camera modules
+HKEX:757	Solargiga Energy Holdings Limited	solar	PV wafers and modules
+HKEX:76	Elate Holdings Limited	unrelated business	Contract electronics manufacturing below the ODM threshold; graphite and other businesses
+HKEX:8066	Phoenitron Holdings Limited	unrelated business	Smart cards
+HKEX:8118	Zhongzi International Holdings Limited	LED lighting or screens	LED decorative lighting and luminaires (formerly Bortex Global)
+HKEX:8218	Echo International Holdings Group Ltd.	unrelated business	Small circuit-board assemblies; catering
+HKEX:833	Alltronics Holdings Limited	unrelated business	EMS below the ODM revenue threshold
+HKEX:894	Man Yue Technology Holdings Ltd	passive components	Aluminium electrolytic capacitors
+HKEX:912	Suga International Holdings Limited	unrelated business	EMS below the ODM revenue threshold
+HKEX:929	IPE Group Limited	unrelated business	Precision metal components
+HKEX:99	Wong's International Holdings Limited	unrelated business	EMS below the ODM revenue threshold; property
+HKEX:9918	Wise Ally International Holdings Limited	unrelated business	EMS below the ODM revenue threshold
+KRX:001210	Kumho Electric, Inc.	LED lighting or screens	Lamps and LED lighting
+KRX:002380	KCC Corporation	unrelated business	Epoxy molding compounds are a small part of a paints and building-materials group
+KRX:002840	Miwon Commercial Co., Ltd	unrelated business	Surfactants and personal-care chemicals; photoresist raw materials share not confirmed
+KRX:004710	Hansol Technics Co., Ltd	power, battery or cooling	TV power modules, phone EMS and solar modules; parent of Hansol IONES (included)
+KRX:004770	Sunny Electronics Corporation	passive components	Quartz crystal units
+KRX:006200	KEC Holdings Co., Ltd.	holding company of a roster company	Holding company; its listed subsidiary KEC is on the roster
+KRX:007660	ISU Petasys Co., Ltd.	printed circuit boards	Multilayer boards for network and AI servers
+KRX:008060	DAEDUCK Co., Ltd.	holding company of a roster company	Holding company; its listed subsidiary Daeduck Electronics is on the roster
+KRX:009830	HANWHA SOLUTIONS CORPORATION	solar	Qcells solar cells and modules, petrochemicals
+KRX:010060	OCI Holdings Company Ltd.	solar	Solar-grade polysilicon (OCI TerraSus); parent of OCI (already listed)
+KRX:011230	Samwha Electronics Co., Ltd.	passive components	Ferrite cores
+KRX:011690	Y2 Solution CO. LTD	power, battery or cooling	Power supply units for TVs
+KRX:014470	Bubang Co., Ltd.	unrelated business	Holding company of rice-cooker maker Cuchen
+KRX:020150	LOTTE ENERGY MATERIALS CORPORATION	power, battery or cooling	Battery copper foil
+KRX:0220W0	Hanwha Machinery & Service Holdings Co., Ltd.	unrelated business	2026 holding company above Hanwha Vision, which is the entry used for Hanwha Semitech
+KRX:025440	DHAUTOWARE Co. LTD	unrelated business	Automotive electronics
+KRX:031330	SAMT Co., Ltd.	distributor	Distributor of Samsung memory and other components
+KRX:032500	KMW, Inc.	unrelated business	Base-station antennas and RF filters
+KRX:032960	Dongil Technology, Ltd.	passive components	EMI filters and ionisers
+KRX:033200	Moatech Co., Ltd	unrelated business	Stepping motors
+KRX:034220	LG Display Co., Ltd	display	LCD and OLED panels
+KRX:034730	SK Inc.	unrelated business	Group holding; signed in July 2026 to sell its 70.6% of SK Siltron to Doosan
+KRX:036010	ABCO Electronics Co., Ltd.	passive components	Inductors and chip resistors
+KRX:036710	SIMMTECH Holdings Co., Ltd.	holding company of a roster company	Holding company; its listed subsidiary Simmtech is on the roster
+KRX:036830	Soulbrain Holdings Co., Ltd.	holding company of a roster company	Holding company; its listed subsidiary Soulbrain is on the roster
+KRX:037030	Powernet Technologies Corp.	power, battery or cooling	Switching power supplies
+KRX:038460	Biosmart Co., Ltd.	unrelated business	Smart cards
+KRX:042600	Seronics Co., Ltd	unrelated business	Flat cables, TV parts and plastic mouldings
+KRX:043590	WELKEEPS HITECH CO.,LTD	business not confirmed	Driver-IC packaging, transformers and HDDs (formerly Clover Hitech); mix not confirmed
+KRX:049630	JAEYOUNG SOLUTEC CO LTD	modules without own chips	Lens and autofocus modules, moulds
+KRX:051360	Tovis Co., Ltd.	display	Display modules for casino machines and vehicles
+KRX:051910	LG Chem Ltd.	unrelated business	Batteries and petrochemicals; semiconductor materials not a separately reported division
+KRX:052400	KONA I CO., LTD.	unrelated business	Smart cards and payment platforms
+KRX:052420	OSUNG ADVANCED MATERIALS Co., Ltd.	display	Protective and carrier films for displays
+KRX:052710	Amotech Co., Ltd	passive components	Ceramic chip components, antennas and MLCCs
+KRX:054620	APS Inc.	unrelated business	Holding company (formerly APS Holdings) of AP Systems, which is included; FMM and control software
+KRX:065130	Top Engineering Co., Ltd.	display	Dispensers and test equipment for display and camera modules
+KRX:066670	DTC Co. Ltd.	display	LCD modules (formerly Display Tech)
+KRX:066970	L & F Co., Ltd.	power, battery or cooling	Battery cathode materials
+KRX:068790	DMS CO Ltd	display	Wet process equipment for display panels
+KRX:069540	LIGHTRON FIBER-OPTIC DEVICES INC.	modules without own chips	Optical transceiver modules
+KRX:070300	QuantumRail Inc.	unrelated business	Formerly Xcure: USIM and banking smart cards
+KRX:073110	LMS Co., Ltd	display	Prism sheets and optical films for backlights
+KRX:077500	Uniquest Corporation	distributor	Chip distributor
+KRX:079810	APS Innovation Co., Ltd.	unrelated business	Formerly DE&T: battery laser and display equipment; semiconductor share not confirmed
+KRX:079960	Dongyang E&P Inc.	power, battery or cooling	Switching power supplies
+KRX:082210	OPTRONTEC Inc.	modules without own chips	Optical filters and lenses for camera modules
+KRX:082800	VIVOZON PHARMACEUTICAL CO., LTD.	unrelated business	Pharmaceuticals (formerly LED maker Luminomicro)
+KRX:082850	WOOREE BIO Co., Ltd.	unrelated business	FPCBs, backlight parts and health foods; parent of Wooree E&L (included)
+KRX:083500	FNS TECH Co., Ltd.	display	OLED and LCD wet-process equipment; CMP pad line share of sales not confirmed
+KRX:083930	AVACO Co., Ltd.	display	Sputtering and vacuum process equipment for display panels
+KRX:084850	ITM Semiconductor Co., Ltd.	power, battery or cooling	Battery protection circuit packages and packs, e-cigarette devices
+KRX:086670	BMT Co., Ltd.	unrelated business	Industrial fittings and valves; semiconductor share not confirmed
+KRX:089010	Chemtronics Co., Ltd.	unrelated business	Electronic parts and solvents incl. PGMEA; semiconductor share not confirmed
+KRX:089850	UbiVelox Inc	unrelated business	Smart cards and mobile payment services
+KRX:089980	Sang-A Frontec Co Ltd	unrelated business	Fluoropolymer parts, mainly battery cap assemblies; wafer-carrier share of sales not confirmed
+KRX:091120	EM-Tech. Co., Ltd.	unrelated business	Micro speakers and e-cigarette devices
+KRX:091700	PARTRON Co., Ltd.	modules without own chips	Camera modules, antennas and sensor modules
+KRX:092600	NC& Co., Ltd.	unrelated business	Dashcam ODM; shareholder of Nextchip (included)
+KRX:093520	MAKUS, Inc.	distributor	Distributor of AMD (Xilinx) FPGAs
+KRX:093640	Korea Robot Manufacturing Co. Ltd.	business not confirmed	Formerly Tamul Multimedia (car-audio SoCs); current business not confirmed
+KRX:094970	JMT Co., Ltd.	display	PCB assembly for display panel modules
+KRX:095910	S-Energy Co., Ltd.	solar	Solar modules and project development
+KRX:097520	MCNEX Co., Ltd.	modules without own chips	Camera modules
+KRX:099220	SDN Company Ltd.	solar	Solar power plants and modules; marine engines
+KRX:105550	Edge Foundry Co.,Ltd	business not confirmed	Uncooled infrared sensors (formerly Truwin); could not confirm current business
+KRX:106240	Fine Technix Co., Ltd	unrelated business	Hinge parts for foldable phones, LED lighting
+KRX:122990	WiSoL Co., Ltd.	passive components	SAW filters and RF modules
+KRX:123010	MSDI Co., Ltd	business not confirmed	Formerly RNTX/Optopac (image-sensor chip-scale packaging); renamed Aug 2026 for a missile business; mix not confirmed
+KRX:131760	FINETEK CO. LTD.	display	Display module parts and bonding equipment
+KRX:137080	NARAE NANOTECH CORPORATION	display	Coaters for display panels
+KRX:140070	SurplusGLOBAL,Inc.	distributor	Dealer in used semiconductor equipment
+KRX:141000	Viatron Technologies, Inc.	display	Heat-treatment tools for display panels; semiconductor tools in development
+KRX:142210	Unitrontech Co., Ltd.	distributor	Distributor of Micron memory and automotive chips
+KRX:148150	Se Gyung Hi Tech Co., Ltd.	display	Functional and protective films for phones and foldable panels
+KRX:148250	Square Tech Co. Ltd.	passive components	Formerly RN2 Technologies: RF couplers and LTCC parts; pivoting to digital assets
+KRX:155650	YMC Co., Ltd. (Korea)	display	Display sputtering targets and process parts
+KRX:171090	SUNIC SYSTEM Co., Ltd.	display	OLED evaporation equipment
+KRX:178320	SEOJIN SYSTEM CO.,LTD	unrelated business	ESS and telecom enclosures; semiconductor equipment parts share not confirmed
+KRX:180060	Topsun Co., Ltd.	solar	Solar modules
+KRX:190510	Namuga Co., Ltd.	modules without own chips	Camera modules
+KRX:191410	RYUK-IL C&S., Ltd.	unrelated business	Cover glass processing
+KRX:204270	JNTC Co., Ltd.	unrelated business	Cover glass and connectors; glass-substrate work still in development
+KRX:207490	Apex Intec Co., Ltd.	LED lighting or screens	LED lighting fixtures
+KRX:208710	PHOTON CO. LTD	modules without own chips	Formerly Biolog Device: FPCB assemblies for camera modules
+KRX:224060	Codi Co., Ltd.	business not confirmed	Semiconductor/display coating and exposure equipment plus bio; semiconductor share not confirmed
+KRX:239890	P&H Tech Co., Ltd.	display	OLED organic materials
+KRX:248070	SOLUM CO. LTD.	power, battery or cooling	TV power modules and electronic shelf labels
+KRX:254120	XAVIS Co., Ltd.	unrelated business	X-ray inspection for batteries, electronics and food; semiconductor share not confirmed
+KRX:254490	Mirai Semiconductors Co. Ltd.	distributor	Distributor of Samsung memory and system chips
+KRX:256940	Keeps Biopharma Inc.	unrelated business	Pharmaceuticals and battery recycling; legacy OLED mask tensioners (formerly KPS)
+KRX:263600	DERKWOO ELECTRONICS Co., Ltd.	modules without own chips	Brackets and stiffeners for camera modules
+KRX:263810	Sangshin Electronics Co., Ltd.	passive components	Noise filters and reactors for appliances
+KRX:285490	NOVATECH CO.,LTD.	unrelated business	Magnets and shielding parts for tablets
+KRX:288620	S-Prism Co. Ltd.	power, battery or cooling	Formerly S-Fuelcell: building and power fuel cells
+KRX:294140	Lemon Company Limited	unrelated business	Nano-fibre membranes and EMI shielding parts
+KRX:295310	HVM CO. LTD.	unrelated business	Special alloys for aerospace and energy; sputtering-target share not confirmed
+KRX:297890	HB SOLUTION CO. LTD.	display	Inkjet, laser and metrology equipment for display lines
+KRX:299030	HANA Technology Co., Ltd.	power, battery or cooling	Battery manufacturing equipment
+KRX:320000	HanWool Semiconductor, Inc.	unrelated business	Inspection equipment for chip components, films and panels, despite the name
+KRX:322000	HD HYUNDAI ENERGY SOLUTIONS CO. LTD.	solar	Solar cells and modules
+KRX:336260	Doosan Fuel Cell Co., Ltd.	power, battery or cooling	Stationary fuel cells
+KRX:336370	Solus Advanced Materials Co., Ltd.	unrelated business	Circuit copper-foil business sold in 2026; battery foil and OLED materials remain
+KRX:347770	PIMS Inc.	display	Open and fine metal masks for OLED
+KRX:348370	Enchem Co., Ltd.	power, battery or cooling	Battery electrolytes
+KRX:351320	Nexa Dynamics Co. Ltd.	display	Formerly SAT ENG: display bonding equipment; pivoting to commerce and AI servers
+KRX:355690	ATUM CO. LTD	passive components	Planar transformers for TVs and EV chargers
+KRX:356860	TLB Co., Ltd.	printed circuit boards	Memory module PCBs, not IC package substrates
+KRX:357580	Amosense Co., Ltd.	unrelated business	Magnetic shielding sheets and antenna modules; ceramic power-module substrates a newer, smaller line
+KRX:363280	TY Holdings Co. Ltd.	unrelated business	Taeyoung group holding company (construction, broadcasting)
+KRX:368600	ICH Co., Ltd.	unrelated business	Conductive tapes and film antennas
+KRX:371950	POONGWON PRECISION Co., Ltd.	display	Fine metal masks for OLED deposition
+KRX:402340	SK Square Co., Ltd.	unrelated business	Investment holding with about 20% of SK hynix (already listed); no operations of its own
+KRX:416180	Shinsung ST Co., Ltd.	power, battery or cooling	Busbars and cooling parts for EV batteries and ESS
+KRX:463480	Motive Link Co., Ltd.	passive components	Transformers and inductors for EV power conversion (2025 listing)
+NASDAQ:AEVA	Aeva Technologies, Inc.	unrelated business	FMCW lidar sensors
+NASDAQ:AIRG	Airgain, Inc.	modules without own chips	Antennas and embedded wireless modules
+NASDAQ:AMPG	AmpliTech Group, Inc.	unrelated business	RF amplifiers, 5G O-RAN radios and IC-package distribution; in-house MMIC design is minor (amplitechgroup.com)
+NASDAQ:ASTI	Ascent Solar Technologies, Inc.	solar	Thin-film CIGS PV modules
+NASDAQ:AUID	authID Inc.	unrelated business	Biometric identity software
+NASDAQ:AVT	Avnet, Inc.	distributor	Component distribution
+NASDAQ:AZTA	Azenta, Inc.	unrelated business	Sold its semiconductor automation business (now private Brooks Automation) in 2022; life sciences only
+NASDAQ:BOSC	BOS Better Online Solutions Ltd	distributor	Electronic-component distribution and RFID supply-chain systems
+NASDAQ:BTDR	Bitdeer Technologies Group Class A	unrelated business	Bitcoin miner and AI cloud host; in-house SEALMINER ASICs not shown as material external sales
+NASDAQ:CSIQ	Canadian Solar Inc.	solar	PV modules and energy storage
+NASDAQ:DAIO	Data I/O Corporation	unrelated business	Device-programming systems; not a tier product
+NASDAQ:DVLT	Datavault AI Inc.	unrelated business	Data-monetisation software (dvlt.ai); legacy WiSA wireless audio modules
+NASDAQ:ELMT	Elmet Group Co.	unrelated business	Tungsten and molybdenum mill products, mostly defence and aerospace; semiconductor is one of several end markets
+NASDAQ:ENGS	Energys Group Limited	LED lighting or screens	UK LED lighting retrofit and energy-efficiency contractor (SEC SIC 1731)
+NASDAQ:FSLR	First Solar, Inc.	solar	CdTe thin-film PV modules
+NASDAQ:GSM	Ferroglobe PLC	unrelated business	Metallurgical-grade silicon metal, not electronic-grade feedstock
+NASDAQ:HOLO	MicroCloud Hologram Inc.	unrelated business	Holographic software and services; no chip business confirmed
+NASDAQ:HON	Honeywell International Inc.	unrelated business	Electronic materials left with the Solstice spin-off (Oct 2025)
+NASDAQ:IMTE	Integrated Media Technology Limited	unrelated business	Glass lamination and display products
+NASDAQ:INVE	INVE Technologies, Inc.	modules without own chips	RFID and BLE inlays and tags built on third-party chips; renamed Aug 2026
+NASDAQ:IPGP	IPG Photonics Corporation	unrelated business	Industrial fiber lasers for materials processing; laser diodes made for own use
+NASDAQ:KOPN	Kopin Corporation	display	Microdisplays and optical assemblies, 74% defence (10-K FY2025); display product rather than ICs
+NASDAQ:LINK	Interlink Electronics, Inc.	unrelated business	Force-sensing resistors and printed sensors
+NASDAQ:LNKS	Linkers Industries Limited Class A	passive components	Wire and cable harnesses
+NASDAQ:LWLG	Lightwave Logic, Inc.	unrelated business	Electro-optic polymer developer without commercial revenue yet
+NASDAQ:MOBX	Mobix Labs, Inc.	passive components	Now sells EMI filters, filtered connectors, RF modules and cable assemblies for defence (mobixlabs.com); chip line minor
+NASDAQ:MVIS	MicroVision, Inc.	unrelated business	MEMS-mirror lidar sensors
+NASDAQ:NA	Nano Labs Ltd. Class A	unrelated business	Now a BNB crypto-treasury company; H1 2026 revenue US$0.4M from mining machines (6-K 15 Sep 2026)
+NASDAQ:NANO	Forge Nano Holdings, Inc.	business not confirmed	ALD wafer tools are one of three lines (with battery cells and powder ALD); listed Oct 2026, no segment figures yet
+NASDAQ:NEON	Neonode Inc.	modules without own chips	Optical touch-sensor modules and technology licensing
+NASDAQ:ODYS	Odysight.ai Inc.	unrelated business	Visual-sensing predictive-maintenance systems
+NASDAQ:OESX	Orion Energy Systems, Inc.	LED lighting or screens	LED lighting fixtures and maintenance services
+NASDAQ:OLED	Universal Display Corporation	display	OLED emitter materials and IP licensing
+NASDAQ:OUST	Ouster, Inc.	unrelated business	Lidar sensors; custom chips used only in its own sensors
+NASDAQ:PLUG	Plug Power Inc.	power, battery or cooling	Hydrogen fuel cells and electrolysers
+NASDAQ:PXLW	Pixelworks, Inc.	unrelated business	Sold its chip subsidiary (Pixelworks Shanghai) to VeriSilicon, closed Jan 2026 (8-K item 2.01); now TrueCut Motion film-format licensing
+NASDAQ:RELL	Richardson Electronics, Ltd.	distributor	Engineered-solutions distributor of power grid tubes, RF and microwave components
+NASDAQ:RUN	Sunrun Inc.	solar	Residential solar and storage installer
+NASDAQ:SHLS	Shoals Technologies Group, Inc. Class A	solar	Solar electrical balance-of-system components
+NASDAQ:SHMD	SCHMID Group N.V. Class A	printed circuit boards	Wet-process equipment mainly for PCBs and photovoltaics; glass-core substrate tools not broken out
+NASDAQ:SMTK	SmartKem, Inc.	display	Organic thin-film transistor materials for display backplanes; negligible market cap
+NASDAQ:TOYO	TOYO Co., Ltd	solar	Solar cells and modules
+NASDAQ:TTMI	TTM Technologies, Inc.	printed circuit boards	Printed circuit boards and RF assemblies; no IC substrate business
+NASDAQ:TYGO	Tigo Energy, Inc.	solar	Solar module-level power electronics
+NASDAQ:VICR	Vicor Corporation	power, battery or cooling	DC-DC and AC-DC power modules; describes itself as a power conversion company, not a chip maker (vicorpower.com)
 NSE:MOSCHIP	Moschip Technologies Ltd	on the roster through another listing	MosChip is listed here as BSE:MOSCHIP
+NYSE:ARW	Arrow Electronics, Inc.	distributor	Component distribution
+NYSE:BE	Bloom Energy Corporation Class A	power, battery or cooling	Solid-oxide fuel-cell power systems
+NYSE:CTS	CTS Corporation	passive components	Sensors, piezoelectric and frequency-control components
+NYSE:DD	DuPont de Nemours, Inc.	unrelated business	Electronics business spun off as Qnity (NYSE:Q) on 1 Nov 2025
+NYSE:DQ	Daqo New Energy Corp Sponsored ADR	solar	Solar-grade polysilicon
+NYSE:J	Jacobs Solutions Inc.	unrelated business	Fab design engineering is one end market of a diversified engineering group
+NYSE:JKS	Jinko Holdings Limited Sponsored ADR	solar	PV wafers, cells and modules
+NYSE:KN	Knowles Corp.	passive components	Capacitors, RF filters and specialty audio after selling MEMS microphones
+NYSE:TEL	TE Connectivity plc	passive components	Connectors and sensors
+NYSE:VRT	Vertiv Holdings Co. Class A	power, battery or cooling	Data-centre power and thermal management systems
+OTC:ADNH	Advent Technologies Holdings, Inc. Class A	power, battery or cooling	HT-PEM fuel cells
+OTC:ALPP	Alpine 4 Holdings, Inc. Class A	unrelated business	Defunct diversified holding company
+OTC:AVSR	Avistar Communications Corporation	unrelated business	Dormant OTC shell
+OTC:CRKT	Cirmaker Technology Corporation	unrelated business	Non-reporting OTC shell (no SEC filings since 2021); below US$50M
+OTC:DNDT	DND Technologies, Inc.	unrelated business	Dormant OTC shell
+OTC:ECDD	Ecrid Inc	unrelated business	Dormant OTC shell
+OTC:EQTL	Equitech INT'L Corporation	unrelated business	Dormant OTC shell
+OTC:GOGR	Go Green Global Technologies Corp.	unrelated business	Fuel-treatment technology shell
+OTC:HWGG	HWGG Entertainment Limited	business not confirmed	OTC; name indicates an entertainment business; could not confirm any chip activity
+OTC:HYSR	SunHydrogen, Inc.	unrelated business	Solar-to-hydrogen technology developer; no chip products
+OTC:LSCG	Lighting Science Group Corporation	LED lighting or screens	LED lamps and luminaires
+OTC:MFCO	Microwave Filter Company, Inc.	passive components	RF and microwave filters
+OTC:MMATQ	Meta Materials Inc.	unrelated business	Bankrupt metamaterials developer
+OTC:NMGC	Neomagic Corporation	unrelated business	Former chip designer; pink-sheet remnant (about US$1M)
+OTC:OLVI	Oliveda International Inc	unrelated business	Olive-tree cosmetics (oliveda.com); unrelated business
+OTC:PALX	Palomino Labs Inc	unrelated business	OTC shell; no SEC filings found
+OTC:PRKR	ParkerVision, Inc.	unrelated business	RF patent litigation; no product revenue; below US$50M
+OTC:SCIA	SCI Engineered Materials, Inc.	unrelated business	Sputtering targets, but OTC with market cap about US$42M (below the US$50M bar)
+OTC:SMME	SmartMetric, Inc.	unrelated business	Biometric payment-card developer
+OTC:SNRY	Solar Energy Initiatives, Inc.	solar	Dormant solar shell
+OTC:SUNWQ	Sunworks, Inc.	solar	Bankrupt solar installer
+OTC:SVLT	Sunvault Energy, Inc.	solar	Dormant solar shell
+OTC:USLG	US Lighting Group, Inc.	unrelated business	Former LED lighting company; now recreational products
+OTC:VIEWF	Viewtran Group, Inc.	unrelated business	Pink-sheet remnant (formerly Cogo, component distribution in China)
+OTC:VPER	Viper Networks, Inc.	unrelated business	Dormant OTC shell
+OTC:VPIM	Vitality Prime Inc	unrelated business	Dormant OTC shell
+SSE:600183	Shengyi Technology Co., Ltd. Class A	printed circuit boards	Copper-clad laminates mainly for PCBs; substrate-grade share not disclosed
+SSE:600207	Henan Ancai Hi-Tech Co., Ltd. Class A	solar	PV glass
+SSE:600363	Jiangxi Lianchuang Optoelectronic Science & Tech Co., Ltd. Class A	unrelated business	Lasers, superconducting magnets, backlights and controllers; LED chips minor
+SSE:600497	Yunnan Chihong Zinc & Germanium Co., Ltd. Class A	unrelated business	Zinc and lead miner; germanium is a small by-product line
+SSE:600537	EGing Photovoltaic Technology Co., Ltd. Class A	solar	PV modules
+SSE:600563	Xiamen Faratronic Co. Ltd. Class A	passive components	Film capacitors
+SSE:600601	Founder Technology Group Co. Ltd. Class A	printed circuit boards	Printed circuit boards
+SSE:600666	Aurora Optoelectronics Co., Ltd. Class A	unrelated business	Sapphire crystal and compute-leasing business
+SSE:600732	Shanghai Aiko Solar Energy Co., Ltd. Class A	solar	PV cells and modules
+SSE:600839	Sichuan Changhong Electric Co., Ltd. Class A	unrelated business	TVs and home appliances
+SSE:600885	Hongfa Technology Co., Ltd. Class A	passive components	Relays
+SSE:601012	LONGi Green Energy Technology Co., Ltd. Class A	solar	PV wafers, cells and modules
+SSE:601908	Beijing Jingyuntong Technology Co., Ltd. Class A	solar	PV silicon wafers and solar power plants
+SSE:603052	Suzhou K-Hiragawa Electronic Technology Co., Ltd. Class A	unrelated business	Die-cut functional parts for batteries and consumer electronics
+SSE:603083	CIG Shanghai Co., Ltd. Class A	modules without own chips	Optical transceiver modules and broadband CPE
+SSE:603175	Dynamic Electronics Co Ltd Class A	printed circuit boards	Printed circuit boards
+SSE:603186	Zhejiang Wazam New Material Co., Ltd. Class A	printed circuit boards	Copper-clad laminates for PCBs; BT and build-up film sales still small
+SSE:603203	Quick Intelligent Equipment Co., Ltd. Class A	unrelated business	Soldering and SMT equipment; die-bonding tools a minor line
+SSE:603228	Shenzhen Kinwong Electronic Co., Ltd. Class A	printed circuit boards	Printed circuit boards
+SSE:603236	Quectel Wireless Solutions Co. Ltd. Class A	modules without own chips	Cellular and Wi-Fi modules built on third-party chips
+SSE:603256	Grace Fabric Technology Co., Ltd. Class A	printed circuit boards	Glass cloth mainly for PCB laminates; low-CTE substrate cloth is a small share
+SSE:603380	Suzhou Etron Technologies Co. Ltd. Class A	unrelated business	EMS provider below the US$1B scale (revenue about US$0.3B)
+SSE:603396	Yingkou Jinchen Machinery Co. Ltd. Class A	solar	PV module and cell production lines
+SSE:603459	Jiangxi Redboard Technology Co Ltd Class A	printed circuit boards	Printed circuit boards
+SSE:603628	Clenergy Technology Co. Ltd. Class A	solar	PV mounting systems
+SSE:603678	Fujian Torch Electron Technology Co Ltd	passive components	MLCCs
+SSE:603685	Zhejiang Chenfeng Science and Technology Co., Ltd. Class A	LED lighting or screens	LED lamp components and heat sinks
+SSE:603738	TKD Science and Technology Co., Ltd. Class A	passive components	Quartz crystal resonators and oscillators
+SSE:603773	WG Tech (JiangXi) Group Co., LTD. Class A	display	Display glass thinning and coating; glass-core substrate line still small
+SSE:603920	Olympic Circuit Technology Co., Ltd. Class A	printed circuit boards	Printed circuit boards
+SSE:603931	Hangzhou Greenda Electronic Materials Co., Ltd. Class A	display	TMAH developer sold mainly to panel makers; IC customers still in qualification
+SSE:603933	Fujian Raynen Technology Co., Ltd. Class A	distributor	IC distribution and industrial automation
+SSE:605218	Ways Electron Co. Ltd. Class A	display	Backlight and display modules
+SSE:605588	Keystone Technology Co. Ltd. Class A	display	Polarizer and display components; photomask project about 1% of 2025 revenue
+SSE:688003	Suzhou TZTEK Technology Co. Ltd. Class A	unrelated business	Machine-vision inspection equipment; semiconductor metrology revenue not disclosed
+SSE:688011	Harbin Xinguang Optic-Electronics Technology Co., Ltd. Class A	unrelated business	Military optical guidance and simulation systems
+SSE:688020	Guangzhou Fangbang Electronics Co. Ltd. Class A	printed circuit boards	EMI shielding films for flexible PCBs; carrier copper foil not yet material
+SSE:688025	Shenzhen Jpt Opto-Electronics Co. Ltd. Class A	unrelated business	Fibre lasers and laser processing equipment
+SSE:688053	Chengdu Screen Microelectronics Co. Ltd. Class A	unrelated business	Component screening lab for end users, not production test
+SSE:688055	InfoVision Optoelectronics (Kunshan) Co., Ltd. Class A	display	LCD panels
+SSE:688093	Suzhou Shihua New Material Technology Co. Ltd. Class A	unrelated business	Functional adhesive materials for consumer electronics
+SSE:688097	Bozhon Precision Industry Technology Co.Ltd. Class A	unrelated business	Consumer-electronics assembly automation
+SSE:688103	Kunshan GuoLi Electronic Technology Co., Ltd. Class A	passive components	Vacuum relays and vacuum capacitors, mainly for EVs
+SSE:688150	Shaanxi Lighte Optoelectronics Material Co., Ltd. Class A	display	OLED organic materials
+SSE:688159	Shenzhen Neoway Technology Co., Ltd. Class A	modules without own chips	Cellular IoT modules
+SSE:688181	Beijing Bayi Space LCD Technology Co., Ltd. Class A	display	Liquid-crystal materials for display panels
+SSE:688183	Shengyi Electronics Co., Ltd. Class A	printed circuit boards	Printed circuit boards
+SSE:688205	Wuxi Taclink Optoelectronics Technology Co., Ltd. Class A	modules without own chips	Optical transceiver modules and amplifiers
+SSE:688223	Jinko Solar Co., Ltd. Class A	solar	PV modules
+SSE:688272	Beijing Fjr Optoelectronic Technology Co., Ltd. Class A	unrelated business	Infrared thermal imagers built on purchased detectors
+SSE:688303	Xinjiang Daqo New Energy Co. Ltd. Class A	solar	Solar-grade polysilicon
+SSE:688312	Shenzhen Yanmade Technology, Inc. Class A	unrelated business	Test equipment for flexible printed circuits
+SSE:688322	Orbbec Inc. Class A	unrelated business	3D vision sensors and camera modules built around in-house depth chips
 SSE:688347	Hua Hong Grace Semiconductor Limited Class A	on the roster through another listing	Hua Hong Semiconductor is listed here as HKEX:1347
+SSE:688348	Yuneng Technology Co., Ltd. Class A	solar	PV micro-inverters
+SSE:688378	Jilin OLED Material Tech Co., Ltd. Class A	display	OLED evaporation materials and sources
+SSE:688387	CICT Mobile Communication Technology Co., Ltd.Class A	unrelated business	5G base-station equipment; revenue below US$1B
+SSE:688392	SBT Ultrasonic Technology Co., Ltd. Class A	unrelated business	Ultrasonic welding equipment, mainly for batteries
+SSE:688395	Shenzhen Sine Electric Co., Ltd. Class A	unrelated business	Variable-frequency drives and servo systems
+SSE:688429	Changzhou Shichuang Energy Co., Ltd. Class A	solar	PV wet-process additives, equipment and cells
+SSE:688472	CSI Solar Co., Ltd.	solar	PV modules and energy storage (Canadian Solar subsidiary)
+SSE:688503	Changzhou Fusion New Material Co., Ltd. Class A	solar	PV silver paste; announced blank-mask acquisition not yet material
+SSE:688516	Wuxi Autowell Technology Co. Ltd. Class A	solar	PV stringers; semiconductor bonders a minor line
+SSE:688519	Nanya New Material Technology Co., Ltd. Class A	printed circuit boards	Copper-clad laminates for PCBs
+SSE:688530	Omat Advanced Materials (Guangdong) Co., Ltd. Class A	display	Sputtering targets mainly for display panels
+SSE:688538	Everdisplay Optronics (Shanghai) Co., Ltd. Class A	display	AMOLED panels
+SSE:688552	Aerospace Nanhu Electronic Information Technology Co., Ltd. Class A	unrelated business	Air-defence early-warning radar
+SSE:688556	Qingdao Gaoce Technology Co. Ltd. Class A	solar	PV wire saws and diamond wire
+SSE:688598	KBC Corp. Ltd. Class A	solar	Carbon-carbon hot-zone parts for PV crystal pullers
+SSE:688599	Trina Solar Ltd Class A	solar	PV modules, trackers and storage
+SSE:688629	Sichuan Huafeng Technology Co., Ltd. Class A	passive components	Connectors
+SSE:688662	Guangdong Fuxin Technology Co., Ltd. Class A	power, battery or cooling	Thermoelectric cooling devices and modules
+SSE:688663	WindSun Science & Technology Co., Ltd. Class A	unrelated business	Reactive-power compensation equipment and industrial drives
+SSE:688682	Shanghai Hollywave Electronic System Co., Ltd. Class A	unrelated business	Phased-array calibration and electromagnetic simulation systems
+SSE:688686	OPT Machine Vision Tech Co., Ltd. Class A	unrelated business	Machine-vision light sources, lenses and software
+SSE:688726	LAPLACE Renewable Energy Technology Co. Ltd. Class A	solar	PV cell diffusion and LPCVD equipment
+SSE:688775	Arashi Vision Inc. Class A	unrelated business	Action and panoramic cameras
+SSE:688776	Guoguang Electric Co., Ltd.Chengdu Class A	unrelated business	Microwave vacuum tubes and nuclear-industry equipment
+SSE:688781	SeeYA Technology Corp. Class A	display	Silicon-based OLED microdisplays
+SSE:688800	Suzhou Recodeal Interconnect System Co., Ltd. Class A	passive components	Connectors
+SSE:688818	CETC Lantian Technology Co., Ltd. Class A	unrelated business	Space power systems (solar arrays, batteries)
+SSE:688828	CIQTEK Co., Ltd. Class A	unrelated business	Scientific instruments (EPR spectrometers, electron microscopes)
+SSE:688836	Yushu Technology Co., Ltd. Class A	unrelated business	Legged and humanoid robots
+SZSE:000034	Digital China Group Co., Ltd Class A	distributor	IT distribution; own-brand servers are a minority
+SZSE:000050	Tianma Microelectronics Co., Ltd Class A	display	Display panels and modules
+SZSE:000062	Shenzhen Huaqiang Industry Co., Ltd Class A	distributor	Electronic component distribution
+SZSE:000100	TCL Technology Group Corporation Class A	display	Display panels (CSOT); controls TCL Zhonghuan (SZSE:002129), which is included separately
+SZSE:000541	Foshan Electrical and Lighting Co., Ltd. Class A	LED lighting or screens	Lamps and luminaires; controls Nationstar (SZSE:002449), which is included separately
+SZSE:000636	Guangdong Fenghua Advanced Technology (Holding) Co., Ltd. Class A	passive components	MLCCs, chip resistors and inductors
+SZSE:000670	Infotmic Co. Ltd. Class A	distributor	Mostly electronic component distribution; own SoC design unit is small
+SZSE:000711	Indium Target Advanced Materials (Harbin) Co., Ltd. Class A	unrelated business	Waste recycling; planned ITO target line not yet in production
+SZSE:000725	BOE Technology Group Co., Ltd. Class A	display	Display panels; controls HC SemiTek (SZSE:300323), which is included separately
+SZSE:000733	China Zhenhua (Group) Science & Technology Co., Ltd. Class A	passive components	Military passive components; discrete-semiconductor unit is a minority
+SZSE:000988	Huagong Tech Co., Ltd. Class A	modules without own chips	Optical transceivers, laser equipment and sensors
+SZSE:001232	Shenzhen JLC Technology Group Co., Ltd.	printed circuit boards	PCB prototyping, PCBA and component e-commerce
+SZSE:001269	Inner Mongolia OJing Science and Technology Co. Ltd. Class A	solar	Quartz crucibles and silicon material cleaning, mainly for PV
+SZSE:001389	Delton Technology (Guangzhou) Inc.	printed circuit boards	PCBs for servers
+SZSE:001399	HKC Corporation Limited Class A	display	LCD panels, TVs and monitors
+SZSE:002017	Eastcompeace Technology Co., Ltd. Class A	unrelated business	Smart cards and digital identity services
+SZSE:002023	Sichuan Haite High-Tech Co., Ltd. Class A	unrelated business	Aviation maintenance and training; HiWafer GaAs/GaN fab stake not confirmed as a consolidated business
+SZSE:002036	LianChuang Electronic Technology Co Ltd Class A	modules without own chips	Camera lenses, camera modules and touch displays
+SZSE:002104	Hengbao Co., Ltd. Class A	unrelated business	Smart cards and payment terminals
+SZSE:002106	Shenzhen Laibao Hi-Tech Co., Ltd. Class A	display	Touch panels and ITO glass
+SZSE:002137	SHENZHEN SEA STAR TECHNOLOGY CO., LTD. Class A	unrelated business	Smart hardware contract manufacturing and lighting
+SZSE:002138	Shenzhen Sunlord Electronics Co., Ltd. Class A	passive components	Chip inductors and other passive components
+SZSE:002199	Zhejiang East Crystal Electronic Co., Ltd. Class A	passive components	Quartz crystal resonators
+SZSE:002218	Shenzhen Topray Solar Co., Ltd. Class A	solar	PV cells and modules
+SZSE:002222	Castech Inc. Class A	unrelated business	Laser and nonlinear optical crystals for the laser industry at large; no named semiconductor business
+SZSE:002273	Zhejiang Quartz Crystal Optoelectronic Technology Co Ltd Class A	unrelated business	Optical filters, thin-film optics and AR/HUD components
+SZSE:002289	Shenzhen Success Electronics Co. Ltd. Class A	display	LCD and touch display modules
+SZSE:002369	Shenzhen Zowee Tech Co. Ltd. Class A	unrelated business	Electronics contract manufacturing, below the ODM revenue threshold
+SZSE:002384	Suzhou Dongshan Precision Manufacturing Co., Ltd Class A	printed circuit boards	FPC and PCBs, precision components
+SZSE:002387	Visionox Technology Inc. Class A	display	AMOLED panels
+SZSE:002402	Shenzhen H&T Intelligent Control Co., Ltd. Class A	unrelated business	Smart controller boards for appliances and tools; chip unit Chengchang is listed separately (SZSE:001270)
+SZSE:002456	OFILM Group Co., Ltd. Class A	modules without own chips	Camera and fingerprint modules
+SZSE:002459	JA Solar Technology Co., Ltd. Class A	solar	PV cells and modules
+SZSE:002463	Wus Printed Circuit (Kunshan) Co., Ltd. Class A	printed circuit boards	High-layer-count PCBs for servers and switches
+SZSE:002506	GCL System Integration Technology Co. Ltd. Class A	solar	PV modules and systems
+SZSE:002591	Jiangxi Hengda Hi-Tech Co., Ltd. Class A	unrelated business	Anti-wear and thermal-spray protection services
+SZSE:002600	Lingyi iTech (Guangdong) Company Class A	unrelated business	Precision functional parts and chargers; a component supplier rather than an ODM
+SZSE:002636	Goldenmax International Group Ltd. Class A	printed circuit boards	Copper-clad laminates for PCBs
+SZSE:002681	Shenzhen Fenda Technology Co., Ltd. Class A	unrelated business	Speakers and wearables contract manufacturing, below the ODM revenue threshold
+SZSE:002729	Hollyland (China) Electronics Technology Corp Ltd Class A	passive components	Fuses and circuit protection components
+SZSE:002815	Suntak Technology Co., Ltd. Class A	printed circuit boards	PCBs; IC-substrate unit is small
+SZSE:002837	Shenzhen Envicool Technology Co., Ltd. Class A	power, battery or cooling	Data-centre precision cooling
+SZSE:002845	Shenzhen Txd Technology Co., Ltd. Class A	display	LCD and camera modules; gold-bump packaging venture is minor
+SZSE:002851	Shenzhen Megmeet Electrical Co., Ltd. Class A	power, battery or cooling	Power supplies incl. AI server power
+SZSE:002859	Zhejiang Jiemei Electronic & Technology Co., Ltd. Class A	passive components	Carrier tapes and release films for passive components
+SZSE:002860	Hangzhou Star Shuaier Electric Appliance Co. Ltd. Class A	solar	PV modules; compressor relays and protectors
+SZSE:002866	Jiangsu Transimage Technology Co., Ltd. Class A	unrelated business	Keyboard membranes and FPC; sodium-ion batteries
+SZSE:002881	MeiG Smart Technology Co., Ltd. Class A	modules without own chips	Cellular IoT modules
+SZSE:002902	Dongguan Mentech Optical & Magnetic Co., Ltd. Class A	passive components	Magnetic components, optical modules and power adapters
+SZSE:002908	Guangdong Tecsun Science & Technology Co., Ltd. Class A	unrelated business	Social-security cards and identity services
+SZSE:002925	Xiamen Intretech Inc. Class A	unrelated business	Smart controllers and contract manufacturing, below the ODM revenue threshold
+SZSE:002938	Avary Holding (Shenzhen) Co., Ltd. Class A	printed circuit boards	FPC and SLP boards; subsidiary of Zhen Ding, which is already on the dashboard
+SZSE:002952	Yes Optoelectronics (Group) Co., Ltd. Class A	display	LCD display modules
+SZSE:002962	Hubei W-Olf Photoelectric Technology Co., Ltd. Class A	unrelated business	Infrared cut-off filters for camera modules
+SZSE:002975	Zhuhai Bojay Electronics Co., Ltd. Class A	unrelated business	Electronics test fixtures and automation
+SZSE:002990	Maxvision Technology Corp.	unrelated business	Border inspection and smart port systems
+SZSE:002992	Shenzhen Baoming Technology Co., Ltd. Class A	display	LED backlight modules; composite copper foil
+SZSE:003015	Jiangsu Rijiu Optoelectronics Jointstock Co. Ltd. Class A	display	ITO conductive films for touch panels
+SZSE:300037	Shenzhen Capchem Technology Co., Ltd. Class A	unrelated business	Battery electrolytes and capacitor chemicals; semiconductor chemicals are a small share
+SZSE:300083	Guangdong Create Century Intelligent Equipment Group Corporation Limited Class A	unrelated business	CNC machine tools
+SZSE:300115	Shenzhen Everwin Precision Technology Co., Ltd. Class A	unrelated business	Precision metal parts and connectors
+SZSE:300118	Risen Energy Co., Ltd. Class A	solar	PV cells and modules
+SZSE:300125	Lingda Group Co., Ltd. Class A	solar	PV cells
+SZSE:300128	Suzhou Jinfu Technology Co Ltd Class A	display	Optical films, backlight and display components
+SZSE:300131	Shenzhen Yitoa Intelligent Control Co., Ltd. Class A	distributor	Mostly component distribution; own display-driver and MEMS chip unit is a minority
+SZSE:300136	Shenzhen Sunway Communication Co., Ltd. Class A	passive components	Antennas and connectors
+SZSE:300151	Shenzhen Changhong Technology Co. Ltd Class A	unrelated business	Precision moulds and medical consumables; wafer-carrier line is still small
+SZSE:300184	Wuhan P&S Information Technology Co., Ltd. Class A	distributor	Electronic component distribution
+SZSE:300232	Unilumin Group Co., Ltd. Class A	LED lighting or screens	LED display screens
+SZSE:300259	Suntront Technology Co. Ltd. Class A	unrelated business	Smart water and gas meters
+SZSE:300279	Wuxi Hodgen Technology Co., Ltd. Class A	unrelated business	Smart controller boards
+SZSE:300285	Shandong Sinocera Functional Material Co., Ltd. Class A	passive components	MLCC dielectric powders and functional ceramics
+SZSE:300296	Leyard Optoelectronic Co., Ltd. Class A	LED lighting or screens	LED display screens
+SZSE:300301	Shenzhen Changfang Group Co., Ltd. Class A	LED lighting or screens	Portable and home LED lighting; LED packaging is a minor business
+SZSE:300317	Jiawei Renewable Energy Co., Ltd. Class A	solar	PV lighting products, power plants and energy storage
+SZSE:300319	Shenzhen Microgate Technology Co., Ltd. Class A	passive components	Inductors, LTCC and SAW filters, LCD modules
+SZSE:300331	SVG Group Co. Ltd. Class A	unrelated business	Micro-nano optical films; direct-write lithography tools mainly for displays
+SZSE:300360	Hangzhou Sunrise Technology Co., Ltd. Class A	unrelated business	Smart electricity and water meters
+SZSE:300389	Shenzhen Absen Optoelectronic Co Ltd Class A	LED lighting or screens	LED display screens
+SZSE:300394	Suzhou TFC Optical Communication Co., Ltd. Class A	modules without own chips	Optical subassemblies and passive optical components for transceivers
+SZSE:300400	Shenzhen JT Automation Equipment Co Ltd Class A	unrelated business	SMT reflow ovens
+SZSE:300408	Chaozhou Three-Circle (Group) Co., Ltd. Class A	passive components	Ceramic ferrules, MLCCs and ceramic packages for passives
+SZSE:300433	Lens Technology Co. Ltd. Class A	unrelated business	Cover glass and structural parts; assembly is a minor part
+SZSE:300460	Guangdong Faith Long Crystal Technology Co., Ltd. Class A	passive components	Quartz crystal resonators and oscillators
+SZSE:300475	Shannon Semiconductor Technology Co., Ltd. Class A	distributor	Memory chip distribution (SK Hynix agent); own enterprise SSD brand is small
+SZSE:300476	Victory Giant Technology (HuiZhou) Co., Ltd. Class A	printed circuit boards	PCBs for AI servers
+SZSE:300493	Shanghai Fortune Techgroup Co Ltd Class A	distributor	IC distribution and design-in services
+SZSE:300543	Shenzhen Longood Intelligent Electronic Co., Ltd. Class A	unrelated business	Smart controller boards
+SZSE:300545	Shenzhen Liande Automatic Equipment Co., Ltd. Class A	display	Display module bonding equipment
+SZSE:300548	EverProX Technologies Co., Ltd. Class A	modules without own chips	PLC splitters, optical modules and active optical cables
+SZSE:300552	Vanjee Technology Co., Ltd. Class A	unrelated business	ETC, weigh-in-motion and LiDAR systems
+SZSE:300553	Hangzhou Jizhi Mechatronic Co., Ltd. Class A	unrelated business	Balancing machines
+SZSE:300554	Wuxi Boda New Energy Technology Co., Ltd. Class A	business not confirmed	Formerly Sanchao (dicing blades, grinding wheels); current business after its rename not confirmed
+SZSE:300576	Shenzhen Rongda Photosensitive & Technology Co., Ltd. Class A	printed circuit boards	PCB solder-resist and photoresist inks; semiconductor resists are minor
+SZSE:300582	Inventronics (Hangzhou), Inc. Class A	power, battery or cooling	LED drivers
+SZSE:300593	Beijing Relpow Technology Co., Ltd. Class A	power, battery or cooling	Power supplies and modules for defence and telecom
+SZSE:300615	XDC Industries (Shenzhen) Ltd. Class A	passive components	RF metal components for base stations
+SZSE:300632	Xiamen Guangpu Electronics Co., Ltd. Class A	LED lighting or screens	LED lighting, sensors and solar products
+SZSE:300638	Fibocom Wireless, Inc. Class A	modules without own chips	Cellular IoT modules
+SZSE:300657	XiaMen HongXin Electron-tech Group Co. Ltd. Class A	printed circuit boards	Flexible printed circuits; AI server leasing
+SZSE:300684	Jones Tech PLC Class A	power, battery or cooling	Thermal interface and EMI shielding materials
+SZSE:300686	Shenzhen CDL Precision Technology Co., Ltd. Class A	unrelated business	Die-cut functional parts for consumer electronics
+SZSE:300693	Shenzhen Sinexcel Electric Co., Ltd. Class A	power, battery or cooling	Power quality, EV charging and energy storage converters
+SZSE:300701	Senba Sensing Technology Co. Ltd. Class A	unrelated business	Pyroelectric infrared and light sensors
+SZSE:300724	Shenzhen S.C New Energy Technology Corp. Class A	solar	PV cell production equipment; semiconductor wet-tool unit is minor
+SZSE:300752	Shenzhen Longli Technology Co., Ltd. Class A	display	LED backlight modules
+SZSE:300776	Wuhan DR Laser Technology Corp. Ltd. Class A	solar	Laser equipment for PV cells
+SZSE:300812	Shenzhen Etmade Automatic Equipment Co., Ltd. Class A	display	Display module assembly equipment
+SZSE:300835	Sinomag Technology Co., Ltd. Class A	passive components	Ferrite magnets and inductors
+SZSE:300842	Wuxi DK Electronic Materials Co., Ltd. Class A	solar	PV conductive silver paste
+SZSE:300875	Tianjin Jieqiang Power Equipment Co. Ltd. Class A	unrelated business	Nuclear, biological and chemical defence equipment
+SZSE:300889	Shenzhen EXC-LED Technology Co., Ltd. Class A	LED lighting or screens	LED landscape lighting fixtures and control systems
+SZSE:300909	Shenzhen Hui Chuang Da Technology Co., Ltd. Class A	unrelated business	Light-guide films, keyboard backlight modules and connectors
+SZSE:300939	Shenzhen AV-Display Co., Ltd. Class A	display	LCD display modules
+SZSE:300940	Shenzhen Australis Electronic Technology Co., Ltd. Class A	display	LED backlight modules
+SZSE:300968	Guangdong Green Precision Components Co., Ltd. Class A	unrelated business	Precision structural parts for consumer electronics
+SZSE:300976	Dongguan Tarry Electronics Co., Ltd. Class A	unrelated business	Die-cut functional parts for consumer electronics
+SZSE:301002	Shenzhen SOSEN Electronics Co. Ltd. Class A	power, battery or cooling	LED driver power supplies
+SZSE:301045	Talant Optronics (suzhou) Co., Ltd. Class A	display	Light guide plates for LCD backlights
+SZSE:301050	Chengdu RML Technology Co., Ltd. Class A	unrelated business	Millimetre-wave phased-array microsystems for defence
+SZSE:301099	Shanghai YCT Electronics Group Co., Ltd. Class A	distributor	Component distribution; automotive analog IC design unit is small
+SZSE:301106	Jiangsu Smartwin Electronics Technology Co., Ltd. Class A	display	LCD display modules
+SZSE:301180	Suzhou Wanxiang Technology Co., Ltd. Class A	unrelated business	Precision components for consumer-electronics batteries
+SZSE:301200	Shenzhen Han's CNC Technology Co., Ltd. Class A	printed circuit boards	PCB drilling and processing equipment
+SZSE:301205	Linktel Technologies Co., Ltd. Class A	modules without own chips	Optical transceiver modules
+SZSE:301217	Anhui Tongguan Copper Foil Group Co., Ltd. Class A	printed circuit boards	Copper foil for PCBs and batteries
+SZSE:301338	GKG Precision Machine Co., Ltd. Class A	unrelated business	SMT solder-paste printers; LED die bonders
+SZSE:301379	Techshine Electronics Co. Ltd. Class A	display	LCD display modules
+SZSE:301383	Minami Acoustics Limited Class A	unrelated business	Headphones and audio products ODM
+SZSE:301386	Suzhou Future Electrical Co., Ltd. Class A	unrelated business	Circuit-breaker accessories
+SZSE:301421	Nanjing Wavelength Opto-Electronic Science and Technology Co., Ltd. Class A	unrelated business	Laser and infrared optical lenses and components
+SZSE:301486	Shenzhen Zesum Technology Co., Ltd. Class A	unrelated business	Game-controller components and connectors
+SZSE:301489	Guangdong SQ New Material Co., Ltd. Class A	power, battery or cooling	Graphite heat-spreading films and thermal materials
+SZSE:301600	Flaircomm Microelectronics. Inc. Class A	modules without own chips	Automotive connectivity modules and T-Boxes, despite the name
+SZSE:301626	Suzhou Tianmai Thermal Technology Co. Ltd. Class A	power, battery or cooling	Vapour chambers and thermal materials
+SZSE:301636	Zerun Co., Ltd. Class A	solar	PV junction boxes
+SZSE:301658	Shenzhen SOFARSOLAR Co., Ltd.	solar	PV inverters and energy storage
+SZSE:301697	Suzhou Betely Polymer Materials Co., Ltd. Class A	solar	PV conductive silver paste, silicone and coating materials
+SZSE:301716	Shenzhen HFC Co., Ltd. Class A	power, battery or cooling	Thermal interface and EMI materials
+TPEX:1343	Sun Rise E&T Corp.	unrelated business	HDPE pipes
 TPEX:3071	ADDA Corp.	power, battery or cooling	
 TPEX:3078	Channel Well Technology Co., Ltd.	power, battery or cooling	
 TPEX:3117	Tecstar Technology Co., Ltd.	unrelated business	
 TPEX:3152	Advanced Ceramic X Corporation	passive components	
 TPEX:3188	Golden Long Teng Development Co. Ltd.	unrelated business	
 TPEX:3221	Tai-Saw Technology Co., Ltd.	passive components	
+TPEX:3268	Higher Way Electronic Co., Ltd.	distributor	IC application solution house reselling third-party chips, gross margin about 7%; was T09 analog
 TPEX:3276	T-Flex Techvest PCB Co., Ltd.	printed circuit boards	
 TPEX:3285	Microtips Technology Inc.	display	
+TPEX:3313	Feei Cherng Enterprise Co., Ltd	unrelated business	Residential development and building materials
 TPEX:3357	TAI-TECH Advanced Electronics Co., Ltd.	passive components	
 TPEX:3360	Sunnic Technology & Merchandise Inc.	distributor	
 TPEX:3444	Niching Industrial Corp.	distributor	
@@ -17,26 +495,36 @@ TPEX:3483	Forcecon Technology Co. Ltd.	power, battery or cooling
 TPEX:3491	Universal Microwave Technology, Inc.	modules without own chips	
 TPEX:3523	EFUN Technology Co., Ltd.	display	
 TPEX:3531	Shian Yih Electronic Industry Co., Ltd	unrelated business	
+TPEX:3555	BaaS Innovation Co., Ltd.	unrelated business	Electronics trading and consumer products (ADATA subsidiary)
 TPEX:3597	Avertronics Inc.	unrelated business	
 TPEX:3609	Hep Tech Co., Ltd.	LED lighting or screens	
 TPEX:3624	Viking Tech Corporation	passive components	
 TPEX:3684	Grand-Tek Technology Co., Ltd.	modules without own chips	
 TPEX:3713	Hsinjing Holding Co., Ltd.	LED lighting or screens	
+TPEX:3718	CoreIntelligence Holdings Corporation	display	Holding company of Coretronic (backlight modules, projectors); replaced TPEX:5371 on 2026-09-03
+TPEX:4908	APAC Opto Electronics Inc.	modules without own chips	Optical transceiver modules about 94% of sales; was T06 opto in the first pass
 TPEX:4909	New Era Electronics Co., Ltd.	modules without own chips	
 TPEX:4974	Asia Tech Image Inc.	modules without own chips	
 TPEX:4995	Litemax Electronics Inc.	display	
 TPEX:5228	Max Echo Technology Corp	unrelated business	
 TPEX:5245	Wisechip Semiconductor Inc.	display	
+TPEX:5248	Pixon Technologies Corporation	modules without own chips	Contact image sensor modules and lens arrays
+TPEX:5314	Myson Century, Inc.	unrelated business	Now health foods, restaurants, drones and insurance brokerage; no IC design; was T09 mcu
 TPEX:5315	United Radiant Technology Corporation	display	
 TPEX:5386	Albatron Technology Co., Ltd	distributor	
 TPEX:5432	Solomon Data International Corporation	distributor	
 TPEX:5457	Speed Tech Corp.	passive components	
+TPEX:6103	Avid Electronics Corp.	distributor	Semiconductor component trading about 78% of sales, gross margin about 6%; was T09 mcu
 TPEX:6124	Yeh-Chiang Technology Corp.	power, battery or cooling	
 TPEX:6167	Powertip Tech Corp.	display	
 TPEX:6174	AKER Technology Co., Ltd.	passive components	
 TPEX:6198	Rich Circle Development Co Ltd	unrelated business	
+TPEX:6207	Laser Tek Taiwan Co., Ltd.	unrelated business	Laser trimmers, SMT equipment and carrier tape mainly for passive components; was T04 backend
 TPEX:6210	Kintech Electronics Co., Ltd.	printed circuit boards	
 TPEX:6212	Li Ming Development Construction Co., Ltd.	unrelated business	
+TPEX:6218	Hauman Technologies Corp.	unrelated business	IT network systems integration about 62% of sales; semiconductor equipment agency about 12%
+TPEX:6229	V-TAC Technology co., Ltd.	distributor	IC firmware and application house reselling third-party MCUs, sensors and modules; was T09 mcu
+TPEX:6236	Neith Corporation	unrelated business	Biotech and wellness products
 TPEX:6244	Motech Industries, Inc.	solar	
 TPEX:6259	Bull Will Co., Ltd.	unrelated business	
 TPEX:6265	Kuen Chaang Uppertech Corp.	unrelated business	
@@ -48,21 +536,34 @@ TPEX:6560	APPRO Photoelectron, Inc.	modules without own chips
 TPEX:6577	Promate Solutions Corp.	distributor	
 TPEX:6638	Goldtek Technology Co., Ltd.	unrelated business	
 TPEX:6642	Fuzetec Technology Co., Ltd.	passive components	
+TPEX:6739	Grade Upon Technology Corp.	business not confirmed	Factory automation; semiconductor versus panel mix not confirmed
 TPEX:6775	Entire Technology Co Ltd	display	
 TPEX:6784	TSKY Co., Ltd.	unrelated business	
+TPEX:6839	Power Master II Holdings.Co.,Ltd	unrelated business	Power generation and distribution machinery
+TPEX:6842	Nexora Technology Co., LTD.	unrelated business	FPGA design-verification platforms about 45% and defence electronics about 45% of sales; borderline T05
 TPEX:6899	Apex Material Technology Corp.	display	
+TPEX:6977	United Purification Technology Co Ltd	business not confirmed	Water systems for electronics plants; semiconductor customer share not confirmed
 TPEX:6980	Rapidtek Technologies Inc.	modules without own chips	
+TPEX:6992	Fortune Advanced Technology Co., Ltd.	business not confirmed	Power IC designer per profile page only
+TPEX:7669	Suregiant Technology Co. Ltd.	business not confirmed	Release films; semiconductor end use not confirmed
+TPEX:7753	Star Asia Vision Corporation	LED lighting or screens	LED display screens and architectural lighting (Taiwan-Asia Semiconductor subsidiary)
+TPEX:7767	High Performance Information Co., Ltd.	unrelated business	IT equipment resale and services
+TPEX:7846	Htc & Solar Tech Service Limited	business not confirmed	Parts cleaning; semiconductor share not confirmed
 TPEX:7872	Green Solution Technology Co	no market cap at the provider	Emerging-board stock without a market cap at the provider
 TPEX:7873	Raytek Semiconductor, Inc.	no market cap at the provider	Emerging-board stock without a market cap at the provider
 TPEX:7890	Etica Battery INC.	power, battery or cooling	
+TPEX:7894	Hypersonic INC	distributor	Agency sales of packaging and test equipment and parts
 TPEX:7898	InPsytech, Inc.	no market cap at the provider	Emerging-board stock without a market cap at the provider
 TPEX:7913	QBit Semiconductor Ltd.	no market cap at the provider	Emerging-board stock without a market cap at the provider
+TPEX:7917	Centera Photonics Inc	modules without own chips	Optical transceiver modules and active optical cables (Elite Advanced Laser subsidiary)
 TPEX:7918	XALLOY Advanced Materials Corporation	no market cap at the provider	Emerging-board stock without a market cap at the provider
 TPEX:7926	Chunghwa Leading Photonics Tech Co., Ltd.	no market cap at the provider	Emerging-board stock without a market cap at the provider
 TPEX:7928	AuthenX Inc.	no market cap at the provider	Emerging-board stock without a market cap at the provider
 TPEX:7931	Susen Green Energy Co., Ltd.	solar	
+TPEX:7932	e-Ray Technology Co., Ltd.	printed circuit boards	Resins for copper-clad laminates and organometallic catalysts; packaging materials not yet material
 TPEX:7935	Nfore Technology Co Ltd	modules without own chips	
 TPEX:7947	PieceMakers Technology, Inc.	no market cap at the provider	Emerging-board stock without a market cap at the provider
+TPEX:7956	CHIFF Technology Inc	business not confirmed	Storage automation; fab business not confirmed beyond a profile page
 TPEX:8049	Ampire Co., Ltd.	display	
 TPEX:8066	Lifestyle Global Enterprise Inc.	unrelated business	
 TPEX:8080	TerraLink Enterprise Co Ltd	unrelated business	
@@ -72,6 +573,60 @@ TPEX:8182	Harmony Electronics Corp	passive components
 TPEX:8240	Wah Hong Industrial Corp.	display	
 TPEX:8289	Taitien Electronics Co., Ltd.	passive components	
 TPEX:8291	ShineMore Technology Materials Co., Ltd.	unrelated business	
+TSE:167A	Ryoyo Ryosan Holdings,Inc.	distributor	Semiconductor distributor
+TSE:1952	Shin Nippon Air Technologies Co., Ltd.	business not confirmed	General HVAC contractor; site names cleanrooms and semiconductor plants within industrial HVAC, share not disclosed
+TSE:1980	DAI-DAN Co., Ltd.	business not confirmed	General HVAC and MEP contractor; site names precision HVAC for semiconductor and electronic-device plants among many fields, share not disclosed
+TSE:2737	Tomen Devices Corp.	distributor	Memory and semiconductor distributor
+TSE:2760	Tokyo Electron Device Limited	distributor	Semiconductor distributor with a small own-brand business
+TSE:280A	TMH, Inc.	distributor	Used semiconductor equipment sales are 86% of revenue; parts repair is 14%
+TSE:3131	Shinden Hightex Corp.	distributor	Semiconductor and display component trading company
+TSE:3132	MACNICA HOLDINGS INC.	distributor	Semiconductor distributor
+TSE:3156	Restar Corporation	distributor	Semiconductor and electronics distributor
+TSE:3374	Naigai Tec Corporation	distributor	Tool parts reseller, about 80% to Tokyo Electron; contract assembly is 14% of sales
+TSE:4064	Nippon Carbide Industries Company,Incorporated	unrelated business	Functional resins, retroreflective sheeting, ceramic substrates for chip resistors
+TSE:5713	Sumitomo Metal Mining Co., Ltd.	unrelated business	Mining and smelting; Materials segment is 14% of sales (battery and powder materials) and bonded SiC is not yet a material business
+TSE:6235	OPTORUN CO.,LTD.	unrelated business	Optical thin-film coating equipment
+TSE:6384	SHOWA SHINKU CO., LTD.	unrelated business	Vacuum equipment for quartz crystal devices and optics, not wafer fabs
+TSE:6396	Unozawa-Gumi Iron Works, Limited	unrelated business	Dry vacuum pumps and blowers sold mainly to chemical plants and general industry; no semiconductor line on company site
+TSE:6524	KOHOKU KOGYO CO. LTD.	passive components	Lead terminals for aluminium electrolytic capacitors; optical components for subsea cables
+TSE:6632	JVCKENWOOD Corporation	unrelated business	Car AV, professional radio and audio equipment
+TSE:6635	Di-Nikko Engineering Co., Ltd.	unrelated business	PCB assembly and lens assembly contractor
+TSE:6666	RIVER ELETEC CORPORATION	passive components	Quartz crystal devices
+TSE:6677	SK-Electronics Co., Ltd.	display	Large photomasks for flat-panel displays only
+TSE:6731	Pixela Corporation	unrelated business	TV tuners and home appliances
+TSE:6740	Japan Display Inc.	display	LCD and OLED panels
+TSE:6770	Alps Alpine Co., Ltd.	passive components	Switches, sensors, haptics and automotive modules
+TSE:6777	santec Holdings Corporation	unrelated business	Optical test instruments and components
+TSE:6779	Nihon Dempa Kogyo Co., Ltd.	passive components	Quartz crystal devices
+TSE:6817	Sumida Corporation	passive components	Inductors and coils
+TSE:6838	Tamagawa Holdings Co., Ltd.	unrelated business	Wireless and RF equipment; renewable energy
+TSE:6899	Asti Corporation	unrelated business	Automotive electrical parts and wire harnesses
+TSE:6905	Cosel Co., Ltd.	power, battery or cooling	Switching power supplies
+TSE:6907	Geomatec Co., Ltd.	display	Contract thin-film coating, mainly display substrates
+TSE:6912	KIKUSUI HOLDINGS CORPORATION	power, battery or cooling	DC power supplies and electronic test instruments
+TSE:6926	Okaya Electric Industries Co., Ltd.	passive components	Noise-suppression capacitors and surge absorbers
+TSE:6962	Daishinku Corp.,	passive components	Quartz crystal devices
+TSE:6981	Murata Manufacturing Co., Ltd.	passive components	MLCC-led components are 63% of sales; RF modules, SAW filters and pSemi RF ICs are secondary
+TSE:6989	Hokuriku Electric Industry Co., Ltd.	passive components	Resistors, modules and sensors
+TSE:6999	Koa Corporation	passive components	Resistors
+TSE:7087	WILLTEC Co., Ltd.	unrelated business	Manufacturing staffing, engineer dispatch and small EMS
+TSE:7433	Hakuto Co., Ltd.	distributor	Electronics trading company
+TSE:7537	Marubun Corporation	distributor	Semiconductor distributor
+TSE:7609	Daitron Co., Ltd.	distributor	Electronic parts trading company; own equipment is 27% of sales
+TSE:7692	EARTH INFINITY CO. LTD.	unrelated business	Electricity and gas retail
+TSE:7713	Sigma Koki Co., Ltd.	unrelated business	Optical components and laser systems for research, bio-medical, inspection and optical-communications uses; company business page names no semiconductor line
+TSE:7794	EDP Corporation	unrelated business	Mainly seed crystals for lab-grown diamond jewellery; semiconductor substrates are still research-grade
+TSE:8150	Sanshin Electronics Co., Ltd.	distributor	Semiconductor distributor
+TSE:8154	Kaga Electronics Co., Ltd.	distributor	Electronics trading company with an EMS arm
+TSX:CHE.UN	Chemtrade Logistics Income Fund	unrelated business	Ultrapure sulphuric acid for fabs is a product line inside a diversified chemicals fund, not a named division
+TSX:ET	Evertz Technologies Limited	unrelated business	Broadcast video equipment
+TSX:MDA	MDA Space Ltd	unrelated business	Satellites and space robotics
+TSX:NEO	Neo Performance Materials, Inc.	unrelated business	Rare-earth magnets and chemicals; gallium and indium recycling is not a material chip-chain business
+TSXV:AUTO	Agereh Technologies Inc.	unrelated business	Transport analytics; not a chip company
+TSXV:CBLU	Clear Blue Technologies International, Inc.	solar	Off-grid solar power systems
+TSXV:QNC	Quantum eMotion Corp.	unrelated business	Quantum random-number cybersecurity products; QRNG chips listed as coming soon (quantumemotion.com)
+TSXV:SPRQ	SPARQ Systems Inc	solar	Solar microinverters
+TSXV:YNV	Ynvisible Interactive Inc. Class A	display	Printed electrochromic displays
 TWSE:1410	Nan Yang Dyeing & Finishing Co. Ltd.	unrelated business	
 TWSE:1471	Solytech Enterprise Corporation	unrelated business	
 TWSE:2241	Amulaire Thermal Technology, Inc.	power, battery or cooling	
@@ -88,6 +643,8 @@ TWSE:2428	Thinking Electronic Industrial Co., Ltd.	passive components
 TWSE:2459	Audix Corporation	passive components	
 TWSE:2460	Gem Terminal Industries Co., Ltd.	passive components	
 TWSE:2484	Siward Crystal Technology Co., Ltd	passive components	
+TWSE:2491	FORTUNE ORIENTAL CO., LTD.	unrelated business	Electronic component trading, lighting and property development
+TWSE:2493	AMPOC Far-East Co., Ltd.	printed circuit boards	PCB wet-process equipment and process-chemical agency; semiconductor lines mostly agency or in validation
 TWSE:3003	K.S. Terminals Inc.	passive components	
 TWSE:3015	FSP Technology Inc.	power, battery or cooling	
 TWSE:3017	Asia Vital Components Co., Ltd.	power, battery or cooling	
@@ -129,6 +686,7 @@ TWSE:6443	TSEC Corporation	solar
 TWSE:6456	General Interface Solution (GIS) Holding Ltd.	display	
 TWSE:6477	Anji Technology Co Ltd	solar	
 TWSE:6698	FineMat Applied Materials Co., Ltd.	display	
+TWSE:6742	Vactronics Technologies, Inc.	unrelated business	Optical thin-film filters and coatings; wafer-level optical coating is a minority of sales
 TWSE:6805	Fositek Corp.	unrelated business	
 TWSE:6831	Taiwan Microloops Corp.	power, battery or cooling	
 TWSE:6862	Trio Technology International Group Co., Ltd.	passive components	

@@ -1,6 +1,6 @@
 # The Silicon Spectrum
 
-A browser-based dashboard of 765 companies across the semiconductor supply chain,
+A browser-based dashboard of 1,468 companies across the semiconductor supply chain,
 from polysilicon to the companies that buy the finished chips.
 
 Open the live portal at **https://www.pandala.in/semi/**. A downloaded copy of
@@ -11,8 +11,8 @@ load market data. Use the deployed portal, or serve the complete repository.
 
 The companies live in the `TIERS` list in `index.html`: ten tiers, each split
 into groups by what its companies make (for example lithography, deposition and
-etch, inspection and packaging equipment within Tier 4). 747 of the
-765 companies are listed; the rest are private companies or
+etch, inspection and packaging equipment within Tier 4). 1,392 of the
+1,468 companies are listed; the rest are private companies or
 subsidiaries without a market value of their own.
 
 **What is included.** A company is on the roster when its main business, or a
@@ -41,9 +41,10 @@ TSMC's US ADR. To add a company, add a line to its tier with `name`, `hq`,
 `ticker`, `seg` (one of the tier's segment ids) and `domain`.
 
 **Checking coverage.** `scripts/audit-roster.mjs` compares the roster with the
-provider: every symbol must resolve and carry a market cap, and every primary
-listing the provider files under its Semiconductors or Electronic Production
-Equipment industries must be either on the roster or in
+provider: every symbol must resolve (a newly listed company without a market
+cap yet is reported as a notice), and every primary listing the provider files
+under its Semiconductors or Electronic Production Equipment industries must be
+either on the roster or in
 `scripts/roster-exclusions.tsv`, which records each listing that was ruled out
 and why. A newly listed company therefore shows up as unreviewed.
 
@@ -113,7 +114,7 @@ opens and when **Refresh market data** is selected.
 
 ## Market data and calculations
 
-Each visitor's browser sends one batch request for the 747 listed companies
+Each visitor's browser sends one batch request for the 1,387 listed companies
 to TradingView's public screener endpoint. It then fetches the exchange rates
 for the currencies those shares are priced in. Prices, market caps, rankings, tier totals, tier percentages, and the
 combined total are calculated from that request. There are no embedded market

@@ -44,7 +44,7 @@ test('every company is well formed and sits in one of its tier’s segments', ()
       for (const key of Object.keys(company)) {
         assert.ok(['name', 'hq', 'ticker', 'seg', 'domain', 'status', 'note', 'flows'].includes(key), key + ' in ' + id);
       }
-      if (company.status !== undefined) assert.ok(['private', 'crossref'].includes(company.status), 'status ' + id);
+      if (company.status !== undefined) assert.ok(['private', 'crossref', 'uncovered'].includes(company.status), 'status ' + id);
       // A private company or unlisted unit says who owns it; a listed one has a symbol.
       if (company.status) assert.ok(company.note && company.note.length >= 10, 'ownership note ' + id);
       if (company.status) assert.equal(company.ticker, undefined, 'unlisted companies carry no symbol: ' + id);
