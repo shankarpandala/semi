@@ -5,39 +5,22 @@
 })(typeof globalThis === 'object' ? globalThis : this, function () {
   'use strict';
 
-  // Explicit listings prevent an ambiguous ticker from resolving to another company.
-  // Yahoo suffixes are retained as the dashboard's company identifiers.
-  const symbols = Object.create(null);
-  const listings = [
-    ['', 'NASDAQ', 'AAPL AEIS AMAT AMD AMKR AMZN ARM ASML AVGO CDNS CEVA ENTG GFS GOOGL ICHR INTC KLAC LIN LRCX MKSI MRVL MSFT MU NVDA QCOM RMBS SMCI SNPS TER TSEM UCTT'],
-    ['', 'NYSE', 'APD ASX AVTR KEYS TSM UMC'],
-    ['.DE', 'XETR', 'BAS MRK WAF WCH'],
-    ['.PA', 'EURONEXT', 'AI'],
-    ['.AS', 'EURONEXT', 'ASM'],
-    ['.BR', 'EURONEXT', 'SOLB'],
-    ['.SW', 'SIX', 'COTN VACN'],
-    ['.VI', 'VIE', 'ATS'],
-    ['.T', 'TSE', '2802 3436 4004 4043 4062 4063 4091 4109 4186 4901 5333 6361 6525 6856 6857 6947 6971 7731 7735 7751 8035'],
-    ['.TW', 'TWSE', '2317 2356 2382 2408 2449 2454 3037 3189 3231 3532 4958 6239 8046 8150'],
-    ['.TWO', 'TPEX', '6147 6488'],
-    ['.KS', 'KRX', '000660 005930 009150 456040'],
-    ['.KQ', 'KRX', '005290 033640 036540 067310'],
-    ['.SZ', 'SZSE', '002156 002185 002371 002916'],
-    ['.SS', 'SSE', '600584 688012'],
-    ['.HK', 'HKEX', '0981 1347'],
-  ];
-  for (const [suffix, exchange, tickers] of listings) {
-    for (const ticker of tickers.split(' ')) {
-      const localTicker = exchange === 'HKEX' ? String(Number(ticker)) : ticker;
-      symbols[ticker + suffix] = exchange + ':' + localTicker;
-    }
-  }
-  // MosChip's listing is on BSE; its legacy dashboard identifier used .NS.
-  symbols['MOSCHIP.NS'] = 'BSE:MOSCHIP';
+  // The roster identifies each listing by the provider's own symbol, written
+  // EXCHANGE:CODE (for example NASDAQ:NVDA, TSE:8035, KRX:000660). Only that
+  // shape is accepted, so nothing else can reach the request or the widget URL.
+  const SYMBOL = /^[A-Z][A-Z0-9_]{1,14}:[A-Z0-9][A-Z0-9._&-]{0,19}$/;
 
   function tradingViewSymbol(ticker) {
     if (typeof ticker !== 'string') return null;
-    return symbols[ticker.trim().toUpperCase()] || null;
+    const symbol = ticker.trim().toUpperCase();
+    return SYMBOL.test(symbol) ? symbol : null;
+  }
+
+  // Listing page for a symbol: /symbols/EXCHANGE-CODE/.
+  function listingUrl(symbol) {
+    const split = symbol.indexOf(':');
+    return 'https://www.tradingview.com/symbols/' + encodeURIComponent(symbol.slice(0, split)) + '-'
+      + encodeURIComponent(symbol.slice(split + 1)) + '/';
   }
 
   function createPanel({host, status, retry, link}) {
@@ -89,7 +72,7 @@
 
       const request = generation;
       let finished = false;
-      const url = 'https://www.tradingview.com/symbols/' + symbol.replace(':', '-') + '/';
+      const url = listingUrl(symbol);
       link.href = url;
       link.target = '_blank';
       link.rel = 'noopener noreferrer';
@@ -168,5 +151,5 @@
     return {show, hide};
   }
 
-  return {tradingViewSymbol, createPanel};
+  return {tradingViewSymbol, listingUrl, createPanel};
 });
