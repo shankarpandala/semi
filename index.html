@@ -308,7 +308,7 @@
 
 <footer>
   DATA SCOPE — <span id="scopeCount">—</span> companies across the full sand-to-system chain, <span id="scopeListed">—</span> of them listed. A company is included when its main business, or a named division with outside customers, sits in one of the ten tiers. Each company appears once, in the tier of its main business, and each tier is split into groups by what its companies make. Out of scope: solar, display panels, passive components, printed circuit boards other than IC substrates, component distributors and LED lighting. Tier 10 covers hyperscalers, device and server brands and large contract manufacturers, not every buyer of chips.<br>
-  MARKET DATA — your browser fetches prices and company market caps from TradingView whenever you open this page or refresh market data. Your browser converts prices and caps to USD using fetched exchange rates. Tier totals, rankings, and weights use only the market caps received in that request; unavailable companies are excluded. Quotes may be delayed or reflect the last market close. “Fetched” is the retrieval time, not the trading time. Private companies and subsidiaries have no standalone public valuation.<br>
+  MARKET DATA — your browser fetches prices and company market caps from TradingView whenever you open this page or refresh market data. Your browser converts prices and caps to USD using fetched exchange rates. Tier totals, rankings, and weights use only the market caps received in that request; unavailable companies are excluded. Quotes may be delayed or reflect the last market close. “Fetched” is the retrieval time, not the trading time. Private companies and subsidiaries have no standalone public valuation, and companies listed only on the Beijing Stock Exchange are shown without one because the data provider does not carry that exchange.<br>
   SUPPLY-CHAIN SOURCES — Semiconductor Engineering · imec · 24 Market Reports · CSIMarket · Fortune Business Insights · TRUMPF newsroom · TradingView industry listings · company filings and websites.
 </footer>
 
@@ -467,7 +467,7 @@ const TIERS = [
       {name:'Mitsubishi Gas Chemical', hq:'Japan', ticker:'TSE:4182', seg:'wet', domain:'Super-pure hydrogen peroxide; BT resin for package substrates'},
       {name:'Shanghai Sinyang Semiconductor Materials', hq:'China', ticker:'SZSE:300236', seg:'wet', domain:'Copper plating and cleaning chemicals, KrF and ArF photoresists'},
       {name:'Grandit', hq:'China', ticker:'SSE:688549', seg:'wet', domain:'Electronic-grade HF, sulfuric and nitric acid; fluorine specialty gases'},
-      {name:'Solvay S.A.', hq:'Belgium', ticker:'EURONEXT:SOLB', seg:'wet', domain:'Specialty polymers, electronic wet chemicals', note:'Solvay demerged its specialty-chemicals arm into Syensqo in Dec 2023; the listing represents Solvay SA post-split.', flows:true},
+      {name:'Solvay S.A.', hq:'Belgium', ticker:'EURONEXT:SOLB', seg:'wet', domain:'Electronic-grade hydrogen peroxide and wet chemicals', note:'Solvay spun off its specialty polymers into Syensqo in December 2023; Syensqo is shown separately in this tier.', flows:true},
       {name:'PhiChem', hq:'China', ticker:'SZSE:300398', seg:'wet', domain:'Wet chemicals for bumping and packaging, molding compounds; display materials'},
       {name:'Sinophorus Electronic Materials', hq:'China', ticker:'SSE:688545', seg:'wet', domain:'Electronic-grade phosphoric and sulfuric acid, etchants and cleaners'},
       {name:'Crystal Clear Electronic Material', hq:'China', ticker:'SZSE:300655', seg:'wet', domain:'High-purity hydrogen peroxide and sulfuric acid, i-line and KrF photoresists'},
@@ -2055,6 +2055,13 @@ function buildPage(){
   let requestId = 0;
   let controller = null;
   let lastQuery = null;
+  // A company opened from a link is kept in view while the page settles: the
+  // first data load re-ranks the cards and late web fonts reflow them. It stops
+  // as soon as the visitor scrolls, closes the drawer, or a few seconds pass.
+  let pendingReveal = null;
+  const settleReveal = () => {
+    if(pendingReveal && currentCo === pendingReveal) cards.get(pendingReveal).scrollIntoView({block:'center', behavior:'instant'});
+  };
 
   const positive = value => typeof value === 'number' && Number.isFinite(value) && value > 0;
   const fmtCount = value => value.toLocaleString('en-US');
@@ -2247,6 +2254,7 @@ function buildPage(){
     marketPrices?.hide();
     cards.forEach(card => card.classList.remove('active'));
     currentCo = currentTier = null;
+    pendingReveal = null;
     updateHash();
   }
 
@@ -2396,6 +2404,7 @@ function buildPage(){
         refreshButton.disabled = false;
         refreshButton.textContent = 'Refresh market data';
         renderMarketValues();
+        settleReveal();
       }
     }
   }
@@ -2435,7 +2444,13 @@ function buildPage(){
       setCollapsed(node, false);
       tierNodes.get(tier).row.classList.add('visible');
       openDrawer(tier, co);
-      requestAnimationFrame(() => cards.get(co).scrollIntoView({block:'center'}));
+      pendingReveal = co;
+      requestAnimationFrame(settleReveal);
+      document.fonts?.ready.then(settleReveal);
+      for(const type of ['wheel', 'touchmove', 'keydown']){
+        window.addEventListener(type, () => { pendingReveal = null; }, {passive:true, once:true});
+      }
+      setTimeout(() => { pendingReveal = null; }, 6000);
       break;
     }
   }
