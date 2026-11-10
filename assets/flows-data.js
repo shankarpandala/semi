@@ -40,7 +40,7 @@
     {id:"t7-abf", tier:6, tierLabel:"Tier 7", role:"ABF film", column:6, hex:"#E89B4B",
       companies:["Ajinomoto Co., Inc."]},
     {id:"t4", tier:3, tierLabel:"Tier 4", role:"Fab equipment", column:6, hex:"#4FBF7A",
-      companies:["ASML","Applied Materials","Lam Research","KLA Corporation","Tokyo Electron (TEL)","NAURA Technology Group","ASM International","Advanced Micro-Fabrication Equipment (AMEC)","Canon","SCREEN Holdings","Kokusai Electric","Nikon","Hitachi High-Tech","Plasma-Therm","Disco","Lasertec","BE Semiconductor Industries (Besi)","ASMPT","Onto Innovation","Nova","Camtek"]},
+      companies:["ASML","Applied Materials","Lam Research","KLA Corporation","Tokyo Electron (TEL)","NAURA Technology Group","ASM International","Advanced Micro-Fabrication Equipment (AMEC)","Canon","SCREEN Holdings","Kokusai Electric","Nikon","Hitachi High-Tech","Plasma-Therm","Disco","Lasertec","BE Semiconductor Industries (Besi)","ASMPT","Onto Innovation","Nova","Camtek","Hanmi Semiconductor"]},
     {id:"t1", tier:0, tierLabel:"Tier 1", role:"Silicon wafers", column:6, hex:"#8B7FD8",
       companies:["SUMCO Corporation","GlobalWafers","Siltronic AG","Formosa SUMCO Technology","Shin-Etsu Handotai","SK Siltron","Soitec"]},
     {id:"t3", tier:2, tierLabel:"Tier 3", role:"Subsystems", column:7, hex:"#4FB8AE",
@@ -84,6 +84,7 @@
     "Monolithic Power Systems":"Monolithic Power", "Credo Technology":"Credo", "Cambricon Technologies":"Cambricon",
     "Hygon Information Technology":"Hygon", "BE Semiconductor Industries (Besi)":"Besi", "Onto Innovation":"Onto",
     "Qnity Electronics":"Qnity", "TOPPAN Holdings":"TOPPAN", "Daeduck Electronics":"Daeduck",
+    "Hanmi Semiconductor":"Hanmi",
   };
 
   // Listings used to fetch live market caps: the provider symbols of the companies page.
@@ -124,7 +125,7 @@
     "Onto Innovation":"NYSE:ONTO", "Nova":"NASDAQ:NVMI", "Camtek":"NASDAQ:CAMT", "Qnity Electronics":"NYSE:Q",
     "HOYA":"TSE:7741", "JX Advanced Metals":"TSE:5016", "Soitec":"EURONEXT:SOI", "Photronics":"NASDAQ:PLAB",
     "LG Innotek":"KRX:011070", "TOPPAN Holdings":"TSE:7911", "Simmtech":"KRX:222800", "Daeduck Electronics":"KRX:353200",
-    "Technoprobe":"MIL:TPRO", "FormFactor":"NASDAQ:FORM", "Micronics Japan":"TSE:6871",
+    "Technoprobe":"MIL:TPRO", "FormFactor":"NASDAQ:FORM", "Micronics Japan":"TSE:6871", "Hanmi Semiconductor":"KRX:042700",
   };
 
   // 2025 account of each company, USD billions. revenue is what flows into the
@@ -416,6 +417,11 @@
       outside:[{label:"Etch-equipment makers & fabs buying silicon parts (Hana Materials)", usd:0.192}, {label:"Other packaging & test customers", usd:0.098}],
       basis:"CY2025 (fiscal year ended Dec 31, 2025): revenue $1.1B; cost of revenue $931M; R&D + SG&A $60M; operating income $90M.",
       sources:[{title:"Hana Micron 사업보고서 2025 (DART rcpNo 20260319000032) - sales, income statement, segments, major customers, R&D, cash flow", url:"https://dart.fss.or.kr/dsaf001/main.do?rcpNo=20260319000032"}, {title:"Naver Finance annual summary - Hana Micron 2025 revenue KRW 1,534.4B, OI KRW 127.7B", url:"https://m.stock.naver.com/api/stock/067310/finance/annual"}]},
+    "Hanmi Semiconductor": {revenue:0.406, people:0.057, profit:0.177, conf:"disclosed",
+      scope:"Total revenue (single segment: semiconductor equipment)", period:"FY2025 (Jan 1 - Dec 31, 2025)",
+      outside:[{label:"Korean substrate, module and assembly-house customers other than SK Hynix", usd:0.043}, {label:"Other overseas HBM and 2.5D-packaging bonder buyers, incl. an unnamed customer with 14.8% of revenue", usd:0.07}, {label:"Overseas assembly houses, chipmakers and electronics makers buying saw/vision, EMI-shield and bonder tools", usd:0.069}],
+      basis:"FY2025 (Jan 1 - Dec 31, 2025): revenue $406M; cost of revenue $172M; R&D + SG&A $57M; operating income $177M.",
+      sources:[{title:"Hanmi Semiconductor 2025 business report (DART) - consolidated income statement, cash flow statement, sales by domestic/export, major-customer note", url:"https://dart.fss.or.kr/dsaf001/main.do?rcpNo=20260312001230"}, {title:"Hanmi Semiconductor Q3 2025 quarterly report (분기보고서), DART - domestic and export sales", url:"https://dart.fss.or.kr/dsaf001/main.do?rcpNo=20251114003005"}]},
     "Hemlock Semiconductor": {revenue:0.5, total:0.85, people:0, profit:0, conf:"estimated",
       scope:"Semiconductor-grade (hyperpure) polysilicon only, est. ~$0.5B. Total revenue (~$0.85B, estimated) also includes solar-grade polysilicon sold to the growing US solar supply chain. Hemlock is reported inside Corning's 'Hemlock and Emerging Growth Businesses' segment ($1,460M in 2025), which also holds Corning's solar wafer and module business, Pharmaceutical Technologies and other emerging businesses.", period:"CY2025 (Corning fiscal year Jan 1 - Dec 31, 2025)",
       otherLabel:"Costs and profit (breakdown pending)",
@@ -3440,6 +3446,9 @@
     {from:"SK Hynix", to:"FormFactor", usd:0.18, conf:"disclosed", what:"DRAM and HBM probe cards",
       basis:"FormFactor's only 10% customer in fiscal 2025 took 22.9% of $785.0M revenue = $179.8M. The quarterly table identifies it as SK hynix (23.3%, 25.0%, 24.5%, 19.2% of $171.4M, $195.8M, $202.7M, $215.2M, which also sums to $179.8M).",
       sources:[{title:"FormFactor Form 10-K for fiscal 2025 (year ended Dec 27, 2025)", url:"https://www.sec.gov/Archives/edgar/data/1039399/000103939926000009/form-20251227.htm"}, {title:"FormFactor XBRL financial data (SEC companyfacts, CIK 1039399)", url:"https://data.sec.gov/api/xbrl/companyfacts/CIK0001039399.json"}]},
+    {from:"Micron Technology", to:"Hanmi Semiconductor", usd:0.179, conf:"derived", what:"TC bonders for HBM, conversion kits and service",
+      basis:"Hanmi's largest 2025 customer bought KRW 253,520M (43.96% of revenue); it must be an export customer because domestic sales were only KRW 111,386M, and Micron, Hanmi's main overseas TC-bonder buyer (KRW 111.1B in 2024), is taken to be that customer: KRW 253,520M / 1,420 = $0.1785B.",
+      sources:[{title:"Hanmi Semiconductor 2025 business report (DART) - major-customer note and domestic/export sales", url:"https://dart.fss.or.kr/dsaf001/main.do?rcpNo=20260312001230"}, {title:"New Daily, Apr 2, 2025 - Hanmi's 2024 sales of KRW 299.6B to SK Hynix and KRW 111.1B to Micron", url:"https://biz.newdaily.co.kr/site/data/html/2025/04/02/2025040200057.html"}, {title:"Dealsite, Oct 29, 2025 - Micron as the key customer behind Hanmi's overseas sales; TC bonder vendors at SK Hynix and Micron", url:"https://dealsite.co.kr/articles/150315"}, {title:"LS Securities, Hanmi Semiconductor 3Q25 Preview, Oct 24, 2025 - TC bonder sales by customer (analyst estimates)", url:"https://file.alphasquare.co.kr/media/pdfs/company-report/_251024_%ED%95%9C%EB%AF%B8%EB%B0%98%EB%8F%84%EC%B2%B4%203Q25%20Preview_%EC%B0%A8%EC%9A%A9%ED%98%B8_173_Online%20report%20_%206_10p_%ED%95%9C%EB%AF%B8%EB%B0%98%EB%8F%84%EC%B2%B4.pdf"}]},
     {from:"STMicroelectronics", to:"ASE Technology (incl. SPIL)", usd:0.17, conf:"estimated", what:"Outsourced chip assembly and test",
       basis:"ST bought $1,547M of subcontracting services in 2025, its term for work by foundries and outsourced assembly and test houses; after an estimated ~$1.0B of foundry wafers, about $0.5B is outsourced assembly and test. ASE, the largest assembly and test contractor, is assumed to take about one third; ST does not name its subcontractors.",
       sources:[{title:"STMicroelectronics 2025 Dutch statutory annual report with IFRS accounts (Form 6-K, 26 Mar 2026) - expenses by nature and property, plant and equipment additions", url:"https://www.sec.gov/Archives/edgar/data/932787/000093278726000017/stm_arxmaster-dar2025sec.htm"}, {title:"STMicroelectronics 2025 Dutch statutory annual report with IFRS accounts (Form 6-K, 26 Mar 2026), full-text copy at financialfilings.com", url:"https://financialfilings.com/filings/stmicroelectronics/annual-report/2026/33053709/"}, {title:"STMicroelectronics Form 20-F for fiscal year 2025 (filed 26 Feb 2026) - customers, foundry share, capacity, capital expenditure", url:"https://www.sec.gov/Archives/edgar/data/932787/000093278726000009/stm-20251231.htm"}]},
@@ -3860,6 +3869,9 @@
     {from:"Micron Technology", to:"Nova", usd:0.035, conf:"estimated", what:"Metrology tools and service for DRAM and HBM fabs",
       basis:"Micron is below Nova's 10% threshold (under $88M). It is assumed to take about $35M across its Taiwan, Japan, Singapore and US fabs, drawn from Nova's USA (9%, $79M), other-region (13%, $114M) and Taiwan revenue left after TSMC (about $52M).",
       sources:[{title:"Nova Ltd 20-F 2025, sales by geographic area as percentage of total sales", url:"https://www.sec.gov/Archives/edgar/data/1109345/000117891326000504/R84.htm"}]},
+    {from:"SK Hynix", to:"Hanmi Semiconductor", usd:0.035, conf:"derived", what:"TC bonders for HBM",
+      basis:"Hanmi disclosed three 2025 SK Hynix orders for HBM bonders worth KRW 10,807.5M, 42,812M and 1,567.5M including VAT, all for delivery in 2025; excluding 10% VAT they total KRW 50,170M, or $0.035B. Parts, kits and service beyond these orders are not disclosed.",
+      sources:[{title:"Hanmi Semiconductor DART filing, Jan 14, 2025 - supply contract with SK Hynix, KRW 10,807.5M incl. VAT", url:"https://dart.fss.or.kr/dsaf001/main.do?rcpNo=20250114800153"}, {title:"Hanmi Semiconductor DART filing, May 16, 2025 - supply contract with SK Hynix for Dual TC Bonder Griffin, KRW 42,812M incl. VAT", url:"https://dart.fss.or.kr/dsaf001/main.do?rcpNo=20250516800319"}, {title:"Hanmi Semiconductor DART filing, Nov 17, 2025 - supply contract with SK Hynix, KRW 1,567.5M incl. VAT", url:"https://dart.fss.or.kr/dsaf001/main.do?rcpNo=20251117800179"}, {title:"Hanmi Semiconductor 2025 business report (DART) - domestic sales of KRW 111,386M", url:"https://dart.fss.or.kr/dsaf001/main.do?rcpNo=20260312001230"}]},
     {from:"ASE Technology (incl. SPIL)", to:"BE Semiconductor Industries (Besi)", usd:0.034, conf:"estimated", what:"Flip-chip and multi-module die attach, packaging systems",
       basis:"Besi names ASE as a customer; no customer reached 10% of 2025 revenue of EUR 591.3M and the top ten took about 44%. ASE, the largest assembly house, is assumed to take about EUR 14M of Besi's EUR 71.8M Taiwan sales plus EUR 16M at its plants in Malaysia, China, Korea and Singapore: EUR 30M = $0.034B.",
       sources:[{title:"Besi Annual Report 2025 - customers, revenue by country billed", url:"https://www.besi.com/fileadmin/data/Investor_Relations/AGM/2026/Agenda_item_3_-_Annual_Report_2025.pdf"}]},
@@ -4028,6 +4040,9 @@
     {from:"Texas Instruments", to:"Siltronic AG", usd:0.01, conf:"estimated", what:"Silicon wafers",
       basis:"Siltronic's line 'US analog & power IDMs (Texas Instruments, onsemi, Microchip)' is $0.015B; TI assumed about two thirds (~$0.01B).",
       sources:[{title:"Texas Instruments 2025 Annual Report (incl. Form 10-K for 2025)", url:"https://www.sec.gov/Archives/edgar/data/97476/000009747626000080/ti2025ars.pdf"}]},
+    {from:"ASE Technology (incl. SPIL)", to:"Hanmi Semiconductor", usd:0.01, conf:"estimated", what:"Flip chip bonders, saw and vision placement tools",
+      basis:"ASE ordered flip chip bonders worth USD 5.88M for delivery in Taiwan by September 2025, and ASE and ASE Korea are named Hanmi customers for its market-leading saw and vision placement systems; assumed about $4M of further tool purchases, about $0.01B in all.",
+      sources:[{title:"Hanmi Semiconductor DART filing, May 28, 2025 - flip chip bonder order from ASE, USD 5.88M", url:"https://dart.fss.or.kr/dsaf001/main.do?rcpNo=20250528800084"}, {title:"Hanmi Semiconductor 2025 business report (DART) - major customers", url:"https://dart.fss.or.kr/dsaf001/main.do?rcpNo=20260312001230"}]},
   ];
 
   return {meta, groups, short, tickers, accounts, flows};
