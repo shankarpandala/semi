@@ -457,6 +457,29 @@ async function run(){
       await compatiblePage.close();
     });
 
+    await check('The day/night switch follows the system setting, then remembers the visitor’s choice on both pages', async () => {
+      const themed = await browser.newContext({viewport:{width:1440, height:1000}, colorScheme:'light'});
+      await themed.route('https://scanner.tradingview.com/**', route => route.abort('blockedbyclient'));
+      const themePage = await themed.newPage();
+      await themePage.goto(baseURL+'/', {waitUntil:'load'});
+      assert.equal(await themePage.evaluate(() => document.documentElement.dataset.theme), 'light');
+      const background = () => themePage.evaluate(() => getComputedStyle(document.body).backgroundColor);
+      const day = await background();
+      const toggle = themePage.locator('.theme-toggle');
+      assert.equal(await toggle.getAttribute('aria-label'), 'Switch to night mode');
+      await toggle.click();
+      assert.equal(await themePage.evaluate(() => document.documentElement.dataset.theme), 'dark');
+      assert.notEqual(await background(), day);
+      assert.equal(await toggle.getAttribute('aria-label'), 'Switch to day mode');
+      // The choice outranks the system setting and carries over to the flows page.
+      await themePage.goto(baseURL+'/flows.html', {waitUntil:'load'});
+      assert.equal(await themePage.evaluate(() => document.documentElement.dataset.theme), 'dark');
+      await themePage.locator('.theme-toggle').click();
+      assert.equal(await themePage.evaluate(() => document.documentElement.dataset.theme), 'light');
+      assert.ok(await themePage.locator('#chart .node').count() > 0);
+      await themed.close();
+    });
+
     await check('An HTML-only copy explains missing supporting files and links to the live portal', async () => {
       // Managed Chromium blocks file:// navigation. Model the same missing-file
       // condition with an HTTP copy that has no sibling assets directory.
