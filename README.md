@@ -155,7 +155,8 @@ omit credentials, and go directly to TradingView; there is no relay or proxy
 operated by this project.
 
 Network destinations include `scanner.tradingview.com` for calculations and
-TradingView's widget hosts for optional listing panels. Cloud environment
+TradingView's widget hosts for optional listing panels. A small visit counter at the end of each page is an
+image from `hits.sh`, which counts page loads; if it cannot load, it is left out. Cloud environment
 network rules affect cloud testing; deployed visitors use their own network.
 
 ## Tests

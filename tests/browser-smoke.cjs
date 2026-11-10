@@ -65,6 +65,8 @@ async function run(){
     });
     await context.route('https://fonts.googleapis.com/**', route => route.abort());
     await context.route('https://fonts.gstatic.com/**', route => route.abort());
+    // The visit counter is a third-party image; test runs never count as visits.
+    await context.route('https://hits.sh/**', route => route.abort('blockedbyclient'));
     await context.route(loaderURL, route => route.fulfill({contentType:'text/javascript', body:fixtureLoader}));
     await context.route('https://www.tradingview-widget.com/**', route => {
       const symbol = new URL(route.request().url()).searchParams.get('symbol');
@@ -477,6 +479,7 @@ async function run(){
     await check('The day/night switch follows the system setting, then remembers the visitor’s choice on both pages', async () => {
       const themed = await browser.newContext({viewport:{width:1440, height:1000}, colorScheme:'light'});
       await themed.route('https://scanner.tradingview.com/**', route => route.abort('blockedbyclient'));
+      await themed.route('https://hits.sh/**', route => route.abort('blockedbyclient'));
       const themePage = await themed.newPage();
       await themePage.goto(baseURL+'/', {waitUntil:'load'});
       assert.equal(await themePage.evaluate(() => document.documentElement.dataset.theme), 'light');

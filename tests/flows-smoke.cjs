@@ -25,6 +25,8 @@ async function run(){
     await context.route('https://fonts.googleapis.com/**', route => route.abort());
     await context.route('https://fonts.gstatic.com/**', route => route.abort());
     await context.route('https://scanner.tradingview.com/**', route => route.abort('blockedbyclient'));
+    // The visit counter is a third-party image; tests never count as visits.
+    await context.route('https://hits.sh/**', route => route.abort('blockedbyclient'));
     const page = await context.newPage();
     const errors = [];
     const requests = [];
@@ -71,8 +73,8 @@ async function run(){
       assert.equal(await page.locator('#statCount').textContent(), String(model.flows.length));
       const notDrawn = overview.within.length + overview.lateral.length + overview.counter.length;
       assert.equal(await page.locator('#notes .note-list li').count(), notDrawn);
-      // Only the page itself, fonts, and the market-cap request leave the browser.
-      assert.ok(requests.every(url => url.startsWith(baseURL+'/') || url.startsWith('https://fonts.') || url.startsWith('https://scanner.tradingview.com/')), requests.join('\n'));
+      // Only the page itself, fonts, the market-cap request and the visit counter leave the browser.
+      assert.ok(requests.every(url => url.startsWith(baseURL+'/') || url.startsWith('https://fonts.') || url.startsWith('https://scanner.tradingview.com/') || url.startsWith('https://hits.sh/')), requests.join('\n'));
     });
 
     await check('Hovering a band shows its value; selecting it opens the company flows for that tier pair', async () => {
@@ -324,6 +326,7 @@ async function run(){
       const mobileErrors = [];
       mobile.on('pageerror', error => mobileErrors.push(error.message));
       await mobile.route('https://fonts.googleapis.com/**', route => route.abort());
+      await mobile.route('https://hits.sh/**', route => route.abort('blockedbyclient'));
       for(const hash of ['', '#group=t6', '#co=TSMC']){
         await mobile.goto(baseURL+'/flows.html'+hash, {waitUntil:'load'});
         assert.ok(await mobile.evaluate(() => document.documentElement.scrollWidth <= innerWidth), hash);
@@ -340,6 +343,7 @@ async function run(){
     await check('Live market caps appear in the company heading, tooltips and tables', async () => {
       const capsContext = await browser.newContext({viewport:{width:1440, height:1000}});
       await capsContext.route('https://fonts.googleapis.com/**', route => route.abort());
+      await capsContext.route('https://hits.sh/**', route => route.abort('blockedbyclient'));
       const scans = [];
       await capsContext.route('https://scanner.tradingview.com/**', async route => {
         const body = route.request().postDataJSON();
