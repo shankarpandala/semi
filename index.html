@@ -2089,7 +2089,7 @@ function buildPage(){
     t.listedCount = t.companies.filter(co => co.ticker && co.status !== 'private').length;
     const chip = document.createElement('a');
     chip.className = 'chip';
-    chip.textContent = 'T'+t.id;
+    chip.textContent = t.label;
     chip.href = '#tier-'+t.id;
     chip.title = 'Jump to '+t.label;
     chipsEl.appendChild(chip);
