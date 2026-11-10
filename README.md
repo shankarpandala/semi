@@ -1,10 +1,59 @@
 # The Silicon Spectrum
 
-A browser-based dashboard of 119 companies across the semiconductor supply chain.
+A browser-based dashboard of 765 companies across the semiconductor supply chain,
+from polysilicon to the companies that buy the finished chips.
 
 Open the live portal at **https://www.pandala.in/semi/**. A downloaded copy of
 `index.html` alone is incomplete: the files in `assets/` are also required to
 load market data. Use the deployed portal, or serve the complete repository.
+
+## The roster
+
+The companies live in the `TIERS` list in `index.html`: ten tiers, each split
+into groups by what its companies make (for example lithography, deposition and
+etch, inspection and packaging equipment within Tier 4). 747 of the
+765 companies are listed; the rest are private companies or
+subsidiaries without a market value of their own.
+
+**What is included.** A company is on the roster when its main business, or a
+named division with outside customers, sits in one of the tiers. That covers
+every listed company that could be confirmed, down to small caps, on the exchanges of
+the United States, Canada, Japan, Taiwan, South Korea, mainland China, Hong
+Kong, Europe, Israel, India, South-East Asia and Australia. Each company
+appears once, in the tier of its main business. Parent and subsidiary appear
+separately when both are listed.
+
+**What is left out.** Solar cells and modules, display panels and display-only
+equipment, passive components (capacitors, resistors, inductors, crystals,
+connectors), printed circuit boards other than IC package substrates,
+component distributors, LED lighting and screens (LED chip and package makers
+are in Tier 6), and modules built from other companies' chips. Tier 10 covers
+hyperscalers and large AI-compute buyers, device, server and network brands,
+and contract manufacturers with roughly US$1B or more in revenue; it does not
+try to list every buyer of chips. Companies listed only on the Beijing Stock
+Exchange are not covered by the data provider and are shown without a market
+value where they are notable.
+
+**How a listing is written.** `ticker` is the data provider's own symbol,
+`EXCHANGE:CODE` (`NASDAQ:NVDA`, `TSE:8035`, `KRX:000660`, `HKEX:981`). A few
+companies use a secondary line that was already on the dashboard, such as
+TSMC's US ADR. To add a company, add a line to its tier with `name`, `hq`,
+`ticker`, `seg` (one of the tier's segment ids) and `domain`.
+
+**Checking coverage.** `scripts/audit-roster.mjs` compares the roster with the
+provider: every symbol must resolve and carry a market cap, and every primary
+listing the provider files under its Semiconductors or Electronic Production
+Equipment industries must be either on the roster or in
+`scripts/roster-exclusions.tsv`, which records each listing that was ruled out
+and why. A newly listed company therefore shows up as unreviewed.
+
+```sh
+node scripts/audit-roster.mjs
+```
+
+The provider's industry labels are only a floor: many equipment, materials and
+parts makers are filed under machinery or chemicals, and were added from
+research rather than from those two lists.
 
 ## Money flows
 
@@ -22,9 +71,11 @@ the customer who pays to the supplier who is paid, in USD billions for calendar
   phone business buying Snapdragon chips), are listed below the chart rather than
   drawn.
 
-Every company's bands add up to its 2025 revenue. Coloured bands are payments
-between the 119 companies; grey shows money from customers without a tracked
-flow (mostly companies outside the 119) and
+The flows page covers the 119 companies whose figures have been researched, not
+the whole roster; only those companies' cards link to it. Every company's bands
+add up to its 2025 revenue. Coloured bands are payments between the 119
+companies; grey shows money from customers without a tracked flow (mostly
+companies outside the 119) and
 where the rest of each company's revenue goes (other suppliers and production,
 people and R&D, operating profit). An operating loss is shown as money drawn
 from reserves; tracked purchases above what a profitable company's costs
@@ -62,19 +113,21 @@ opens and when **Refresh market data** is selected.
 
 ## Market data and calculations
 
-Each visitor's browser sends a batch request for the 101 listed companies to
-TradingView's public screener endpoint. It then fetches any required exchange
-rates. Prices, market caps, rankings, tier totals, tier percentages, and the
+Each visitor's browser sends one batch request for the 747 listed companies
+to TradingView's public screener endpoint. It then fetches the exchange rates
+for the currencies those shares are priced in. Prices, market caps, rankings, tier totals, tier percentages, and the
 combined total are calculated from that request. There are no embedded market
 valuations, cached quote files, or fixed exchange rates.
 
 Prices and valuations are shown in USD. Share-price currency and financial
 currency are handled separately; they can differ. A `USD/XXX` exchange rate
-means XXX units per USD, so a native value is divided by that rate. Market caps
-are converted to USD billions. Unknown currencies or missing rates leave the
-affected value unavailable; they are never assumed to be USD.
+means XXX units per USD, so a native value is divided by that rate. Prices
+quoted in hundredths of a unit (UK pence, Israeli agorot, South African cents)
+are scaled first. Market caps are converted to USD billions. Unknown currencies
+or missing rates leave the affected value unavailable; they are never assumed
+to be USD.
 
-Totals include only available market caps and show coverage out of 101 listed
+Totals include only available market caps and show coverage out of the listed
 companies. Private companies and business units have no standalone public
 valuation. An unsuccessful refresh clears previous values and shows
 **Unavailable**. A company's share price can be available even if its market
@@ -108,6 +161,10 @@ With the local server running, the integration checks use Playwright and Chromiu
 ```sh
 node tests/browser-smoke.cjs
 ```
+
+The unit tests include roster checks: unique names and symbols, well-formed
+entries, a valid group for every company, and agreement between the roster's
+`flows` flags and the flows dataset.
 
 The flows page has its own browser checks:
 

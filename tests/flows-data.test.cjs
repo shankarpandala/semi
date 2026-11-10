@@ -1,20 +1,13 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const fs = require('node:fs');
-const path = require('node:path');
 const data = require('../assets/flows-data.js');
 
 // The dashboard's inline TIERS list is the source of truth for company names and tiers.
-function dashboardTiers() {
-  const html = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
-  const start = html.indexOf('const TIERS = [');
-  const end = html.indexOf('];', html.indexOf("label:'Tier 10")) + 2;
-  return new Function(html.slice(start, end) + '\nreturn TIERS;')();
-}
-const tiers = dashboardTiers();
-const names = new Set(tiers.flatMap(tier => tier.companies.map(company => company.name)));
+// The flows page covers the companies flagged there as having researched figures.
+const {tiers} = require('./roster.cjs');
+const names = new Set(tiers.flatMap(tier => tier.companies.filter(company => company.flows).map(company => company.name)));
 
-test('groups cover every dashboard company exactly once, in its own tier and color', () => {
+test('groups cover every company with researched figures exactly once, in its own tier and color', () => {
   assert.equal(names.size, 119);
   const seen = new Map();
   for (const group of data.groups) {
@@ -65,7 +58,7 @@ test('display names refer to tracked companies', () => {
 test('tickers match the dashboard listings', () => {
   const listed = {};
   for (const tier of tiers) for (const company of tier.companies) {
-    if (company.ticker && company.status !== 'private') listed[company.name] = company.ticker;
+    if (company.flows && company.ticker && company.status !== 'private') listed[company.name] = company.ticker;
   }
   assert.deepEqual(data.tickers, listed);
 });
