@@ -240,12 +240,12 @@ async function run(){
       const sub = await page.locator('#viewSub').textContent();
       assert.match(sub, /of other costs is not yet split/, sub);
       assert.match(await page.locator('#accountsNote').textContent(), /† Includes other costs not yet split between suppliers and people/);
-      // A hyperscaler's other money is hardware bought outside the 119.
+      // A hyperscaler's other money is hardware bought from suppliers that are not tracked.
       await page.goto(baseURL+'/flows.html#co=Microsoft', {waitUntil:'load'});
       const node = page.locator('#chart .node[aria-label^="Other hardware suppliers"]');
       await node.scrollIntoViewIfNeeded();
       await node.hover();
-      assert.match(await page.locator('#tooltip').textContent(), /Hardware bought from suppliers that are not among the 119/);
+      assert.ok((await page.locator('#tooltip').textContent()).includes('Hardware bought from suppliers that are not among the '+model.groupOf.size+':'));
       // With only disclosed flows shown, grey bands are labelled as hidden, not as undrawn.
       await page.goto(baseURL+'/flows.html#co=NVIDIA', {waitUntil:'load'});
       for(const conf of ['derived', 'estimated']) await page.locator(`.chip[data-conf="${conf}"]`).click();

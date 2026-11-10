@@ -331,6 +331,8 @@
   const data = window.FlowsData;
   const model = window.FlowViews.createModel(data);
   const OUTSIDE = window.FlowViews.OUTSIDE;
+  // How many companies have researched figures; the wording below quotes it.
+  const TRACKED = model.groupOf.size;
   const SVGNS = 'http://www.w3.org/2000/svg';
   const OTHER_HEX = '#565E6C';
   // Neutral greys for money that is not a payment between two tracked companies.
@@ -339,7 +341,7 @@
     other:'#4E5562', pending:'#6B6683', people:'#959DAA', profit:'#D3D7DE',
   };
   const OUTSIDE_NOTE = {
-    customers:'Revenue that arrives without a tracked flow: mostly from customers outside the 119 tracked companies, plus purchases by tracked companies too small or too uncertain to draw.',
+    customers:`Revenue that arrives without a tracked flow: mostly from customers outside the ${TRACKED} tracked companies, plus purchases by tracked companies too small or too uncertain to draw.`,
     reserves:'An operating loss: costs above revenue, paid from cash reserves or borrowing.',
     ahead:'Tracked purchases above what the year’s costs absorbed (inventory, prepayments or equipment bought ahead of sales), paid from cash on hand.',
     internal:'Payments between companies inside this group.',
@@ -575,7 +577,7 @@
         + `Coloured bands show ${fmtUSD(drawn)} of payments between tracked companies`
         + (notDrawn > 0.0005 ? `; another ${fmtUSD(notDrawn)} is listed below the chart` : '')
         + (hidden > 0.0005 ? `; ${fmtUSD(hidden)} is hidden by the confidence filter` : '')
-        + '. Grey stubs show money arriving from customers without a tracked flow (mostly companies outside the 119), and money leaving as other suppliers, people and profit. '
+        + `. Grey stubs show money arriving from customers without a tracked flow (mostly companies outside the ${TRACKED}), and money leaving as other suppliers, people and profit. `
         + 'Select a tier or a band to see the companies behind it.');
     } else if(view.kind === 'pair'){
       const from = model.groupById.get(view.from), to = model.groupById.get(view.to);
@@ -592,10 +594,13 @@
       crumb('All tiers', {kind:'overview'});
       crumb(groupLabel(group));
       title.append(swatch(group.hex), groupLabel(group));
-      const partial = group.companies.filter(name => partialScope(accounts[name])).length;
-      const scope = group.id === 't10-brands' ? '(hardware only)'
-        : partial === group.companies.length ? 'from chip-related business'
-        : partial ? `(counting only the chip-related part of ${partial} of its ${group.companies.length} members)` : '';
+      // Members counted in part: hardware buyers, and companies drawn for one segment only.
+      const buyers = group.companies.filter(name => accounts[name] && accounts[name].buyer).length;
+      const partial = buyers + group.companies.filter(name => partialScope(accounts[name])).length;
+      const part = buyers ? 'hardware' : 'chip-related';
+      const scope = !partial ? ''
+        : partial === group.companies.length ? (buyers ? '(hardware only)' : 'from chip-related business')
+        : `(counting only the ${part} part of ${partial} of its ${group.companies.length} members)`;
       let text = accountSentences(graph.account, {subject:'The group', group:true, scope, pendingPhrase:pendingWhat(group.companies)});
       if(graph.totals.internal > 0) text += ` ${fmtUSD(graph.totals.internal)} of the tracked payments run between members.`;
       sub.append(text + ' Select a company to follow its money.');
@@ -980,12 +985,12 @@
     if(action) content.push(el('div', {class:'tt-hint', text:'Select to see the company flows'}));
     return content;
   }
-  // Hyperscalers' 'other' money is hardware bought outside the 119, not cost of revenue.
+  // A buyer's 'other' money is hardware bought from untracked suppliers, not cost of revenue.
   const isBuyer = node => node && node.kind === 'company' && !!(accounts[node.name] && accounts[node.name].buyer);
-  const BUYER_OTHER = 'Hardware bought from suppliers that are not among the 119: networking, storage, optics and other servers.';
+  const BUYER_OTHER = `Hardware bought from suppliers that are not among the ${TRACKED}: networking, storage, optics and other servers.`;
   const outsideNote = (role, payers) => role !== 'other' || !payers.some(isBuyer) ? OUTSIDE_NOTE[role]
     : payers.every(isBuyer) ? BUYER_OTHER
-    : OUTSIDE_NOTE.other.replace(/\.$/, '') + '; for Amazon, Alphabet and Microsoft, hardware bought from suppliers that are not among the 119.';
+    : OUTSIDE_NOTE.other.replace(/\.$/, '') + `; for ${listJoin(payers.filter(isBuyer).map(node => shortName(node.name)))}, hardware bought from suppliers that are not among the ${TRACKED}.`;
   function topOutsideCustomers(names, limit){
     const byLabel = new Map();
     for(const name of names) for(const item of model.account(name).outside) byLabel.set(item.label, (byLabel.get(item.label) || 0) + item.usd);
