@@ -367,6 +367,8 @@
   }
   const CONF_LABEL = {disclosed:'Disclosed', derived:'Derived', estimated:'Estimated'};
   const TABLE_PAGE = 30;
+  // A tier view draws at most this many members; the smallest share one node and stay in the table.
+  const GROUP_MEMBER_CAP = 24;
 
   const $ = id => document.getElementById(id);
   const chart = $('chart');
@@ -480,7 +482,7 @@
     const view = state.view;
     if(view.kind === 'group'){
       const group = model.groupById.get(view.id);
-      return {view, list, group, graph:model.focus(list, group.companies, {outer:'group'})};
+      return {view, list, group, graph:model.focus(list, group.companies, {outer:'group', maxMembers:GROUP_MEMBER_CAP})};
     }
     if(view.kind === 'company'){
       return {view, list, group:model.groupOf.get(view.name), graph:model.focus(list, [view.name], {maxPerSide:20})};
@@ -676,15 +678,17 @@
     const width = Math.max(available, overview ? 980 : 680);
     const columnCount = Math.max(...graph.nodes.map(n => n.column)) + 1;
     const perColumn = Array.from({length:columnCount}, (_, c) => graph.nodes.filter(n => n.column === c).length);
-    const top = 6, bottom = 10;
+    const top = 8, bottom = 10;
     // The overview keeps its left margin for outside-money stubs and puts every label right of its node.
     const marginLeft = overview ? 56 : 180;
     const marginRight = overview ? 150 : 200;
     const nodeWidth = overview ? 14 : 12;
     const innerWidth = width - marginLeft - marginRight;
-    const innerHeight = overview ? (available < 700 ? 580 : 660) : Math.min(1500, Math.max(400, Math.max(...perColumn) * 30));
+    // A tier view gives every member room for its name, however thin its bar.
+    const perNode = view.kind === 'group' ? 32 : 30;
+    const innerHeight = overview ? (available < 700 ? 580 : 660) : Math.min(1500, Math.max(400, Math.max(...perColumn) * perNode));
     const height = innerHeight + top + bottom;
-    const nodePadding = overview ? 20 : Math.max(6, Math.min(14, innerHeight / Math.max(...perColumn) * .3));
+    const nodePadding = overview ? 20 : Math.max(6, Math.min(14, innerHeight / Math.max(...perColumn) * (view.kind === 'group' ? .4 : .3)));
     const result = window.SankeyLayout.layout({
       nodes:graph.nodes, links:graph.links, width:innerWidth, height:innerHeight,
       nodeWidth, nodePadding, minNodeHeight:2, order:graph.order,
@@ -772,7 +776,7 @@
         () => [...node.sourceLinks, ...node.targetLinks], () => nodeTooltip(view, node, action), !!action);
       if(action) bindActivate(g, action);
     }
-    drawLabels(result, labelLayer, {labelsLeft:!overview, marginLeft, marginRight});
+    drawLabels(result, labelLayer, {labelsLeft:!overview, marginLeft, marginRight, edge:Math.min(top, bottom)});
 
     function bindHover(target, nodesOf, linksOf, content, focusable){
       const on = event => {
@@ -818,7 +822,8 @@
     return null;
   }
   const isGroup = node => node.kind === 'group' || node.kind === 'groupSide';
-  const nodeTitle = node => isGroup(node) ? groupLabel(node.group) : node.kind === 'other' || node.kind === 'outside' ? node.label : node.name;
+  const isFold = node => node.kind === 'other' || node.kind === 'members';
+  const nodeTitle = node => isGroup(node) ? groupLabel(node.group) : isFold(node) || node.kind === 'outside' ? node.label : node.name;
   const linkSummary = link => link.outside
     ? `${nodeTitle(link.source)} → ${nodeTitle(link.target)}: ${fmtUSD(link.value)} a year`
     : `${nodeTitle(link.source)} pays ${nodeTitle(link.target)} ${fmtUSD(link.value)} a year`;
@@ -835,7 +840,7 @@
     return parts.join(', ');
   };
 
-  function drawLabels(result, layer, {labelsLeft, marginLeft, marginRight}){
+  function drawLabels(result, layer, {labelsLeft, marginLeft, marginRight, edge = 0}){
     const lineH = 13;
     const columnX = result.columns.map(column => column[0]?.x0);
     const measurer = svgEl('text', {x:0, y:-1000});
@@ -862,8 +867,9 @@
       const sorted = [...column].sort((a, b) => a.y0 - b.y0);
       sorted.forEach((node, i) => {
         const prev = sorted[i-1], next = sorted[i+1];
-        const lo = prev ? (prev.y1 + node.y0) / 2 : Math.min(node.y0, Math.max(0, node.y0 - 20));
-        const hi = next ? (node.y1 + next.y0) / 2 : Math.max(node.y1, Math.min(result.height, node.y1 + 20));
+        // The first and last label of a column may use the chart's outer margin.
+        const lo = prev ? (prev.y1 + node.y0) / 2 : Math.min(node.y0, Math.max(-edge, node.y0 - 20));
+        const hi = next ? (node.y1 + next.y0) / 2 : Math.max(node.y1, Math.min(result.height + edge, node.y1 + 20));
         const lines = labelLines(node);
         const fit = Math.min(lines.length, Math.floor((hi - lo) / lineH));
         if(fit < 1) return;
@@ -900,7 +906,7 @@
       const value = fmtUSD(node.value, true);
       return [{cls:'lbl-tier', text:node.group.tierLabel.toUpperCase()}, {cls:'lbl-name', text:node.group.role}, {cls:'lbl-value', text:value}];
     }
-    const name = node.kind === 'other' || node.kind === 'outside' ? node.label : shortName(node.name);
+    const name = isFold(node) || node.kind === 'outside' ? node.label : shortName(node.name);
     // Shorter forms before an ellipsis: "Costs and profit, pending", then the label without its examples.
     const alts = node.kind === 'outside' ? [name.replace(/ \(breakdown pending\)$/, ', pending'), name.replace(/ \(.*$/, ''),
       ...(node.role === 'reserves' || node.role === 'ahead' ? [name.split(',')[0]] : [])].filter(alt => alt !== name) : [];
@@ -1011,9 +1017,10 @@
       if(node.valueIn) content.push(el('div', {class:'tt-row'}, 'Money in', el('span', {class:'amt', text:fmtUSD(node.valueIn)})));
       if(node.valueOut) content.push(el('div', {class:'tt-row'}, 'Money out', el('span', {class:'amt', text:fmtUSD(node.valueOut)})));
     }
-    if(node.kind === 'other'){
+    if(isFold(node)){
       const names = node.names.slice(0, 8).map(shortName).join(', ') + (node.names.length > 8 ? '…' : '');
       content.push(el('div', {class:'tt-hint', text:names}));
+      if(node.kind === 'members') content.push(el('div', {class:'tt-hint', text:'Each is listed in the table below'}));
     } else if(node.kind === 'company'){
       const a = model.account(node.name);
       const source = accounts[node.name];
