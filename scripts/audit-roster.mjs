@@ -113,5 +113,5 @@ if (problems.length) {
   console.log('\n' + problems.length + ' problems:');
   for (const line of problems) console.log('  ' + line);
 }
-if (!unreviewed.length && !problems.length) console.log('\nRoster and provider agree: nothing unreviewed, every listing priced.');
+if (!unreviewed.length && !problems.length) console.log('\nRoster and provider agree: every listing resolves and nothing is unreviewed.');
 process.exitCode = unreviewed.length || problems.length ? 1 : 0;

@@ -1,6 +1,6 @@
 # The Silicon Spectrum
 
-A browser-based dashboard of 1,468 companies across the semiconductor supply chain,
+A browser-based dashboard of 1,508 companies across the semiconductor supply chain,
 from polysilicon to the companies that buy the finished chips.
 
 Open the live portal at **https://www.pandala.in/semi/**. A downloaded copy of
@@ -11,8 +11,8 @@ load market data. Use the deployed portal, or serve the complete repository.
 
 The companies live in the `TIERS` list in `index.html`: ten tiers, each split
 into groups by what its companies make (for example lithography, deposition and
-etch, inspection and packaging equipment within Tier 4). 1,392 of the
-1,468 companies are listed; the rest are private companies or
+etch, inspection and packaging equipment within Tier 4). 1,416 of the
+1,508 companies are listed; the rest are private companies or
 subsidiaries without a market value of their own.
 
 **What is included.** A company is on the roster when its main business, or a
@@ -117,7 +117,7 @@ opens and when **Refresh market data** is selected.
 
 ## Market data and calculations
 
-Each visitor's browser sends one batch request for the 1,387 listed companies
+Each visitor's browser sends one batch request for the 1,411 listed companies
 to TradingView's public screener endpoint. It then fetches the exchange rates
 for the currencies those shares are priced in. Prices, market caps, rankings, tier totals, tier percentages, and the
 combined total are calculated from that request. There are no embedded market

@@ -1,11 +1,56 @@
 symbol	name	reason	note
 AMEX:LGL	LGL Group, Inc.	unrelated business	Frequency and time reference instruments; holding company
 AMEX:MPTI	M-tron Industries Inc	passive components	RF filters and crystal oscillators
+AQUIS:GWIN	Gowin New Energy Group Ltd.	business not confirmed	Could not confirm the business
+AQUIS:NRGB	Energy B Plc	business not confirmed	Could not confirm the business
+ASX:4DS	4DS Memory Ltd.	unrelated business	ReRAM research at memory-cell stage; pivoted to edge-AI software with the Jenesys acquisition in Oct 2026 (4dsmemory.com)
+ASX:AD8	Audinate Group Ltd.	modules without own chips	Dante audio-networking software, modules and adapters; no own silicon
+ASX:AXE	Archer Materials Limited	unrelated business	Pre-commercial quantum chip and biochip developer (archerx.com.au)
+ASX:CPV	ClearVue Technologies Ltd.	solar	Photovoltaic glazing
+ASX:NVU	Nanoveu Ltd.	business not confirmed	Edge-AI SoC developer; commercial chip sales not confirmed
+ASX:SLX	Silex Systems Limited	unrelated business	Laser uranium enrichment technology; zero-spin silicon project is small
+BET:ASTRA	ASTRASUN Solar Plc.	solar	Solar developer
+BIST:CWENE	CW ENERJI MUHENDISLIK TICARET VE SANAYI A.S.	solar	Solar panels and EPC
+BIST:EMPAE	Empa Elektronik Sanayi ve Ticaret A.S.	distributor	Electronic component distribution
+BIST:INTET	Intetra Teknoloji ve Bilisim Hizmetleri AS	unrelated business	IT and telecom systems integration
+BIST:SMRTG	Smart Gunes Enerjisi Teknolojileri Arastirma Gelistirme Uretim Sanayi ve Ticaret	solar	Solar panels and EPC
+BME:END	Endurance Motive SA	power, battery or cooling	Lithium batteries
+BME:ETC	Energy Solar Tech, S.A.	solar	Solar energy services
+BME:GGR	Greening Group Global S.A.	solar	Solar EPC and energy services
+BME:UMB	Umbrella Global Energy SA	solar	Solar energy developer
+BSE:ADTECH	Adtech Systems Ltd.	unrelated business	Electronic security systems
+BSE:CONTAINE	Containe Technologies Ltd.	business not confirmed	Could not confirm the business (site returned 503)
+BSE:GRERENEW	Gre Renew Enertech Limited	solar	Solar EPC
+BSE:HIGHNESS	Highness Microelectronics Limited	display	TFT-LCD and other display modules (highnessmicro.com)
+BSE:JMDVL	JMD Ventures Ltd	unrelated business	Media and music distribution
+BSE:METSL	Maestros Electronics & Telecommunications Systems Ltd	unrelated business	Medical and telecom electronics
+BSE:RRP	RRP Semiconductor Ltd	business not confirmed	Semiconductor operations could not be confirmed; provider shows no revenue against a market cap above US$1bn
+BSE:SELECTRIC	Schneider Electric President Systems Ltd	unrelated business	Racks and enclosures for IT and telecom
+BSE:SOLARIUM	Solarium Green Energy Limited	solar	Solar EPC
+BSE:STERPOW	Sterling Powergensys Limited	business not confirmed	Could not confirm the business
+BSE:TITANIN	Titan Intech Limited	LED lighting or screens	LED video walls and display systems (titanintech.com)
+BVMT:OTH	One Tech Holding SA	unrelated business	Cables and electronics contract manufacturing (Tunisia)
 CSE:MRM	Micromem Technologies Inc.	unrelated business	Development-stage sensor company with negligible revenue
 CSE:QNCR	QuantumCore Ltd	business not confirmed	Pre-revenue developer of cryogenic chips for quantum computers; no shipping product confirmed (qncor.ca)
 CSE:VTI	Valdor Technology International Inc	unrelated business	Dormant fibre-optic component shell
 CSE:ZTE	ZTEST Electronics Inc.	unrelated business	Small contract electronics assembler (Permatech)
+DSEBD:RANFOUNDRY	Rangpur Foundry Limited	unrelated business	Cast-iron products
+EURONEXT:ALCOF	Cofidur SA	unrelated business	EMS below the T10 revenue threshold
+EURONEXT:ALGRO	Grolleau	unrelated business	Outdoor cabinets and enclosures
+EURONEXT:ALLEX	Lexibook Linguistic Electronic System SA	unrelated business	Children's consumer electronics
+EURONEXT:ALLOG	Logic Instrument SA Class A	unrelated business	Rugged tablets and handhelds
+EURONEXT:ALMUN	Munic SA	unrelated business	Automotive telematics
 EURONEXT:ASML	ASML Holding NV	on the roster through another listing	ASML is listed here as NASDAQ:ASML
+EURONEXT:BAR	Barco NV	display	Projection, medical displays and video walls
+EURONEXT:EXENS	Exosens SA	unrelated business	Image intensifier tubes and detectors for night vision and instruments
+EURONEXT:LACR	Lacroix Group SA	unrelated business	EMS and connected equipment below the T10 revenue threshold
+EURONEXT:MLNOV	Novatech Industries SA	unrelated business	EMS below the T10 revenue threshold
+EURONEXT:VMX	Verimatrix SA	unrelated business	Content and application security software; silicon IP was sold in 2019
+GPW:MLS	ML System Spolka Akcyjna	solar	Building-integrated photovoltaics
+GPW:PTN	Poltronic S.A.	business not confirmed	Could not confirm the business
+GPW:SDS	SDS Optic Spolka Akcyjna	unrelated business	Fibre-optic medical diagnostics
+GPW:VLT	VOOLT Spolka Akcyjna	solar	Solar installations
+GPW:XTP	XTPL SA	unrelated business	Nanomaterial printing and dispensing tools for printed electronics; chip packaging is a target use with no confirmed production deployment (xtpl.com)
 HKEX:1024	Kuaishou Technology Class B	unrelated business	Short-video platform; a buyer of AI compute but not a cloud or hardware company
 HKEX:117	EYANG Holdings (Group) Co., Limited	passive components	MLCCs
 HKEX:1305	Wai Chi Holdings Co., Ltd.	display	LED backlight products
@@ -58,6 +103,8 @@ HKEX:912	Suga International Holdings Limited	unrelated business	EMS below the OD
 HKEX:929	IPE Group Limited	unrelated business	Precision metal components
 HKEX:99	Wong's International Holdings Limited	unrelated business	EMS below the ODM revenue threshold; property
 HKEX:9918	Wise Ally International Holdings Limited	unrelated business	EMS below the ODM revenue threshold
+HOSE:FPT	FPT Corporation	unrelated business	IT services group; FPT Semiconductor is immaterial to group revenue
+IDX:PTSN	PT Sat Nusapersada Tbk	unrelated business	EMS below the T10 revenue threshold
 KRX:001210	Kumho Electric, Inc.	LED lighting or screens	Lamps and LED lighting
 KRX:002380	KCC Corporation	unrelated business	Epoxy molding compounds are a small part of a paints and building-materials group
 KRX:002840	Miwon Commercial Co., Ltd	unrelated business	Surfactants and personal-care chemicals; photoresist raw materials share not confirmed
@@ -173,6 +220,38 @@ KRX:371950	POONGWON PRECISION Co., Ltd.	display	Fine metal masks for OLED deposi
 KRX:402340	SK Square Co., Ltd.	unrelated business	Investment holding with about 20% of SK hynix (already listed); no operations of its own
 KRX:416180	Shinsung ST Co., Ltd.	power, battery or cooling	Busbars and cooling parts for EV batteries and ESS
 KRX:463480	Motive Link Co., Ltd.	passive components	Transformers and inductors for EV power conversion (2025 listing)
+LSE:CWR	Ceres Power Holdings plc	unrelated business	Solid-oxide fuel cell and electrolyser technology licensing
+LSE:EARN	EARNZ PLC	unrelated business	Energy services group
+LSE:ENET	Ethernity Networks Ltd.	unrelated business	FPGA-based network appliances and SmartNIC boards; no own chips (ethernitynet.com)
+LSE:FTC	Filtronic plc	unrelated business	RF and mmWave subsystems (amplifiers, transceivers), not a chip vendor (filtronic.com)
+LSE:HPOW	H-Power plc	business not confirmed	Could not confirm the business
+LSE:MDZ	MediaZest Plc	unrelated business	Audio-visual solutions
+LSE:NANO	Nanoco Group PLC	business not confirmed	Quantum-dot materials developer; material sales to image-sensor makers not confirmed
+MIL:FAE	Fae Technology S.P.A	unrelated business	EMS below the T10 revenue threshold
+MIL:GE	Gefran S.p.A.	unrelated business	Industrial sensors and automation components
+MIL:OPS	Ops Italia S.p.A	business not confirmed	Could not confirm the business (site returned 503)
+MIL:OSA	OSAI Automation System SpA	business not confirmed	Automation maker with a semiconductor test-handler division; listing status unclear (provider shows a residual market cap)
+MIL:SIT	SIT S.p.A.	unrelated business	Gas controls and smart meters
+MYX:AMLEX	Amlex Holdings Bhd.	business not confirmed	Cable assemblies and stamped lead frames; lead-frame share not confirmed (site unreachable)
+MYX:ATECH	Aurelius Technologies Bhd.	unrelated business	EMS below the T10 revenue threshold
+MYX:BETA	Betamek Bhd	unrelated business	Automotive electronics EMS below the T10 revenue threshold
+MYX:CEB	Cape EMS Bhd	unrelated business	EMS below the T10 revenue threshold
+MYX:CNERGEN	Cnergenz Bhd.	distributor	Supplies and integrates third-party electronics-assembly (SMT) line equipment (cnergenz.com)
+MYX:DNONCE	D'nonce Technology Bhd.	unrelated business	Packaging supplies and contract manufacturing
+MYX:GREATEC	Greatech Technology Bhd.	unrelated business	Factory automation lines mainly for solar and battery makers
+MYX:ITRONIC	Industronics Bhd.	unrelated business	Electronic display and telecom systems
+MYX:KOBAY	Kobay Technology Bhd.	unrelated business	Diversified group (manufacturing, property, healthcare); semiconductor tooling share not confirmed
+MYX:OXB	Oxford Innotech Bhd.	business not confirmed	Precision engineering; semiconductor share not confirmed
+MYX:PIE	P.I.E. Industrial Bhd.	unrelated business	EMS and cable products below the T10 revenue threshold
+MYX:QES	Qes Group Bhd	distributor	Mainly distributes third-party test and measuring equipment; own wafer-handling tools are the smaller division (not re-verified, site refused fetch)
+MYX:SALUTE	Salutica Bhd.	unrelated business	Bluetooth audio contract manufacturing
+MYX:SAMAIDEN	Samaiden Group Bhd	solar	Solar EPC
+MYX:SCOPE	Scope Industries Bhd.	unrelated business	EMS below the T10 revenue threshold
+MYX:SFPTECH	SFP Tech Holdings Bhd	business not confirmed	Sheet metal, machining and automation equipment; Bursa files it under Semiconductors but end markets were not confirmed (sfptechholdings.com)
+MYX:SMTRACK	SMTrack Bhd.	unrelated business	RFID tracking and aviation services
+MYX:TRIVE	Trive Property Group Bhd.	unrelated business	Property group
+MYX:TURIYA	Turiya Bhd.	unrelated business	Investment holding (property and other interests) (turiya.com.my)
+MYX:VS	V.S. Industry Bhd.	unrelated business	EMS with about US$0.9bn revenue, just below the T10 threshold
 NASDAQ:AEVA	Aeva Technologies, Inc.	unrelated business	FMCW lidar sensors
 NASDAQ:AIRG	Airgain, Inc.	modules without own chips	Antennas and embedded wireless modules
 NASDAQ:AMPG	AmpliTech Group, Inc.	unrelated business	RF amplifiers, 5G O-RAN radios and IC-package distribution; in-house MMIC design is minor (amplitechgroup.com)
@@ -183,9 +262,10 @@ NASDAQ:AZTA	Azenta, Inc.	unrelated business	Sold its semiconductor automation bu
 NASDAQ:BOSC	BOS Better Online Solutions Ltd	distributor	Electronic-component distribution and RFID supply-chain systems
 NASDAQ:BTDR	Bitdeer Technologies Group Class A	unrelated business	Bitcoin miner and AI cloud host; in-house SEALMINER ASICs not shown as material external sales
 NASDAQ:CSIQ	Canadian Solar Inc.	solar	PV modules and energy storage
+NASDAQ:CVV	CVD Equipment Corporation	unrelated business	Sold its gas-delivery unit and stopped taking system orders in 2026; spares and service only
 NASDAQ:DAIO	Data I/O Corporation	unrelated business	Device-programming systems; not a tier product
 NASDAQ:DVLT	Datavault AI Inc.	unrelated business	Data-monetisation software (dvlt.ai); legacy WiSA wireless audio modules
-NASDAQ:ELMT	Elmet Group Co.	unrelated business	Tungsten and molybdenum mill products, mostly defence and aerospace; semiconductor is one of several end markets
+NASDAQ:ELMT	Elmet Group Co.	unrelated business	Tungsten and molybdenum mill products for defence, aerospace, medical and energy; semiconductor is one of several end markets
 NASDAQ:ENGS	Energys Group Limited	LED lighting or screens	UK LED lighting retrofit and energy-efficiency contractor (SEC SIC 1731)
 NASDAQ:FSLR	First Solar, Inc.	solar	CdTe thin-film PV modules
 NASDAQ:GSM	Ferroglobe PLC	unrelated business	Metallurgical-grade silicon metal, not electronic-grade feedstock
@@ -194,7 +274,7 @@ NASDAQ:HON	Honeywell International Inc.	unrelated business	Electronic materials 
 NASDAQ:IMTE	Integrated Media Technology Limited	unrelated business	Glass lamination and display products
 NASDAQ:INVE	INVE Technologies, Inc.	modules without own chips	RFID and BLE inlays and tags built on third-party chips; renamed Aug 2026
 NASDAQ:IPGP	IPG Photonics Corporation	unrelated business	Industrial fiber lasers for materials processing; laser diodes made for own use
-NASDAQ:KOPN	Kopin Corporation	display	Microdisplays and optical assemblies, 74% defence (10-K FY2025); display product rather than ICs
+NASDAQ:KOPN	Kopin Corporation	display	Microdisplays and optical assemblies, 74% defence (10-K FY2025); a display product rather than ICs, as with other microdisplay makers
 NASDAQ:LINK	Interlink Electronics, Inc.	unrelated business	Force-sensing resistors and printed sensors
 NASDAQ:LNKS	Linkers Industries Limited Class A	passive components	Wire and cable harnesses
 NASDAQ:LWLG	Lightwave Logic, Inc.	unrelated business	Electro-optic polymer developer without commercial revenue yet
@@ -215,10 +295,51 @@ NASDAQ:SHLS	Shoals Technologies Group, Inc. Class A	solar	Solar electrical balan
 NASDAQ:SHMD	SCHMID Group N.V. Class A	printed circuit boards	Wet-process equipment mainly for PCBs and photovoltaics; glass-core substrate tools not broken out
 NASDAQ:SMTK	SmartKem, Inc.	display	Organic thin-film transistor materials for display backplanes; negligible market cap
 NASDAQ:TOYO	TOYO Co., Ltd	solar	Solar cells and modules
-NASDAQ:TTMI	TTM Technologies, Inc.	printed circuit boards	Printed circuit boards and RF assemblies; no IC substrate business
+NASDAQ:TTMI	TTM Technologies, Inc.	printed circuit boards	Printed circuit boards and RF assemblies
 NASDAQ:TYGO	Tigo Energy, Inc.	solar	Solar module-level power electronics
 NASDAQ:VICR	Vicor Corporation	power, battery or cooling	DC-DC and AC-DC power modules; describes itself as a power conversion company, not a chip maker (vicorpower.com)
+NGM:EMART	EmbeddedArt Group AB	unrelated business	Embedded-systems design consultancy
+NGM:MEGR	Mediacle Group AB	unrelated business	Digital media and iGaming services
+NGM:SMOL	Smoltek Nanotech Holding AB	passive components	Carbon-nanofibre capacitor technology, pre-commercial
+NGM:SYNEXO	Synexo Group AB	business not confirmed	Could not confirm the business
+NSE:ACI	Archean Chemical Industries Ltd.	unrelated business	Marine chemicals; its SiCSem silicon-carbide fab was a project, not an operation, when last known (prior knowledge)
+NSE:ALPEXSOLAR	Alpex Solar Ltd.	solar	Solar modules
+NSE:APOLLO	Apollo Micro Systems Ltd.	unrelated business	Defence electronics systems
+NSE:APS	Australian Premium Solar (India) Limited	solar	Solar modules
+NSE:ASMS	Avio Smart Market Stack Ltd	unrelated business	Formerly Bartronics India; identification and smart-card services
+NSE:AVALON	Avalon Technologies Limited	unrelated business	EMS below the T10 revenue threshold
+NSE:BLUECLOUDS	Blue Cloud Softech Solutions Ltd.	business not confirmed	IT services; chip design claims not confirmed
+NSE:CYIENTDLM	Cyient DLM Limited	unrelated business	EMS below the T10 revenue threshold
+NSE:DATAPATTNS	Data Patterns (India) Limited	unrelated business	Defence and aerospace electronics systems
+NSE:ELIN	Elin Electronics Limited	unrelated business	Appliance and lighting contract manufacturing
+NSE:EMMVEE	Emmvee Photovoltaic Power Limited	solar	Solar modules and cells
+NSE:ESCONET	Esconet Technologies Limited	business not confirmed	Own-brand server share versus IT services not confirmed
+NSE:GGBL	Ganesh Green Bharat Limited	solar	Solar modules and EPC
+NSE:HIMALAYAN	Himalayan Solar Limited	solar	Solar business per company name; not checked further
+NSE:HIRECT	Hirect Limited	unrelated business	Railway and industrial power equipment; power-semiconductor devices are a small part (hirect.com)
+NSE:ICELCO	IC Electricals Company Limited	unrelated business	Railway electronics such as passenger information systems (icelectricals.com)
+NSE:INA	Insolation Energy Ltd.	solar	Solar modules
+NSE:INDIFRA	Indifra Ltd.	business not confirmed	Could not confirm the business
+NSE:IZMO	IZMO Limited	business not confirmed	Automotive retail software; silicon-photonics packaging claims not confirmed
+NSE:KARAMTARA	Karamtara Engineering Limited	unrelated business	Transmission-line hardware and solar mounting structures
+NSE:LINDEINDIA	Linde India Ltd.	on the roster through another listing	Listed subsidiary of Linde plc, which is already on the dashboard
 NSE:MOSCHIP	Moschip Technologies Ltd	on the roster through another listing	MosChip is listed here as BSE:MOSCHIP
+NSE:NELCO	Nelco Limited	unrelated business	Satellite communication services
+NSE:PGEL	PG Electroplast Limited	unrelated business	Consumer-durables contract manufacturing, about US$0.55bn revenue, below the T10 threshold
+NSE:PREMIERENE	Premier Energies Limited	solar	Solar cells and modules
+NSE:SAHAJSOLAR	Sahaj Solar Limited	solar	Solar modules and pumps
+NSE:SEL	Sungarner Energies Limited	solar	Solar inverters and batteries
+NSE:SKYTECH	Skytech Infinite Platform Ltd.	business not confirmed	Could not confirm the business
+NSE:SURANASOL	Surana Solar Limited	solar	Solar modules
+NSE:SYRMA	Syrma SGS Technology Limited	unrelated business	EMS with revenue of about US$0.5bn, below the T10 threshold
+NSE:TATAELXSI	Tata Elxsi Limited	unrelated business	ER&D services for transport, media and healthcare; semiconductor practice is SDK, FPGA and safety software work, not a reported division, materiality unconfirmed (tataelxsi.com)
+NSE:UMIYA_MRO	MRO-TEK Networks Limited	unrelated business	Networking products and services
+NSE:URJA	Urja Global Limited	solar	Solar products and batteries
+NSE:UTLSOLAR	Fujiyama Power Systems Limited	solar	Solar inverters, panels and batteries (UTL Solar)
+NSE:VIKRAMSOLR	Vikram Solar Limited	solar	Solar modules
+NSE:VINYAS	Vinyas Innovative Technologies Limited	unrelated business	EMS below the T10 revenue threshold
+NSE:WAAREEENER	WAAREE Energies Limited	solar	Solar modules and cells
+NSE:WEBELSOLAR	Websol Energy System Limited	solar	Solar cells and modules
 NYSE:ARW	Arrow Electronics, Inc.	distributor	Component distribution
 NYSE:BE	Bloom Energy Corporation Class A	power, battery or cooling	Solid-oxide fuel-cell power systems
 NYSE:CTS	CTS Corporation	passive components	Sensors, piezoelectric and frequency-control components
@@ -229,6 +350,28 @@ NYSE:JKS	Jinko Holdings Limited Sponsored ADR	solar	PV wafers, cells and modules
 NYSE:KN	Knowles Corp.	passive components	Capacitors, RF filters and specialty audio after selling MEMS microphones
 NYSE:TEL	TE Connectivity plc	passive components	Connectors and sensors
 NYSE:VRT	Vertiv Holdings Co. Class A	power, battery or cooling	Data-centre power and thermal management systems
+OMXHEX:BOREO	Boreo Oyj	distributor	Electronics and technical trade distribution
+OMXHEX:ICP1V	Incap Oyj	unrelated business	EMS below the T10 revenue threshold
+OMXHEX:IQMX	IQM Quantum Computers Oyj Class A	unrelated business	Quantum computers; outside the ten tiers
+OMXHEX:MODU	Modulight Oyj	unrelated business	Medical laser systems; in-house laser fab is used for its own products (modulight.com)
+OMXSTO:ATCO_A	Atlas Copco AB Class A	on the roster through another listing	Listed parent of Edwards, already on the dashboard as an unlisted entry
+OMXSTO:CARE	Careium AB	unrelated business	Social alarm and telecare products
+OMXSTO:HANZA	Hanza AB	unrelated business	EMS with about US$0.65bn provider revenue, below the T10 threshold
+OMXSTO:INISS_B	Inission AB Class B	unrelated business	EMS below the T10 revenue threshold
+OMXSTO:LAGR_B	Lagercrantz Group AB Class B	unrelated business	Holding group of niche technology product companies
+OMXSTO:NOLA_B	Nolato AB Class B	unrelated business	Polymer components for medical, industrial and consumer products
+OMXSTO:NOTE	NOTE AB	unrelated business	EMS below the T10 revenue threshold
+OMXSTO:NRDAMP	NordAmps AB	business not confirmed	Early-stage III-V-on-silicon RF circuit developer; commercial sales not confirmed (nordamps.com)
+OMXSTO:SALT_B	SaltX Technology Holding AB Class B	unrelated business	Electrification technology for lime and cement kilns
+OMXSTO:SINT	SinterCast AB	unrelated business	Process control for cast-iron foundries
+OMXSTO:SOLT	SolTech Energy Sweden AB	solar	Solar installations
+OMXSTO:TAGM_B	TagMaster AB Class B	unrelated business	RFID and radar sensors for traffic and rail
+OMXSTO:TOBII	Tobii AB	unrelated business	Eye-tracking systems and software
+OSL:ELABS	Elliptic Laboratories ASA	unrelated business	AI virtual-sensor software
+OSL:ELK	Elkem ASA	unrelated business	Metallurgical silicon, ferrosilicon and carbon materials after selling Silicones; no named semiconductor business and silicon is not electronic grade (elkem.com)
+OSL:HAV	HAV Group ASA	unrelated business	Maritime technology and ship design
+OSL:LOKO	Lokotech Group AS	business not confirmed	Scrypt crypto-mining hardware developer; no confirmed chip shipments (lokotech.com)
+OSL:OSUN	Ocean Sun AS	solar	Floating solar technology
 OTC:ADNH	Advent Technologies Holdings, Inc. Class A	power, battery or cooling	HT-PEM fuel cells
 OTC:ALPP	Alpine 4 Holdings, Inc. Class A	unrelated business	Defunct diversified holding company
 OTC:AVSR	Avistar Communications Corporation	unrelated business	Dormant OTC shell
@@ -255,6 +398,22 @@ OTC:USLG	US Lighting Group, Inc.	unrelated business	Former LED lighting company;
 OTC:VIEWF	Viewtran Group, Inc.	unrelated business	Pink-sheet remnant (formerly Cogo, component distribution in China)
 OTC:VPER	Viper Networks, Inc.	unrelated business	Dormant OTC shell
 OTC:VPIM	Vitality Prime Inc	unrelated business	Dormant OTC shell
+PSE:ION	Ionics Inc.	unrelated business	EMS below the T10 revenue threshold
+RUS:NTZL	NITEL	unrelated business	Radar equipment maker
+SET:CPT	CPT Drives and Power Public Co.,Ltd	unrelated business	Motor drives and switchboards
+SET:DELTA	Delta Electronics (Thailand) Public Co. Ltd.	power, battery or cooling	Power supplies, cooling and EV charging products
+SGX:1R6	DX-Tech Holdings Limited	business not confirmed	Appears to be the former Avi-Tech (burn-in services) under a new name; current business not confirmed (site returned 503)
+SGX:41F	GSS Energy Limited	unrelated business	Precision engineering and oil and gas
+SGX:575	ASTI Holdings Limited	business not confirmed	Back-end equipment and tape-and-reel services group under an SGX delisting directive; current status not confirmed
+SGX:BDA	PNE Industries Ltd	unrelated business	Small contract manufacturer and trading group
+SGX:BN2	Valuetronics Holdings Limited	unrelated business	EMS below the T10 revenue threshold
+SGX:BXE	CDW Holding Limited	display	LCD backlight units and precision components
+SGX:C76	Creative Technology Ltd.	unrelated business	Consumer audio products
+SGX:M11	Manufacturing Integration Technology Ltd.	business not confirmed	Believed to have sold its semiconductor equipment unit (MIT Semiconductor); remaining business not confirmed
+SGX:WJ9	Advanced Systems Automation Limited	business not confirmed	Micro-cap precision-components contract manufacturer; current business not confirmed (site returned 503)
+SIX:CICN	Cicor Technologies	unrelated business	EMS with about US$0.8bn revenue, below the T10 threshold
+SIX:GAV	Carlo Gavazzi Holding AG	unrelated business	Automation components (sensors, relays, energy meters)
+SIX:UHR	Swatch Group Ltd. Bearer	unrelated business	Watchmaker; its chip unit EM Microelectronic is shown as an unlisted subsidiary instead
 SSE:600183	Shengyi Technology Co., Ltd. Class A	printed circuit boards	Copper-clad laminates mainly for PCBs; substrate-grade share not disclosed
 SSE:600207	Henan Ancai Hi-Tech Co., Ltd. Class A	solar	PV glass
 SSE:600363	Jiangxi Lianchuang Optoelectronic Science & Tech Co., Ltd. Class A	unrelated business	Lasers, superconducting magnets, backlights and controllers; LED chips minor
@@ -477,6 +636,11 @@ SZSE:301636	Zerun Co., Ltd. Class A	solar	PV junction boxes
 SZSE:301658	Shenzhen SOFARSOLAR Co., Ltd.	solar	PV inverters and energy storage
 SZSE:301697	Suzhou Betely Polymer Materials Co., Ltd. Class A	solar	PV conductive silver paste, silicone and coating materials
 SZSE:301716	Shenzhen HFC Co., Ltd. Class A	power, battery or cooling	Thermal interface and EMI materials
+TASE:PCBT	PCB Technologies Ltd.	printed circuit boards	Printed circuit boards and assembly, mainly defence and aerospace
+TASE:PRTC	Priortech Limited	unrelated business	Holding company whose main asset is a stake in Camtek (in the North America roster)
+TASE:SOLA	Sola Renewable Energies Ltd.	solar	Solar developer
+TASE:TLSY	Telsys Ltd.	distributor	Electronic component distribution; owner of module maker Variscite
+TASE:TOFD	Tomer Food Combination Ltd	business not confirmed	Could not confirm the business; name suggests food sector
 TPEX:1343	Sun Rise E&T Corp.	unrelated business	HDPE pipes
 TPEX:3071	ADDA Corp.	power, battery or cooling	
 TPEX:3078	Channel Well Technology Co., Ltd.	power, battery or cooling	
@@ -618,11 +782,11 @@ TSE:7713	Sigma Koki Co., Ltd.	unrelated business	Optical components and laser sy
 TSE:7794	EDP Corporation	unrelated business	Mainly seed crystals for lab-grown diamond jewellery; semiconductor substrates are still research-grade
 TSE:8150	Sanshin Electronics Co., Ltd.	distributor	Semiconductor distributor
 TSE:8154	Kaga Electronics Co., Ltd.	distributor	Electronics trading company with an EMS arm
-TSX:CHE.UN	Chemtrade Logistics Income Fund	unrelated business	Ultrapure sulphuric acid for fabs is a product line inside a diversified chemicals fund, not a named division
+TSX:CHE.UN	Chemtrade Logistics Income Fund	unrelated business	UltraPure sulphuric acid is one product line of a diversified chemicals fund, not a named division
 TSX:ET	Evertz Technologies Limited	unrelated business	Broadcast video equipment
 TSX:MDA	MDA Space Ltd	unrelated business	Satellites and space robotics
-TSX:NEO	Neo Performance Materials, Inc.	unrelated business	Rare-earth magnets and chemicals; gallium and indium recycling is not a material chip-chain business
-TSXV:AUTO	Agereh Technologies Inc.	unrelated business	Transport analytics; not a chip company
+TSX:NEO	Neo Performance Materials, Inc.	unrelated business	Rare-earth magnets, chemicals and rare metals; no distinct chip-chain division confirmed
+TSXV:AUTO	Agereh Technologies Inc.	unrelated business	Small transport-technology company; not a chip maker
 TSXV:CBLU	Clear Blue Technologies International, Inc.	solar	Off-grid solar power systems
 TSXV:QNC	Quantum eMotion Corp.	unrelated business	Quantum random-number cybersecurity products; QRNG chips listed as coming soon (quantumemotion.com)
 TSXV:SPRQ	SPARQ Systems Inc	solar	Solar microinverters
@@ -698,3 +862,8 @@ TWSE:8104	RiTdisplay Corp	display
 TWSE:8105	Giantplus Technology Co., Ltd.	display	
 TWSE:8112	Supreme Electronics Co., Ltd.	distributor	
 TWSE:8249	Creative Sensor Inc.	modules without own chips	
+UPCOM:TIE	Telecommunications Industry Electronics JSC	unrelated business	Electronics trading and assembly (Vietnam)
+UPCOM:VBH	Viettronics Binh Hoa JSC	unrelated business	Consumer electronics assembly
+XETR:F3C	SFC Energy AG	power, battery or cooling	Fuel cells and power supplies
+XETR:SIE	Siemens AG	on the roster through another listing	Listed parent of Siemens EDA, already on the dashboard as an unlisted entry
+XETR:UMD	UMT United Mobility Technology AG	unrelated business	Mobile payment and fintech holding
