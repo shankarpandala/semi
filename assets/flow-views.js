@@ -205,7 +205,8 @@
     // counterparties into their tier groups so a whole tier stays readable.
     // With accounts (the default), outside customers and the company's costs
     // and profit appear as nodes, so each member's in and out equal its revenue.
-    function focus(list, members, {maxPerSide = 18, outer = 'company', accounts = true} = {}) {
+    // maxMembers caps the members drawn in a long group: the smallest fold into one node.
+    function focus(list, members, {maxPerSide = 18, outer = 'company', accounts = true, maxMembers = Infinity} = {}) {
       const memberSet = new Set(members);
       const inbound = list.filter(flow => memberSet.has(flow.to) && !memberSet.has(flow.from));
       const outbound = list.filter(flow => memberSet.has(flow.from) && !memberSet.has(flow.to));
@@ -222,6 +223,8 @@
           if (item.inTotal > EPS || item.outTotal > EPS) middle.set(name, Math.max(middle.get(name) || 0, item.inTotal));
         }
       }
+      const keptMembers = keep(middle, maxMembers);
+      const mid = name => keptMembers.has(name) ? 'M:' + name : 'M:*';
       const left = [];
       const right = [];
       const links = new Map();
@@ -235,11 +238,11 @@
         right.push(...groups.filter(group => rightGroups.has(group)).map(group => sideGroup('R', group)));
         for (const flow of inbound) {
           const source = 'L:' + flow.fromGroup.id;
-          add(links, source + '>M:' + flow.to, flow, () => ({source, target: 'M:' + flow.to}));
+          add(links, source + '>' + mid(flow.to), flow, () => ({source, target: mid(flow.to)}));
         }
         for (const flow of outbound) {
           const target = 'R:' + flow.toGroup.id;
-          add(links, 'M:' + flow.from + '>' + target, flow, () => ({source: 'M:' + flow.from, target}));
+          add(links, mid(flow.from) + '>' + target, flow, () => ({source: mid(flow.from), target}));
         }
       } else {
         const payers = totals(inbound, 'from');
@@ -250,11 +253,11 @@
         right.push(...sideNodes('R', payees, keepRight, 0, 'payees'));
         for (const flow of inbound) {
           const source = keepLeft.has(flow.from) ? 'L:' + flow.from : 'L:*';
-          add(links, source + '>M:' + flow.to, flow, () => ({source, target: 'M:' + flow.to}));
+          add(links, source + '>' + mid(flow.to), flow, () => ({source, target: mid(flow.to)}));
         }
         for (const flow of outbound) {
           const target = keepRight.has(flow.to) ? 'R:' + flow.to : 'R:*';
-          add(links, 'M:' + flow.from + '>' + target, flow, () => ({source: 'M:' + flow.from, target}));
+          add(links, mid(flow.from) + '>' + target, flow, () => ({source: mid(flow.from), target}));
         }
       }
 
@@ -266,8 +269,8 @@
           if (!(usd > EPS)) return;
           if (!map.has(key)) map.set(key, {id: 'X' + side + ':' + key, kind: 'outside', role, side, label});
           const id = map.get(key).id;
-          const linkKey = side === 'L' ? id + '>M:' + name : 'M:' + name + '>' + id;
-          const entry = links.get(linkKey) || {source: side === 'L' ? id : 'M:' + name, target: side === 'L' ? 'M:' + name : id, value: 0, flows: [], outside: role};
+          const linkKey = side === 'L' ? id + '>' + mid(name) : mid(name) + '>' + id;
+          const entry = links.get(linkKey) || {source: side === 'L' ? id : mid(name), target: side === 'L' ? mid(name) : id, value: 0, flows: [], outside: role};
           entry.value += usd;
           links.set(linkKey, entry);
         };
@@ -300,9 +303,15 @@
       }
 
       const midColumn = left.length ? 1 : 0;
+      const ordered = [...middle.keys()].sort(byGroupThenValue(middle));
+      const folded = ordered.filter(name => !keptMembers.has(name));
       const nodes = [
         ...left.map(node => ({...node, column: 0})),
-        ...[...middle.keys()].sort(byGroupThenValue(middle)).map(name => companyNode('M:' + name, name, midColumn)),
+        ...ordered.filter(name => keptMembers.has(name)).map(name => companyNode('M:' + name, name, midColumn)),
+        ...(folded.length ? [{
+          id: 'M:*', column: midColumn, kind: 'members', names: folded, group: groupOf.get(folded[0]),
+          label: folded.length + ' smaller companies',
+        }] : []),
         ...right.map(node => ({...node, column: midColumn + 1})),
       ];
       return {

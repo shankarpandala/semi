@@ -302,8 +302,8 @@
     <h2 id="methodTitle">How to read this</h2>
     <dl>
       <dt>Direction</dt><dd>Each band runs from the customer who pays to the supplier who is paid. Bands are gross payments: a dollar Microsoft pays Foxconn for an AI rack reappears in Foxconn's payment to NVIDIA, and again in NVIDIA's payment to TSMC. Column totals therefore overlap and should not be added together.</dd>
-      <dt>Scope</dt><dd>Every company's bands add up to its 2025 revenue. Coloured bands are payments between the 119 companies whose figures have been researched: chips, memory, wafers, tools, subsystems, materials, gases, IP, packaging, test and assembly. The <a href="./">companies page</a> lists many more companies in every tier; those are not drawn here until their figures are researched, so their sales and purchases still sit in the grey bands. Grey shows money from customers without a tracked flow (mostly companies outside the 119, such as consumers, enterprises, Meta, Dell and Chinese fabs, plus purchases by tracked companies too small or uncertain to draw) and where the rest of each company's revenue goes: other suppliers and production costs, people and R&amp;D, and operating profit. An operating loss appears as money drawn from reserves; when a profitable company’s tracked purchases exceed what the year’s costs absorbed (inventory, prepayments or equipment bought ahead of sales), the difference appears as purchases paid from cash. Where the split of a company’s remaining revenue between other suppliers, people and profit is still being researched, it is shown as one amount marked “breakdown pending”.</dd>
-      <dt>Partial scopes</dt><dd>Most of Amazon's, Alphabet's and Microsoft's revenue (retail, ads, software) and Apple's services revenue have little to do with chips. For these four, only the hardware part is counted: the hyperscalers' purchases of servers, networking and chips, and Apple's device sales ($307B) plus the $75B Foxconn pays Apple for components Apple buys and resells to it. Apple does not book those receipts as revenue, but its gross payment to Foxconn includes the parts, so both legs are shown. Most companies with large non-chip businesses, such as Linde, BASF, Canon or Kyocera, count only their chip-related segment. A few are shown whole because their other businesses trade with tracked companies: Samsung Electronics (phones and TVs), Samsung Electro-Mechanics (cameras and capacitors), Tata Electronics (iPhone assembly) and board makers such as Zhen Ding and AT&amp;S. The company view states each scope and the full revenue.</dd>
+      <dt>Scope</dt><dd>Every company's bands add up to its 2025 revenue. Coloured bands are payments between the <span id="methodCount">tracked</span> companies whose figures have been researched: chips, memory, wafers, tools, subsystems, materials, gases, IP, packaging, test and assembly. The <a href="./">companies page</a> lists many more companies in every tier; those are not drawn here until their figures are researched, so their sales and purchases still sit in the grey bands. Grey shows money from customers without a tracked flow (mostly companies whose figures have not been researched, such as consumers, enterprises, carmakers and Chinese fabs, plus purchases by tracked companies too small or uncertain to draw) and where the rest of each company's revenue goes: other suppliers and production costs, people and R&amp;D, and operating profit. An operating loss appears as money drawn from reserves; when a profitable company’s tracked purchases exceed what the year’s costs absorbed (inventory, prepayments or equipment bought ahead of sales), the difference appears as purchases paid from cash. Where the split of a company’s remaining revenue between other suppliers, people and profit is still being researched, it is shown as one amount marked “breakdown pending”.</dd>
+      <dt>Partial scopes</dt><dd>Most of the revenue of the hyperscalers (Amazon, Alphabet, Microsoft, Meta and Oracle) and Tesla, and Apple's services revenue, have little to do with chips. For these, only the hardware part is counted: the hyperscalers' purchases of servers, networking and chips, Tesla's AI training hardware, and Apple's device sales ($307B) plus the $75B Foxconn pays Apple for components Apple buys and resells to it. Apple does not book those receipts as revenue, but its gross payment to Foxconn includes the parts, so both legs are shown. Most companies with large non-chip businesses, such as Linde, BASF, Canon or Kyocera, count only their chip-related segment. A few are shown whole because their other businesses trade with tracked companies: Samsung Electronics (phones and TVs), Samsung Electro-Mechanics (cameras and capacitors), Tata Electronics (iPhone assembly) and board makers such as Zhen Ding and AT&amp;S. The company view states each scope and the full revenue.</dd>
       <dt>Market cap</dt><dd>Market value is fetched live when the page opens, as on the companies page, and shown in tooltips and tables. It is a valuation of future profits, not money that moves in a year, so it is never drawn as a band. It values the whole company, while the revenue shown is often only the chip-related part, so the two should not be read as a price-to-sales ratio.</dd>
       <dt>Period</dt><dd id="methodPeriod"></dd>
       <dt>Confidence</dt><dd><span class="conf-cell"><i class="conf-key disclosed"></i>Disclosed</span> — the payer or supplier reports the amount or share for this counterparty (named, or identified with near certainty). <span class="conf-cell"><i class="conf-key derived"></i>Derived</span> — calculated from reported figures plus a stated assumption. <span class="conf-cell"><i class="conf-key estimated"></i>Estimated</span> — analyst estimates or modelling from market shares; treat as an order of magnitude.</dd>
@@ -331,6 +331,8 @@
   const data = window.FlowsData;
   const model = window.FlowViews.createModel(data);
   const OUTSIDE = window.FlowViews.OUTSIDE;
+  // How many companies have researched figures; the wording below quotes it.
+  const TRACKED = model.groupOf.size;
   const SVGNS = 'http://www.w3.org/2000/svg';
   const OTHER_HEX = '#565E6C';
   // Neutral greys for money that is not a payment between two tracked companies.
@@ -339,7 +341,7 @@
     other:'#4E5562', pending:'#6B6683', people:'#959DAA', profit:'#D3D7DE',
   };
   const OUTSIDE_NOTE = {
-    customers:'Revenue that arrives without a tracked flow: mostly from customers outside the 119 tracked companies, plus purchases by tracked companies too small or too uncertain to draw.',
+    customers:`Revenue that arrives without a tracked flow: mostly from customers outside the ${TRACKED} tracked companies, plus purchases by tracked companies too small or too uncertain to draw.`,
     reserves:'An operating loss: costs above revenue, paid from cash reserves or borrowing.',
     ahead:'Tracked purchases above what the year’s costs absorbed (inventory, prepayments or equipment bought ahead of sales), paid from cash on hand.',
     internal:'Payments between companies inside this group.',
@@ -357,7 +359,7 @@
     ['people', 'People, R&D & overhead'], ['profit', 'Operating profit'],
   ];
   const legendRole = role => role === 'internal' || role === 'hidden' ? 'notDrawn' : role;
-  // Diversified companies count only their chip-related segment; Tier 10 counts hardware only.
+  // Diversified companies count only their chip-related segment; hardware buyers count hardware only.
   const partialScope = source => !!source && !source.buyer && !source.wholeBusiness && !/^(Total revenue|Whole company)/.test(source.scope || '');
   // What an unsplit amount holds: some companies' profit is known and drawn separately.
   function pendingWhat(names){
@@ -367,6 +369,8 @@
   }
   const CONF_LABEL = {disclosed:'Disclosed', derived:'Derived', estimated:'Estimated'};
   const TABLE_PAGE = 30;
+  // A tier view draws at most this many members; the smallest share one node and stay in the table.
+  const GROUP_MEMBER_CAP = 24;
 
   const $ = id => document.getElementById(id);
   const chart = $('chart');
@@ -480,7 +484,7 @@
     const view = state.view;
     if(view.kind === 'group'){
       const group = model.groupById.get(view.id);
-      return {view, list, group, graph:model.focus(list, group.companies, {outer:'group'})};
+      return {view, list, group, graph:model.focus(list, group.companies, {outer:'group', maxMembers:GROUP_MEMBER_CAP})};
     }
     if(view.kind === 'company'){
       return {view, list, group:model.groupOf.get(view.name), graph:model.focus(list, [view.name], {maxPerSide:20})};
@@ -569,11 +573,11 @@
       const drawn = graph.links.reduce((total, link) => total + link.value, 0);
       const notDrawn = sum(graph.flows) - drawn;
       const hidden = sum(model.flows) - sum(graph.flows);
-      sub.append(`The ${model.groupOf.size} companies with researched figures took in ${fmtUSD(allAccounts.revenue)} in 2025. Tier 10 counts hardware only. Most companies with large non-chip businesses count only their chip-related segment; a few are shown whole because their other businesses trade with tracked companies, such as Samsung Electronics, Samsung Electro-Mechanics, Tata Electronics (iPhone assembly) and board makers like Zhen Ding. `
+      sub.append(`The ${model.groupOf.size} companies with researched figures took in ${fmtUSD(allAccounts.revenue)} in 2025. Hyperscalers and Tesla count hardware purchases only. Most companies with large non-chip businesses count only their chip-related segment; a few are shown whole because their other businesses trade with tracked companies, such as Samsung Electronics, Samsung Electro-Mechanics, Tata Electronics (iPhone assembly) and board makers like Zhen Ding. `
         + `Coloured bands show ${fmtUSD(drawn)} of payments between tracked companies`
         + (notDrawn > 0.0005 ? `; another ${fmtUSD(notDrawn)} is listed below the chart` : '')
         + (hidden > 0.0005 ? `; ${fmtUSD(hidden)} is hidden by the confidence filter` : '')
-        + '. Grey stubs show money arriving from customers without a tracked flow (mostly companies outside the 119), and money leaving as other suppliers, people and profit. '
+        + `. Grey stubs show money arriving from customers without a tracked flow (mostly companies outside the ${TRACKED}), and money leaving as other suppliers, people and profit. `
         + 'Select a tier or a band to see the companies behind it.');
     } else if(view.kind === 'pair'){
       const from = model.groupById.get(view.from), to = model.groupById.get(view.to);
@@ -590,10 +594,13 @@
       crumb('All tiers', {kind:'overview'});
       crumb(groupLabel(group));
       title.append(swatch(group.hex), groupLabel(group));
-      const partial = group.companies.filter(name => partialScope(accounts[name])).length;
-      const scope = group.id === 't10-brands' ? '(hardware only)'
-        : partial === group.companies.length ? 'from chip-related business'
-        : partial ? `(counting only the chip-related part of ${partial} of its ${group.companies.length} members)` : '';
+      // Members counted in part: hardware buyers, and companies drawn for one segment only.
+      const buyers = group.companies.filter(name => accounts[name] && accounts[name].buyer).length;
+      const partial = buyers + group.companies.filter(name => partialScope(accounts[name])).length;
+      const part = buyers ? 'hardware' : 'chip-related';
+      const scope = !partial ? ''
+        : partial === group.companies.length ? (buyers ? '(hardware only)' : 'from chip-related business')
+        : `(counting only the ${part} part of ${partial} of its ${group.companies.length} members)`;
       let text = accountSentences(graph.account, {subject:'The group', group:true, scope, pendingPhrase:pendingWhat(group.companies)});
       if(graph.totals.internal > 0) text += ` ${fmtUSD(graph.totals.internal)} of the tracked payments run between members.`;
       sub.append(text + ' Select a company to follow its money.');
@@ -676,15 +683,17 @@
     const width = Math.max(available, overview ? 980 : 680);
     const columnCount = Math.max(...graph.nodes.map(n => n.column)) + 1;
     const perColumn = Array.from({length:columnCount}, (_, c) => graph.nodes.filter(n => n.column === c).length);
-    const top = 6, bottom = 10;
+    const top = 8, bottom = 10;
     // The overview keeps its left margin for outside-money stubs and puts every label right of its node.
     const marginLeft = overview ? 56 : 180;
     const marginRight = overview ? 150 : 200;
     const nodeWidth = overview ? 14 : 12;
     const innerWidth = width - marginLeft - marginRight;
-    const innerHeight = overview ? (available < 700 ? 580 : 660) : Math.min(1500, Math.max(400, Math.max(...perColumn) * 30));
+    // A tier view gives every member room for its name, however thin its bar.
+    const perNode = view.kind === 'group' ? 32 : 30;
+    const innerHeight = overview ? (available < 700 ? 580 : 660) : Math.min(1500, Math.max(400, Math.max(...perColumn) * perNode));
     const height = innerHeight + top + bottom;
-    const nodePadding = overview ? 20 : Math.max(6, Math.min(14, innerHeight / Math.max(...perColumn) * .3));
+    const nodePadding = overview ? 20 : Math.max(6, Math.min(14, innerHeight / Math.max(...perColumn) * (view.kind === 'group' ? .4 : .3)));
     const result = window.SankeyLayout.layout({
       nodes:graph.nodes, links:graph.links, width:innerWidth, height:innerHeight,
       nodeWidth, nodePadding, minNodeHeight:2, order:graph.order,
@@ -772,7 +781,7 @@
         () => [...node.sourceLinks, ...node.targetLinks], () => nodeTooltip(view, node, action), !!action);
       if(action) bindActivate(g, action);
     }
-    drawLabels(result, labelLayer, {labelsLeft:!overview, marginLeft, marginRight});
+    drawLabels(result, labelLayer, {labelsLeft:!overview, marginLeft, marginRight, edge:Math.min(top, bottom)});
 
     function bindHover(target, nodesOf, linksOf, content, focusable){
       const on = event => {
@@ -818,7 +827,8 @@
     return null;
   }
   const isGroup = node => node.kind === 'group' || node.kind === 'groupSide';
-  const nodeTitle = node => isGroup(node) ? groupLabel(node.group) : node.kind === 'other' || node.kind === 'outside' ? node.label : node.name;
+  const isFold = node => node.kind === 'other' || node.kind === 'members';
+  const nodeTitle = node => isGroup(node) ? groupLabel(node.group) : isFold(node) || node.kind === 'outside' ? node.label : node.name;
   const linkSummary = link => link.outside
     ? `${nodeTitle(link.source)} → ${nodeTitle(link.target)}: ${fmtUSD(link.value)} a year`
     : `${nodeTitle(link.source)} pays ${nodeTitle(link.target)} ${fmtUSD(link.value)} a year`;
@@ -835,7 +845,7 @@
     return parts.join(', ');
   };
 
-  function drawLabels(result, layer, {labelsLeft, marginLeft, marginRight}){
+  function drawLabels(result, layer, {labelsLeft, marginLeft, marginRight, edge = 0}){
     const lineH = 13;
     const columnX = result.columns.map(column => column[0]?.x0);
     const measurer = svgEl('text', {x:0, y:-1000});
@@ -862,8 +872,9 @@
       const sorted = [...column].sort((a, b) => a.y0 - b.y0);
       sorted.forEach((node, i) => {
         const prev = sorted[i-1], next = sorted[i+1];
-        const lo = prev ? (prev.y1 + node.y0) / 2 : Math.min(node.y0, Math.max(0, node.y0 - 20));
-        const hi = next ? (node.y1 + next.y0) / 2 : Math.max(node.y1, Math.min(result.height, node.y1 + 20));
+        // The first and last label of a column may use the chart's outer margin.
+        const lo = prev ? (prev.y1 + node.y0) / 2 : Math.min(node.y0, Math.max(-edge, node.y0 - 20));
+        const hi = next ? (node.y1 + next.y0) / 2 : Math.max(node.y1, Math.min(result.height + edge, node.y1 + 20));
         const lines = labelLines(node);
         const fit = Math.min(lines.length, Math.floor((hi - lo) / lineH));
         if(fit < 1) return;
@@ -900,7 +911,7 @@
       const value = fmtUSD(node.value, true);
       return [{cls:'lbl-tier', text:node.group.tierLabel.toUpperCase()}, {cls:'lbl-name', text:node.group.role}, {cls:'lbl-value', text:value}];
     }
-    const name = node.kind === 'other' || node.kind === 'outside' ? node.label : shortName(node.name);
+    const name = isFold(node) || node.kind === 'outside' ? node.label : shortName(node.name);
     // Shorter forms before an ellipsis: "Costs and profit, pending", then the label without its examples.
     const alts = node.kind === 'outside' ? [name.replace(/ \(breakdown pending\)$/, ', pending'), name.replace(/ \(.*$/, ''),
       ...(node.role === 'reserves' || node.role === 'ahead' ? [name.split(',')[0]] : [])].filter(alt => alt !== name) : [];
@@ -974,12 +985,12 @@
     if(action) content.push(el('div', {class:'tt-hint', text:'Select to see the company flows'}));
     return content;
   }
-  // Hyperscalers' 'other' money is hardware bought outside the 119, not cost of revenue.
+  // A buyer's 'other' money is hardware bought from untracked suppliers, not cost of revenue.
   const isBuyer = node => node && node.kind === 'company' && !!(accounts[node.name] && accounts[node.name].buyer);
-  const BUYER_OTHER = 'Hardware bought from suppliers that are not among the 119: networking, storage, optics and other servers.';
+  const BUYER_OTHER = `Hardware bought from suppliers that are not among the ${TRACKED}: networking, storage, optics and other servers.`;
   const outsideNote = (role, payers) => role !== 'other' || !payers.some(isBuyer) ? OUTSIDE_NOTE[role]
     : payers.every(isBuyer) ? BUYER_OTHER
-    : OUTSIDE_NOTE.other.replace(/\.$/, '') + '; for Amazon, Alphabet and Microsoft, hardware bought from suppliers that are not among the 119.';
+    : OUTSIDE_NOTE.other.replace(/\.$/, '') + `; for ${listJoin(payers.filter(isBuyer).map(node => shortName(node.name)))}, hardware bought from suppliers that are not among the ${TRACKED}.`;
   function topOutsideCustomers(names, limit){
     const byLabel = new Map();
     for(const name of names) for(const item of model.account(name).outside) byLabel.set(item.label, (byLabel.get(item.label) || 0) + item.usd);
@@ -1011,9 +1022,10 @@
       if(node.valueIn) content.push(el('div', {class:'tt-row'}, 'Money in', el('span', {class:'amt', text:fmtUSD(node.valueIn)})));
       if(node.valueOut) content.push(el('div', {class:'tt-row'}, 'Money out', el('span', {class:'amt', text:fmtUSD(node.valueOut)})));
     }
-    if(node.kind === 'other'){
+    if(isFold(node)){
       const names = node.names.slice(0, 8).map(shortName).join(', ') + (node.names.length > 8 ? '…' : '');
       content.push(el('div', {class:'tt-hint', text:names}));
+      if(node.kind === 'members') content.push(el('div', {class:'tt-hint', text:'Each is listed in the table below'}));
     } else if(node.kind === 'company'){
       const a = model.account(node.name);
       const source = accounts[node.name];
@@ -1132,7 +1144,7 @@
     const pendingNote = rows.some(r => pendingOf(r.a) > 0.0005) || pendingOf(total) > 0.0005
       ? ` † Includes ${what} not yet split${what === 'other costs' ? ' between suppliers and people' : ''}.` : '';
     $('accountsNote').textContent = (view.kind === 'overview'
-      ? 'Tier 10 counts hardware only. Most companies with large non-chip businesses count only their chip-related segment; a few are shown whole because their other businesses trade with tracked companies, such as Samsung Electronics, Samsung Electro-Mechanics, Tata Electronics (iPhone assembly) and board makers like Zhen Ding. Group totals include payments between companies in the same group. Market cap values the whole company.'
+      ? 'Hyperscalers and Tesla count hardware purchases only. Most companies with large non-chip businesses count only their chip-related segment; a few are shown whole because their other businesses trade with tracked companies, such as Samsung Electronics, Samsung Electro-Mechanics, Tata Electronics (iPhone assembly) and board makers like Zhen Ding. Group totals include payments between companies in the same group. Market cap values the whole company.'
       : 'Sorted by revenue. Select a company for its sources. Market cap values the whole company.') + pendingNote;
   }
 
@@ -1247,6 +1259,7 @@
   $('statTotal').textContent = fmtUSD(all.total);
   $('statCount').textContent = String(all.count);
   $('statCompanies').textContent = trackedNames.size + ' / ' + model.groupOf.size;
+  $('methodCount').textContent = String(TRACKED);
   $('methodPeriod').textContent = `${data.meta.period}, in ${data.meta.unit}. Other currencies are converted at fixed 2025 averages: ${data.meta.fx}. Compiled ${data.meta.compiled}.`;
 
   function sum(list){ return list.reduce((s, f) => s + f.usd, 0); }
