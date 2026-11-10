@@ -38,7 +38,10 @@ value where they are notable.
 `EXCHANGE:CODE` (`NASDAQ:NVDA`, `TSE:8035`, `KRX:000660`, `HKEX:981`). A few
 companies use a secondary line that was already on the dashboard, such as
 TSMC's US ADR. To add a company, add a line to its tier with `name`, `hq`,
-`ticker`, `seg` (one of the tier's segment ids) and `domain`.
+`ticker`, `seg` (one of the tier's segment ids) and `domain`. A company without
+a provider listing has no `ticker`; it carries a `status` and a `note` saying
+who owns it: `private` for private companies and unlisted subsidiaries,
+`uncovered` for a company listed on an exchange the provider does not carry.
 
 **Checking coverage.** `scripts/audit-roster.mjs` compares the roster with the
 provider: every symbol must resolve (a newly listed company without a market
