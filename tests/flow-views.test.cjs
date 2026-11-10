@@ -195,6 +195,31 @@ test('group focus with accounts shows payments inside the group on both sides', 
   assert.equal(sumLinks(view, l => l.source === 'XL:customers'), 2 + 3);
 });
 
+test('a long group folds its smallest members into one node without losing money', () => {
+  const tools = Array.from({length: 30}, (_, i) => 'Tool' + i);
+  const flows = tools.map((name, i) => flow('Fab1', name, 30 - i));
+  const accounts = Object.fromEntries(tools.map((name, i) => [name, {revenue: 2 * (30 - i), people: 1, profit: 1}]));
+  const model = createModel(withAccounts(flows, accounts));
+  const view = model.focus(model.flows, tools, {outer: 'group', maxMembers: 8});
+  const middle = view.nodes.filter(n => n.id.startsWith('M:'));
+  assert.equal(middle.length, 8);
+  // The largest members keep their own nodes, in order; the rest share the last one.
+  assert.deepEqual(middle.slice(0, 7).map(n => n.name), tools.slice(0, 7));
+  const rest = middle[7];
+  assert.deepEqual([rest.id, rest.kind, rest.label, rest.names.length], ['M:*', 'members', '23 smaller companies', 23]);
+  assert.equal(rest.group.id, 'tool');
+  const all = tools.map(model.account);
+  const sumOf = (items, key) => items.reduce((sum, item) => sum + item[key], 0);
+  assert.ok(close(sumLinks(view, l => l.target.startsWith('M:')), sumOf(all, 'inTotal')));
+  assert.ok(close(sumLinks(view, l => l.source.startsWith('M:')), sumOf(all, 'outTotal')));
+  assert.ok(close(sumLinks(view, l => l.target === 'M:*'), sumOf(all.slice(7), 'inTotal')));
+  assert.ok(close(sumLinks(view, l => l.source === 'M:*'), sumOf(all.slice(7), 'outTotal')));
+  assert.ok(close(view.account.revenue, sumOf(all, 'revenue')));
+  // Without a cap, or under it, every member keeps its own node.
+  assert.equal(model.focus(model.flows, tools, {outer: 'group'}).nodes.filter(n => n.id.startsWith('M:')).length, 30);
+  assert.equal(model.focus(model.flows, tools.slice(0, 8), {outer: 'group', maxMembers: 8}).nodes.filter(n => n.kind === 'members').length, 0);
+});
+
 test('overview stubs make each group\'s height its full account', () => {
   const model = createModel(withAccounts(
     [flow('Sys1', 'Chip1', 10), flow('Chip1', 'Fab1', 8), flow('Fab1', 'Fab2', 1)],
