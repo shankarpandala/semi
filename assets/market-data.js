@@ -9,11 +9,17 @@
 
   const ENDPOINT = 'https://scanner.tradingview.com';
   const COLUMNS = ['close', 'market_cap_basic', 'change', 'update_mode', 'currency', 'fundamental_currency_code'];
-  const FX_CURRENCIES = new Set(['JPY', 'TWD', 'KRW', 'CNY', 'HKD', 'EUR', 'CHF', 'INR', 'GBP', 'AUD', 'CAD']);
+  // Share-price currencies of the exchanges on the roster.
+  const FX_CURRENCIES = new Set([
+    'JPY', 'TWD', 'KRW', 'CNY', 'HKD', 'EUR', 'CHF', 'INR', 'GBP', 'AUD', 'CAD',
+    'SEK', 'NOK', 'DKK', 'PLN', 'MYR', 'SGD', 'THB', 'PHP', 'IDR', 'ILS', 'RUB', 'TRY', 'ZAR',
+  ]);
+  // Exchanges that quote in hundredths of the currency unit.
+  const MINOR_UNITS = {GBp: 'GBP', GBX: 'GBP', ILA: 'ILS', ZAC: 'ZAR'};
   const positive = value => typeof value === 'number' && Number.isFinite(value) && value > 0;
 
   function currencyUnit(value) {
-    if (value === 'GBp' || value === 'GBX') return {code: 'GBP', scale: 100};
+    if (Object.prototype.hasOwnProperty.call(MINOR_UNITS, value)) return {code: MINOR_UNITS[value], scale: 100};
     if (typeof value !== 'string' || !/^[A-Z]{3}$/.test(value)) return null;
     return {code: value, scale: 1};
   }

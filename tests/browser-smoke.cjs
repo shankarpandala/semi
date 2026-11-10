@@ -4,6 +4,15 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const {chromium} = require('playwright');
+const roster = require('./roster.cjs');
+
+// Counts come from the roster itself, formatted as the page formats them.
+const COMPANIES = roster.companies.length;
+const LISTED = roster.listed.length;
+const fmt = value => value.toLocaleString('en-US');
+const NEW_COMPANY = roster.companies.find(company => !company.flows && company.ticker);
+// Listed on an exchange the provider does not carry: counted as listed, never requested.
+const UNCOVERED = roster.companies.filter(company => company.status === 'uncovered');
 
 const baseURL = process.env.SEMI_BASE_URL || 'http://127.0.0.1:8000';
 const scannerURL = 'https://scanner.tradingview.com';
@@ -102,23 +111,29 @@ async function run(){
     await initialRequest;
 
     await check('Opening the portal requests all listings and shows loading without old valuations', async () => {
-      assert.equal(await page.locator('.card').count(), 119);
+      assert.equal(await page.locator('.card').count(), COMPANIES);
       assert.equal(await page.locator('.row').count(), 10);
       assert.equal(await page.locator('#tierChips .chip').count(), 10);
+      assert.equal(await page.locator('#statTiers').textContent(), '10');
+      assert.equal(await page.locator('#statCompanies').textContent(), fmt(COMPANIES));
+      assert.equal(await page.locator('#resultCount').textContent(), fmt(COMPANIES)+' companies');
+      assert.equal(await page.locator('#scopeCount').textContent(), fmt(COMPANIES));
+      assert.equal(await page.locator('#scopeListed').textContent(), fmt(LISTED + UNCOVERED.length));
       assert.equal(await page.locator('#statTotalCap').textContent(), 'Loading…');
-      assert.equal(await page.locator('#statPricedCount').textContent(), '0 / 101');
+      assert.equal(await page.locator('#statPricedCount').textContent(), '0 / '+fmt(LISTED));
       assert.equal(await page.locator('#statUpdated').textContent(), 'Loading…');
       assert.equal(await page.locator('#marketRefresh').isDisabled(), true);
       assert.ok(!(await page.locator('body').textContent()).includes('Jul 2026'));
       assert.ok(!(await page.locator('.rows').textContent()).includes('$'));
       assert.equal(scannerRequests.length, 1);
-      assert.equal(scannerRequests[0].body.symbols.tickers.length, 101);
-      assert.equal(new Set(scannerRequests[0].body.symbols.tickers).size, 101);
+      assert.equal(scannerRequests[0].body.symbols.tickers.length, LISTED);
+      assert.equal(new Set(scannerRequests[0].body.symbols.tickers).size, LISTED);
+      assert.deepEqual([...scannerRequests[0].body.symbols.tickers].sort(), roster.listed.map(company => company.ticker).sort());
       assert.deepEqual(scannerRequests[0].body.columns, ['close','market_cap_basic','change','update_mode','currency','fundamental_currency_code']);
     });
 
     await check('Completion recalculates totals and shares while preserving open drawer, search, focus, and hash', async () => {
-      const card = await findCompany('NVDA');
+      const card = await findCompany('NASDAQ:NVDA');
       await card.focus();
       await page.keyboard.press('Enter');
       await page.locator('#marketWidget iframe').waitFor();
@@ -127,48 +142,114 @@ async function run(){
       await releasePending(initialQuotes);
       await loaded();
       assert.equal(await page.locator('#statTotalCap').textContent(), '$350.0B');
-      assert.equal(await page.locator('#statPricedCount').textContent(), '3 / 101');
+      assert.equal(await page.locator('#statPricedCount').textContent(), '3 / '+fmt(LISTED));
       assert.match(await page.locator('#tier-8 .row-cap-line').textContent(), /\$150\.0B/);
       assert.match(await page.locator('#tier-8 .wt-pct').textContent(), /42\.9%/);
       assert.equal(await page.locator('#drawerCapBig').textContent(), '$100.0B');
       assert.match(await page.locator('#drawerCapSub').textContent(), /66\.7%/);
       assert.match(await page.locator('#drawerPrice').textContent(), /\$125\.00/);
       assert.match(await card.locator('.quote-price').textContent(), /\$125\.00 USD/);
-      assert.equal(await page.locator('#search').inputValue(), 'NVDA');
+      assert.equal(await page.locator('#search').inputValue(), 'NASDAQ:NVDA');
       assert.equal(await page.locator('.card:not(.hidden)').count(), 1);
       assert.equal(new URL(page.url()).hash, '#co=NVIDIA');
-      assert.equal(await page.evaluate(() => document.activeElement._co?.ticker), 'NVDA');
-      assert.equal(await page.locator('.card').count(), 119);
+      assert.equal(await page.evaluate(() => document.activeElement._co?.ticker), 'NASDAQ:NVDA');
+      assert.equal(await page.locator('.card').count(), COMPANIES);
       assert.equal(await page.locator('.row').count(), 10);
       assert.equal(await page.locator('#marketWidget iframe').count(), 1);
-      assert.match(await page.locator('#marketDataStatus').textContent(), /3 of 101/);
+      assert.ok((await page.locator('#marketDataStatus').textContent()).includes('3 of '+fmt(LISTED)+' listed'));
       assert.match(await page.locator('#statUpdated').getAttribute('title'), /retrieval time/);
       await page.keyboard.press('Escape');
     });
 
     await check('Search supports company, ticker, headquarters, domain, zero matches, and reset', async () => {
-      await findCompany('NVIDIA');
-      await findCompany('NVDA');
+      await findCompany('Hemlock Semiconductor');
+      await findCompany('NASDAQ:NVDA');
+      await findCompany('nasdaq:nvda');
       await page.locator('#search').fill('Taiwan');
-      const headquarters = await page.locator('.card:not(.hidden) .hq').allTextContents();
-      assert.ok(headquarters.length > 1 && headquarters.every(hq => hq === 'Taiwan'));
+      const matched = await page.locator('.card:not(.hidden)').evaluateAll(cards => cards.map(card => [card.dataset.name, card.dataset.hq, card.dataset.domain]));
+      const taiwanese = roster.companies.filter(company => company.hq === 'Taiwan').length;
+      assert.ok(matched.length >= taiwanese && taiwanese > 1);
+      assert.ok(matched.every(fields => fields.some(field => field.includes('taiwan'))));
+      assert.equal(await page.locator('#resultCount').textContent(), fmt(matched.length)+' matches');
       await findCompany('sub-3nm');
       assert.equal(await page.locator('.card:not(.hidden) .name').textContent(), 'TSMC');
       await page.locator('#search').fill('unmatched-company-123');
       assert.equal(await page.locator('#resultCount').textContent(), '0 matches');
       await page.locator('#search').fill('');
-      assert.equal(await page.locator('.card:not(.hidden)').count(), 119);
+      assert.equal(await page.locator('.card:not(.hidden)').count(), COMPANIES);
+    });
+
+    await check('Tiers are split into groups that total their members, collapse, and reopen for a search', async () => {
+      for(const tier of roster.tiers){
+        const used = tier.segments.filter(segment => tier.companies.some(company => company.seg === segment.id));
+        assert.equal(await page.locator('#tier-'+tier.id+' .seg').count(), used.length, tier.label);
+        assert.deepEqual(await page.locator('#tier-'+tier.id+' .seg-name').allTextContents(), used.map(segment => segment.label));
+      }
+      const compute = page.locator('#tier-8 .seg[data-seg="compute"]');
+      const members = roster.tiers[8].companies.filter(company => company.seg === 'compute').length;
+      assert.equal(await compute.locator('.card').count(), members);
+      assert.equal(await compute.locator('.seg-meta').textContent(), fmt(members)+' companies · $150.0B');
+      assert.equal(await compute.locator('.card .name').first().textContent(), 'NVIDIA');
+      await compute.locator('.seg-head').click();
+      assert.equal(await compute.locator('.seg-head').getAttribute('aria-expanded'), 'false');
+      assert.equal(await compute.locator('.strip').isVisible(), false);
+      const amd = await findCompany('NASDAQ:AMD');
+      assert.equal(await amd.isVisible(), true);
+      assert.equal(await compute.locator('.seg-meta').textContent(), '1 of '+fmt(members)+' · $150.0B');
+      assert.equal(await page.locator('.seg:visible').count(), 1);
+      await page.locator('#search').fill('');
+      assert.equal(await compute.locator('.strip').isVisible(), false);
+      await page.locator('#segToggle').click();
+      assert.equal(await page.locator('#segToggle').textContent(), 'Expand all groups');
+      assert.equal(await page.locator('.strip:visible').count(), 0);
+      assert.equal(await page.locator('.seg-head[aria-expanded="true"]').count(), 0);
+      await page.locator('#segToggle').click();
+      assert.equal(await page.locator('#segToggle').textContent(), 'Collapse all groups');
+      assert.equal(await page.locator('.strip:visible').count(), await page.locator('.seg').count());
+      assert.equal(await compute.locator('.strip').isVisible(), true);
+    });
+
+    await check('Only companies with researched figures link to the money-flows page', async () => {
+      await (await findCompany('NASDAQ:NVDA')).click();
+      assert.equal(await page.locator('#drawerSegment').textContent(), 'Processors, GPUs & AI accelerators');
+      assert.match(await page.locator('#drawerHq').textContent(), /United States · NASDAQ:NVDA$/);
+      assert.equal(await page.locator('#drawerFlows').isVisible(), true);
+      assert.equal(await page.locator('#drawerFlows').getAttribute('href'), 'flows.html#co=NVIDIA');
+      await page.keyboard.press('Escape');
+      assert.ok(NEW_COMPANY, 'the roster has companies beyond the flows page');
+      await (await findCompany(NEW_COMPANY.ticker)).click();
+      assert.equal(await page.locator('#drawerName').textContent(), NEW_COMPANY.name);
+      assert.equal(await page.locator('#drawerFlows').isVisible(), false);
+      assert.equal(await page.locator('#drawerCapBig').textContent(), 'Unavailable');
+      await page.keyboard.press('Escape');
+      await page.locator('#search').fill('');
+    });
+
+    await check('Companies on an exchange the provider does not cover are shown as listed without a value', async () => {
+      assert.ok(UNCOVERED.length > 0, 'the roster has uncovered listings');
+      const company = UNCOVERED[0];
+      const card = await findCompany(company.name);
+      assert.equal(await card.locator('.cap-value').textContent(), 'Listed');
+      assert.match(await card.locator('.cap-sub').textContent(), /not covered by the data provider/);
+      assert.equal(await card.locator('.quote-price').isVisible(), false);
+      await card.click();
+      assert.equal(await page.locator('#drawerCapBig').textContent(), 'No market data');
+      assert.equal(await page.locator('#drawerCapSub').textContent(), company.note);
+      assert.equal(await page.locator('#marketPanel').isVisible(), false);
+      assert.equal(await page.locator('#drawerPrice').isVisible(), false);
+      await page.keyboard.press('Escape');
+      await page.locator('#search').fill('');
     });
 
     await check('Native prices and market caps use fetched FX and their independent currencies', async () => {
       quotes = [quote('TSE:3436', 1500, 1.5e12, 'JPY'), quote('NYSE:TSM', 300, 30e12, 'USD', 'TWD')];
       await refresh();
       assert.equal(await page.locator('#statTotalCap').textContent(), '$1.01T');
-      assert.equal(await page.locator('#statPricedCount').textContent(), '2 / 101');
-      const sumco = await findCompany('3436.T');
+      assert.equal(await page.locator('#statPricedCount').textContent(), '2 / '+fmt(LISTED));
+      const sumco = await findCompany('TSE:3436');
       assert.equal(await sumco.locator('.cap-value').textContent(), '$10.0B');
       assert.match(await sumco.locator('.quote-price').textContent(), /\$10\.00 USD/);
-      const tsm = await findCompany('TSM');
+      const tsm = await findCompany('NYSE:TSM');
       assert.equal(await tsm.locator('.cap-value').textContent(), '$1.00T');
       assert.match(await tsm.locator('.quote-price').textContent(), /\$300\.00 USD/);
       const fxRequest = scannerRequests.find(request => request.url.endsWith('/forex/scan'));
@@ -181,12 +262,12 @@ async function run(){
       quotes = [...quotes, quote('NASDAQ:NVDA', 125, 100e9)];
       await refresh();
       assert.equal(await page.locator('#statTotalCap').textContent(), '$100.0B');
-      assert.equal(await page.locator('#statPricedCount').textContent(), '1 / 101');
+      assert.equal(await page.locator('#statPricedCount').textContent(), '1 / '+fmt(LISTED));
       assert.match(await page.locator('#marketDataStatus').textContent(), /share prices for 2/);
-      const sumco = await findCompany('3436.T');
+      const sumco = await findCompany('TSE:3436');
       assert.equal(await sumco.locator('.cap-value').textContent(), 'Unavailable');
       assert.equal(await sumco.locator('.quote-price').textContent(), 'Price unavailable');
-      const tsm = await findCompany('TSM');
+      const tsm = await findCompany('NYSE:TSM');
       assert.equal(await tsm.locator('.cap-value').textContent(), 'Unavailable');
       assert.match(await tsm.locator('.quote-price').textContent(), /\$300\.00 USD/);
       fxMode = 'success';
@@ -197,12 +278,12 @@ async function run(){
         mode = failure;
         await refresh();
         assert.equal(await page.locator('#statTotalCap').textContent(), 'Unavailable');
-        assert.equal(await page.locator('#statPricedCount').textContent(), '0 / 101');
+        assert.equal(await page.locator('#statPricedCount').textContent(), '0 / '+fmt(LISTED));
         assert.equal(await page.locator('#statUpdated').textContent(), '—');
         assert.ok(!(await page.locator('.rows').textContent()).includes('$'));
         assert.equal(await page.locator('.tier-weight').count(), 0);
         assert.match(await page.locator('#marketDataStatus').textContent(), /unavailable/i);
-        assert.equal(await page.locator('.card').count(), 119);
+        assert.equal(await page.locator('.card').count(), COMPANIES);
       });
     }
 
@@ -211,11 +292,11 @@ async function run(){
       quotes = [quote('NASDAQ:NVDA', 12, 10e9), quote('NASDAQ:AMD', 20, 20e9), quote('NYSE:TSM', 30, 30e9)];
       await refresh();
       assert.equal(await page.locator('#statTotalCap').textContent(), '$60.0B');
-      assert.equal(await page.locator('#statPricedCount').textContent(), '3 / 101');
+      assert.equal(await page.locator('#statPricedCount').textContent(), '3 / '+fmt(LISTED));
       assert.equal(await page.locator('#tier-8 .card .name').first().textContent(), 'AMD');
       assert.match(await page.locator('#tier-8 .row-cap-line').textContent(), /\$30\.0B/);
       assert.match(await page.locator('#tier-8 .wt-pct').textContent(), /50\.0%/);
-      await (await findCompany('NVDA')).click();
+      await (await findCompany('NASDAQ:NVDA')).click();
       assert.match(await page.locator('#drawerCapSub').textContent(), /33\.3%/);
       assert.match(await page.locator('#drawerPrice').textContent(), /\$12\.00/);
       await page.keyboard.press('Escape');
@@ -225,10 +306,10 @@ async function run(){
       quotes = [quote('NASDAQ:NVDA', 123, null)];
       await refresh();
       assert.equal(await page.locator('#statTotalCap').textContent(), 'Unavailable');
-      assert.equal(await page.locator('#statPricedCount').textContent(), '0 / 101');
+      assert.equal(await page.locator('#statPricedCount').textContent(), '0 / '+fmt(LISTED));
       assert.notEqual(await page.locator('#statUpdated').textContent(), '—');
       assert.equal(await page.locator('.tier-weight').count(), 0);
-      await (await findCompany('NVDA')).click();
+      await (await findCompany('NASDAQ:NVDA')).click();
       assert.equal(await page.locator('#drawerCapBig').textContent(), 'Unavailable');
       assert.match(await page.locator('#drawerPrice').textContent(), /\$123\.00/);
       await page.keyboard.press('Escape');
@@ -241,12 +322,12 @@ async function run(){
       await loaded();
       assert.equal(scannerRequests.filter(request => request.url.endsWith('/global/scan')).length, before+1);
       assert.equal(await page.locator('#statTotalCap').textContent(), '$350.0B');
-      assert.equal(await page.locator('.card').count(), 119);
+      assert.equal(await page.locator('.card').count(), COMPANIES);
     });
 
     await check('Private companies have no public quote panel and make no extra market request', async () => {
       const before = requests.filter(url => /tradingview/.test(url)).length;
-      await (await findCompany('Hemlock')).click();
+      await (await findCompany('Hemlock Semiconductor')).click();
       assert.equal(await page.locator('#drawerCapBig').textContent(), 'Private');
       assert.equal(await page.locator('#marketPanel').isVisible(), false);
       assert.equal(await page.locator('#drawerPrice').isVisible(), false);
@@ -257,7 +338,7 @@ async function run(){
     await check('A blocked optional widget preserves fetched data and can be retried independently', async () => {
       await context.unroute(loaderURL);
       await context.route(loaderURL, route => route.abort('blockedbyclient'));
-      await (await findCompany('NVDA')).click();
+      await (await findCompany('NASDAQ:NVDA')).click();
       await page.locator('#marketRetry:visible').waitFor();
       assert.equal(await page.locator('#drawerCapBig').textContent(), '$100.0B');
       assert.match(await page.locator('#drawerPrice').textContent(), /\$125\.00/);
@@ -278,10 +359,10 @@ async function run(){
         await route.fulfill({contentType:'text/javascript', body:fixtureLoader});
       });
       const firstRequest = page.waitForRequest(loaderURL);
-      await (await findCompany('NVDA')).click();
+      await (await findCompany('NASDAQ:NVDA')).click();
       await firstRequest;
       await page.keyboard.press('Escape');
-      await (await findCompany('TSM')).click();
+      await (await findCompany('NYSE:TSM')).click();
       await firstRoute.fulfill({contentType:'text/javascript', body:fixtureLoader}).catch(() => {});
       await page.frameLocator('#marketWidget iframe').getByText('Fixture listing NYSE:TSM').waitFor();
       assert.equal(await page.locator('#drawerName').textContent(), 'TSMC');
@@ -305,7 +386,7 @@ async function run(){
       await page.goto('about:blank');
       await page.goto(baseURL+'/#tier-5', {waitUntil:'domcontentloaded'});
       await page.locator('#tier-5.visible').waitFor();
-      assert.equal(await page.locator('.card').count(), 119);
+      assert.equal(await page.locator('.card').count(), COMPANIES);
     });
 
     await check('Market requests go directly to the provider with no credentials or JSON preflight', async () => {
@@ -346,12 +427,12 @@ async function run(){
       assert.equal(await page.locator('#statTotalCap').textContent(), '$20.0B');
       await releasePending([quote('NASDAQ:NVDA', 999, 999e9)]);
       assert.equal(await page.locator('#statTotalCap').textContent(), '$20.0B');
-      assert.equal(await page.locator('#statPricedCount').textContent(), '1 / 101');
+      assert.equal(await page.locator('#statPricedCount').textContent(), '1 / '+fmt(LISTED));
     });
 
     await check('Mobile cards and drawer fit without horizontal overflow or JavaScript errors', async () => {
       await page.setViewportSize({width:390, height:844});
-      await (await findCompany('NVDA')).click();
+      await (await findCompany('NASDAQ:NVDA')).click();
       await page.locator('#marketWidget iframe').waitFor();
       const sizes = await page.evaluate(() => ({
         body:[document.documentElement.scrollWidth, document.documentElement.clientWidth],
@@ -370,7 +451,7 @@ async function run(){
       await compatiblePage.waitForFunction(() => !document.getElementById('marketRefresh').disabled);
       assert.equal(await compatiblePage.evaluate(() => typeof Object.hasOwn), 'undefined');
       assert.equal(await compatiblePage.locator('#statTotalCap').textContent(), '$20.0B');
-      assert.equal(await compatiblePage.locator('#statPricedCount').textContent(), '1 / 101');
+      assert.equal(await compatiblePage.locator('#statPricedCount').textContent(), '1 / '+fmt(LISTED));
       assert.notEqual(await compatiblePage.locator('#statUpdated').textContent(), '—');
       assert.deepEqual(compatibilityErrors, []);
       await compatiblePage.close();
@@ -396,7 +477,7 @@ async function run(){
       assert.equal(await copiedPage.locator('#marketPortalLink').getAttribute('href'), 'https://www.pandala.in/semi/');
       assert.equal(await copiedPage.locator('#statTotalCap').textContent(), 'Unavailable');
       assert.equal(await copiedPage.locator('#statUpdated').textContent(), '—');
-      assert.equal(await copiedPage.locator('.card').count(), 119);
+      assert.equal(await copiedPage.locator('.card').count(), COMPANIES);
       assert.ok(!copyRequests.some(url => url.startsWith(scannerURL+'/')));
       assert.deepEqual(copyErrors, []);
       await copiedPage.close();
